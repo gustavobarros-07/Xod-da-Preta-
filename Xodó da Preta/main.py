@@ -1,6 +1,6 @@
 from flask import Flask, render_template
 from pathlib import Path
-
+# é minha agora
 BASE_DIR = Path(__file__).resolve().parent
 
 app = Flask(
