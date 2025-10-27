@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if produto %}Editar{% else %}Adicionar{% endif %} Produto - Admin | Xodó da Preta</title>
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --cor-preta: #000000;
+            --cor-dourada: #D4AF37;
+            --cor-bege: #F5F5F5;
+            --cor-cinza-escuro: #333333;
+        }
+        
+        body {
+            background-color: var(--cor-bege);
+        }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 250px;
+            background-color: var(--cor-preta);
+            padding: 20px 0;
+            z-index: 1000;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid var(--cor-dourada);
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-header h4 {
+            color: var(--cor-dourada);
+            margin: 0;
+            font-weight: 700;
+        }
+        
+        .sidebar-header small {
+            color: var(--cor-bege);
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li a {
+            display: block;
+            padding: 15px 25px;
+            color: var(--cor-bege);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-menu li a:hover,
+        .sidebar-menu li a.active {
+            background-color: var(--cor-dourada);
+            color: var(--cor-preta);
+            padding-left: 35px;
+        }
+        
+        .sidebar-menu li a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+        }
+        
+        .admin-header {
+            background-color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .form-container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--cor-dourada);
+            box-shadow: 0 0 0 0.2rem rgba(212, 175, 55, 0.25);
+        }
+        
+        .btn-save {
+            background-color: var(--cor-dourada);
+            color: var(--cor-preta);
+            font-weight: 600;
+            padding: 12px 30px;
+        }
+        
+        .btn-save:hover {
+            background-color: #C48835;
+            color: var(--cor-preta);
+        }
+        
+        .image-preview {
+            max-width: 300px;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        .image-preview img {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+        
+        .size-checkbox {
+            display: inline-block;
+            margin-right: 15px;
+        }
+        
+        .size-checkbox input[type="checkbox"] {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h4>Xodó da Preta</h4>
+            <small>Admin Panel</small>
+        </div>
+        
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{{ url_for('admin.dashboard') }}">
+                    <i class="fas fa-th-large"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.produtos') }}" class="active">
+                    <i class="fas fa-box"></i> Produtos
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.configuracoes') }}">
+                    <i class="fas fa-cog"></i> Configurações
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('home') }}" target="_blank">
+                    <i class="fas fa-external-link-alt"></i> Ver Site
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.logout') }}">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Conteúdo Principal -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="admin-header">
+            <h1>
+                <i class="fas fa-{% if produto %}edit{% else %}plus{% endif %}"></i>
+                {% if produto %}Editar Produto{% else %}Adicionar Novo Produto{% endif %}
+            </h1>
+            <nav>
+                <a href="{{ url_for('admin.produtos') }}" class="text-muted">
+                    <i class="fas fa-arrow-left"></i> Voltar para produtos
+                </a>
+            </nav>
+        </div>
+        
+        <!-- Formulário -->
+        <div class="form-container">
+            <form method="POST" enctype="multipart/form-data">
+                <div class="row">
+                    <!-- Coluna Esquerda -->
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <label for="nome" class="form-label">
+                                <i class="fas fa-tag"></i> Nome do Produto *
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="nome" 
+                                   name="nome" 
+                                   value="{{ produto.nome if produto else '' }}"
+                                   required 
+                                   placeholder="Ex: Brinco de Pérola">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="descricao" class="form-label">
+                                <i class="fas fa-align-left"></i> Descrição
+                            </label>
+                            <textarea class="form-control" 
+                                      id="descricao" 
+                                      name="descricao" 
+                                      rows="4"
+                                      placeholder="Descreva o produto...">{{ produto.descricao if produto else '' }}</textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="preco" class="form-label">
+                                    <i class="fas fa-dollar-sign"></i> Preço (R$) *
+                                </label>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="preco" 
+                                       name="preco" 
+                                       step="0.01" 
+                                       min="0"
+                                       value="{{ produto.preco if produto else '' }}"
+                                       required
+                                       placeholder="0.00">
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="categoria" class="form-label">
+                                    <i class="fas fa-list"></i> Categoria *
+                                </label>
+                                <select class="form-select" id="categoria" name="categoria" required>
+                                    <option value="">Selecione...</option>
+                                    {% for cat in categorias %}
+                                    <option value="{{ cat }}" {% if produto and produto.categoria == cat %}selected{% endif %}>
+                                        {{ cat }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-ruler"></i> Tamanhos Disponíveis
+                            </label>
+                            <div>
+                                {% for tamanho in tamanhos_disponiveis %}
+                                <div class="size-checkbox">
+                                    <input type="checkbox" 
+                                           id="tamanho_{{ tamanho }}" 
+                                           name="tamanhos" 
+                                           value="{{ tamanho }}"
+                                           {% if produto and tamanho in tamanhos_produto %}checked{% endif %}>
+                                    <label for="tamanho_{{ tamanho }}">{{ tamanho }}</label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="ordem" class="form-label">
+                                    <i class="fas fa-sort"></i> Ordem de Exibição
+                                </label>
+                                <input type="number" 
+                                       class="form-control" 
+                                       id="ordem" 
+                                       name="ordem" 
+                                       value="{{ produto.ordem if produto else 0 }}"
+                                       min="0">
+                                <small class="text-muted">Menor número aparece primeiro</small>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-toggle-on"></i> Status
+                                </label>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" 
+                                           type="checkbox" 
+                                           id="ativo" 
+                                           name="ativo"
+                                           {% if not produto or produto.ativo %}checked{% endif %}>
+                                    <label class="form-check-label" for="ativo">
+                                        Produto Ativo (visível no site)
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Coluna Direita - Upload de Imagem -->
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="imagem" class="form-label">
+                                <i class="fas fa-image"></i> Imagem do Produto
+                            </label>
+                            <input type="file" 
+                                   class="form-control" 
+                                   id="imagem" 
+                                   name="imagem" 
+                                   accept="image/*"
+                                   onchange="previewImage(event)">
+                            <small class="text-muted">Formatos: JPG, PNG, GIF, WEBP (máx 16MB)</small>
+                        </div>
+                        
+                        <div class="image-preview" id="imagePreview">
+                            {% if produto and produto.imagem %}
+                                <img src="{{ url_for('static', filename='uploads/' + produto.imagem) }}" alt="{{ produto.nome }}">
+                                <p class="mt-2 mb-0"><small>Imagem atual</small></p>
+                            {% else %}
+                                <i class="fas fa-image fa-3x text-muted"></i>
+                                <p class="mt-2 mb-0 text-muted">Nenhuma imagem</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Botões -->
+                <div class="mt-4 d-flex justify-content-between">
+                    <a href="{{ url_for('admin.produtos') }}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-save">
+                        <i class="fas fa-save"></i> Salvar Produto
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        function previewImage(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('imagePreview');
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview">
+                        <p class="mt-2 mb-0"><small>Nova imagem</small></p>
+                    `;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+</body>
+</html>

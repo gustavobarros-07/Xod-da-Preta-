@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações - Admin | Xodó da Preta</title>
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --cor-preta: #000000;
+            --cor-dourada: #D4AF37;
+            --cor-bege: #F5F5F5;
+            --cor-cinza-escuro: #333333;
+        }
+        
+        body {
+            background-color: var(--cor-bege);
+        }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 250px;
+            background-color: var(--cor-preta);
+            padding: 20px 0;
+            z-index: 1000;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid var(--cor-dourada);
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-header h4 {
+            color: var(--cor-dourada);
+            margin: 0;
+            font-weight: 700;
+        }
+        
+        .sidebar-header small {
+            color: var(--cor-bege);
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li a {
+            display: block;
+            padding: 15px 25px;
+            color: var(--cor-bege);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-menu li a:hover,
+        .sidebar-menu li a.active {
+            background-color: var(--cor-dourada);
+            color: var(--cor-preta);
+            padding-left: 35px;
+        }
+        
+        .sidebar-menu li a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+        }
+        
+        .admin-header {
+            background-color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .config-container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-control:focus {
+            border-color: var(--cor-dourada);
+            box-shadow: 0 0 0 0.2rem rgba(212, 175, 55, 0.25);
+        }
+        
+        .btn-save {
+            background-color: var(--cor-dourada);
+            color: var(--cor-preta);
+            font-weight: 600;
+            padding: 12px 30px;
+        }
+        
+        .btn-save:hover {
+            background-color: #C48835;
+            color: var(--cor-preta);
+        }
+        
+        .info-box {
+            background-color: #fff3cd;
+            border-left: 4px solid var(--cor-dourada);
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h4>Xodó da Preta</h4>
+            <small>Admin Panel</small>
+        </div>
+        
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{{ url_for('admin.dashboard') }}">
+                    <i class="fas fa-th-large"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.produtos') }}">
+                    <i class="fas fa-box"></i> Produtos
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.configuracoes') }}" class="active">
+                    <i class="fas fa-cog"></i> Configurações
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('home') }}" target="_blank">
+                    <i class="fas fa-external-link-alt"></i> Ver Site
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.logout') }}">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Conteúdo Principal -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="admin-header">
+            <h1><i class="fas fa-cog"></i> Configurações da Loja</h1>
+            <p class="text-muted mb-0">Gerencie as informações da sua loja</p>
+        </div>
+        
+        <!-- Mensagens Flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <!-- Formulário de Configurações -->
+        <div class="config-container">
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                <strong>Informação:</strong> Estas configurações aparecem no site (rodapé, contato, etc).
+            </div>
+            
+            <form method="POST">
+                <div class="mb-4">
+                    <label for="loja_nome" class="form-label">
+                        <i class="fas fa-store"></i> Nome da Loja
+                    </label>
+                    <input type="text" 
+                           class="form-control" 
+                           id="loja_nome" 
+                           name="loja_nome" 
+                           value="{{ configs.loja_nome }}"
+                           placeholder="Ex: Xodó da Preta">
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label for="loja_telefone" class="form-label">
+                            <i class="fab fa-whatsapp"></i> Telefone / WhatsApp
+                        </label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="loja_telefone" 
+                               name="loja_telefone" 
+                               value="{{ configs.loja_telefone }}"
+                               placeholder="Ex: 55 11 99999-9999">
+                        <small class="text-muted">Formato: Código do país + DDD + Número</small>
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <label for="loja_email" class="form-label">
+                            <i class="fas fa-envelope"></i> Email de Contato
+                        </label>
+                        <input type="email" 
+                               class="form-control" 
+                               id="loja_email" 
+                               name="loja_email" 
+                               value="{{ configs.loja_email }}"
+                               placeholder="contato@exemplo.com">
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <label for="loja_instagram" class="form-label">
+                            <i class="fab fa-instagram"></i> Instagram
+                        </label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="loja_instagram" 
+                               name="loja_instagram" 
+                               value="{{ configs.loja_instagram }}"
+                               placeholder="@sualojaaqui">
+                    </div>
+                    
+                    <div class="col-md-6 mb-4">
+                        <label for="loja_endereco" class="form-label">
+                            <i class="fas fa-map-marker-alt"></i> Endereço / Cidade
+                        </label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="loja_endereco" 
+                               name="loja_endereco" 
+                               value="{{ configs.loja_endereco }}"
+                               placeholder="São Paulo, SP">
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-end mt-4">
+                    <button type="submit" class="btn btn-save">
+                        <i class="fas fa-save"></i> Salvar Configurações
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Preview -->
+        <div class="config-container mt-4">
+            <h4 class="mb-3"><i class="fas fa-eye"></i> Pré-visualização</h4>
+            <p class="text-muted">Estas informações aparecerão assim no site:</p>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title" style="color: var(--cor-dourada);">{{ configs.loja_nome }}</h5>
+                            <p class="card-text mb-2">
+                                <i class="fas fa-phone"></i> {{ configs.loja_telefone }}
+                            </p>
+                            <p class="card-text mb-2">
+                                <i class="fas fa-envelope"></i> {{ configs.loja_email }}
+                            </p>
+                            <p class="card-text mb-2">
+                                <i class="fab fa-instagram"></i> {{ configs.loja_instagram }}
+                            </p>
+                            <p class="card-text mb-0">
+                                <i class="fas fa-map-marker-alt"></i> {{ configs.loja_endereco }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

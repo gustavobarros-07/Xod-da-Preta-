@@ -2,6 +2,7 @@ from flask import Flask, render_template
 from pathlib import Path
 from config import Config
 from database import db, init_db
+from admin_routes import admin_bp
 
 # Diretório base
 BASE_DIR = Path(__file__).resolve().parent
@@ -23,6 +24,9 @@ db.init_app(app)
 # Criar tabelas se não existirem
 with app.app_context():
     db.create_all()
+
+# Registrar Blueprint do Admin
+app.register_blueprint(admin_bp)
 
 # ========================================
 # ROTAS DO SITE
