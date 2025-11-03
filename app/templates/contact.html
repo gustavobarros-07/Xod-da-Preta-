@@ -1,63 +1,79 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 
 <head>
-    <title>Xodó da Preta  - Contato</title>
+    <title>Xodó da Preta - Contato</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-   <!-- Ícones -->
- <link rel="apple-touch-icon" href="{{ url_for('static', filename='zay/assets/img/apple-icon.png') }}">
- <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='zay/assets/img/favicon.ico') }}">
+    <!-- Ícones -->
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='zay/assets/img/apple-icon.png') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='zay/assets/img/favicon.ico') }}">
 
- <!-- CSS principal -->
- <link rel="stylesheet" href="{{ url_for('static', filename='zay/assets/css/bootstrap.min.css') }}">
- <link rel="stylesheet" href="{{ url_for('static', filename='zay/assets/css/templatemo.css') }}">
- <link rel="stylesheet" href="{{ url_for('static', filename='zay/assets/css/custom.css') }}">
- <link rel="stylesheet" href="{{ url_for('static', filename='zay/assets/css/fontawesome.min.css') }}">
- <!-- Custom CSS -->
- <link rel="stylesheet" href="{{ url_for('static', filename='zay/assets/css/custom.css') }}">
+    <!-- CSS principal -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='zay/assets/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='zay/assets/css/templatemo.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='zay/assets/css/custom.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='zay/assets/css/fontawesome.min.css') }}">
 
- <!-- Google Fonts -->
- <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;200;300;400;500;700;900&display=swap">
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;200;300;400;500;700;900&display=swap">
 
- <!-- Font Awesome -->
- <link rel="stylesheet" href="{{ url_for('static', filename='zay/assets/css/fontawesome.min.css') }}">
-
- <!--
-    
- TemplateMo 559 Zay Shop
-
- https://templatemo.com/tm-559-zay-shop
-
- -->
+    <style>
+        .whatsapp-btn {
+            background-color: #25D366;
+            border-color: #25D366;
+            color: white;
+            font-weight: 600;
+            padding: 15px 40px;
+            font-size: 18px;
+            transition: all 0.3s;
+        }
+        
+        .whatsapp-btn:hover {
+            background-color: #128C7E;
+            border-color: #128C7E;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4);
+        }
+        
+        .whatsapp-btn i {
+            margin-right: 10px;
+        }
+        
+        .contact-info-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .contact-info-card h5 {
+            color: #D4AF37;
+            margin-bottom: 20px;
+        }
+        
+        .contact-info-card p {
+            margin-bottom: 10px;
+        }
+        
+        .contact-info-card i {
+            color: #D4AF37;
+            margin-right: 10px;
+            width: 20px;
+        }
+    </style>
 </head>
 
 <body>
     <!-- Start Top Nav -->
-    <nav class="navbar navbar-expand-lg bg-dark navbar-light d-none d-lg-block" id="templatemo_nav_top">
-        <div class="container text-light">
-            <div class="w-100 d-flex justify-content-between">
-                <div>
-                    <i class="fa fa-envelope mx-2"></i>
-                    <a class="navbar-sm-brand text-light text-decoration-none" href="mailto:info@company.com"></a>
-                    <i class="fa fa-phone mx-2"></i>
-                    <a class="navbar-sm-brand text-light text-decoration-none" href="tel:010-020-0340">+55 11 954375056</a>
-                </div>
-                <div>
-                    <a class="text-light" href="https://fb.com/templatemo" target="_blank" rel="sponsored"><i class="fab fa-facebook-f fa-sm fa-fw me-2"></i></a>
-                    <a class="text-light" href="https://www.instagram.com/xododapreta?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank"><i class="fab fa-instagram fa-sm fa-fw me-2"></i></a>
-                </div>
-            </div>
-        </div>
-    </nav>
-    <!-- Close Top Nav -->
-
+    {% include 'partials/topbar.html' %}
 
     <!-- Header -->
     <nav class="navbar navbar-expand-lg navbar-light shadow">
         <div class="container d-flex justify-content-between align-items-center">
-
             <a class="navbar-brand text-success logo h1 align-self-center" href="{{ url_for('home') }}">
                 Xodó da Preta
             </a>
@@ -66,7 +82,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <div class="align-self-center collapse navbar-collapse flex-fill  d-lg-flex justify-content-lg-between" id="templatemo_main_nav">
+            <div class="align-self-center collapse navbar-collapse flex-fill d-lg-flex justify-content-lg-between" id="templatemo_main_nav">
                 <div class="flex-fill">
                     <ul class="nav navbar-nav d-flex justify-content-between mx-lg-auto">
                         <li class="nav-item">
@@ -84,24 +100,15 @@
                     </ul>
                 </div>
                 <div class="navbar align-self-center d-flex">
-                    <div class="d-lg-none flex-sm-fill mt-3 mb-4 col-7 col-sm-auto pr-3">
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="inputMobileSearch" placeholder="Search ...">
-                            <div class="input-group-text">
-                                <i class="fa fa-fw fa-search"></i>
-                            </div>
-                        </div>
-                    </div>
                     <a class="nav-icon d-none d-lg-inline" href="#" data-bs-toggle="modal" data-bs-target="#templatemo_search">
                         <i class="fa fa-fw fa-search text-dark mr-2"></i>
                     </a>
                     <a class="nav-icon position-relative text-decoration-none" href="#">
                         <i class="fa fa-fw fa-cart-arrow-down text-dark mr-1"></i>
-                        <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">!</span>
+                        <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">0</span>
                     </a>
                 </div>
             </div>
-
         </div>
     </nav>
     <!-- Close Header -->
@@ -123,146 +130,154 @@
         </div>
     </div>
 
-
     <!-- Start Content Page -->
     <div class="container-fluid bg-light py-5">
         <div class="col-md-6 m-auto text-center">
-            <h1 class="h1">Nos contate</h1>
+            <h1 class="h1">Entre em Contato</h1>
             <p>
-                
+                Ficou com alguma dúvida? Envie uma mensagem pelo WhatsApp!
             </p>
         </div>
     </div>
 
-    <!-- Start Map -->
-    <div id="mapid" style="width: 100%; height: 300px;"></div>
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
-    <script>
-        var mymap = L.map('mapid').setView([-23.013104, -43.394365, 13], 13);
-
-        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-            maxZoom: 18,
-            attribution: 'Zay Telmplte | Template Design by <a href="https://templatemo.com/">Templatemo</a> | Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-                '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-                'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-            id: 'mapbox/streets-v11',
-            tileSize: 512,
-            zoomOffset: -1
-        }).addTo(mymap);
-
-        L.marker([-23.013104, -43.394365, 13]).addTo(mymap)
-            .bindPopup("<b>Zay</b> eCommerce Template<br />Location.").openPopup();
-
-        mymap.scrollWheelZoom.disable();
-        mymap.touchZoom.disable();
-    </script>
-    <!-- Ena Map -->
-
     <!-- Start Contact -->
     <div class="container py-5">
         <div class="row py-5">
-            <form class="col-md-9 m-auto" method="post" role="form">
-                <div class="row">
-                    <div class="form-group col-md-6 mb-3">
-                        <label for="inputname">Nome</label>
-                        <input type="text" class="form-control mt-1" id="name" name="name" placeholder="Nome">
-                    </div>
-                    <div class="form-group col-md-6 mb-3">
-                        <label for="inputemail">E-mail</label>
-                        <input type="email" class="form-control mt-1" id="email" name="email" placeholder="E-mail">
-                    </div>
+            <!-- Informações de Contato -->
+            <div class="col-md-4 mb-4">
+                <div class="contact-info-card">
+                    <h5><i class="fas fa-info-circle"></i> Informações</h5>
+                    
+                    <p>
+                        <i class="fas fa-phone"></i>
+                        <strong>Telefone/WhatsApp:</strong><br>
+                        <a href="https://wa.me/5511954375056" target="_blank" class="text-decoration-none">
+                            +55 11 95437-5056
+                        </a>
+                    </p>
+                    
+                    <p>
+                        <i class="fas fa-envelope"></i>
+                        <strong>Email:</strong><br>
+                        <a href="mailto:{{ loja_email }}" class="text-decoration-none">
+                            {{ loja_email }}
+                        </a>
+                    </p>
+                    
+                    <p>
+                        <i class="fab fa-instagram"></i>
+                        <strong>Instagram:</strong><br>
+                        <a href="https://www.instagram.com/xododapreta" target="_blank" class="text-decoration-none">
+                            @xododapreta
+                        </a>
+                    </p>
+                    
+                    <p>
+                        <i class="fas fa-map-marker-alt"></i>
+                        <strong>Localização:</strong><br>
+                        São Paulo, SP
+                    </p>
+                    
+                    <hr>
+                    
+                    <p class="text-muted small mb-0">
+                        <i class="fas fa-clock"></i>
+                        Respondemos em até 24 horas!
+                    </p>
                 </div>
-                <div class="mb-3">
-                    <label for="inputsubject">Assunto</label>
-                    <input type="text" class="form-control mt-1" id="subject" name="subject" placeholder="Assunto">
+            </div>
+            
+            <!-- Formulário -->
+            <div class="col-md-8">
+                <div class="contact-info-card">
+                    <h5><i class="fab fa-whatsapp"></i> Enviar Mensagem via WhatsApp</h5>
+                    
+                    <form id="contactForm">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Seu Nome *</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="name" 
+                                   placeholder="Digite seu nome"
+                                   required>
+                            <div class="invalid-feedback">
+                                Por favor, digite seu nome.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Sua Mensagem *</label>
+                            <textarea class="form-control" 
+                                      id="message" 
+                                      rows="6" 
+                                      placeholder="Digite sua mensagem..."
+                                      required></textarea>
+                            <div class="invalid-feedback">
+                                Por favor, digite sua mensagem.
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button type="submit" class="btn whatsapp-btn btn-lg">
+                                <i class="fab fa-whatsapp"></i>
+                                Enviar via WhatsApp
+                            </button>
+                        </div>
+                        
+                        <p class="text-muted text-center mt-3 small">
+                            Ao clicar, você será redirecionado para o WhatsApp com sua mensagem pronta.
+                        </p>
+                    </form>
                 </div>
-                <div class="mb-3">
-                    <label for="inputmessage">Mensagem</label>
-                    <textarea class="form-control mt-1" id="message" name="message" placeholder="Mensagem" rows="8"></textarea>
-                </div>
-                <div class="row">
-                    <div class="col text-end mt-2">
-                        <button type="submit" class="btn btn-success btn-lg px-3">Vamos conversar</button>
-                    </div>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
     <!-- End Contact -->
 
-
     <!-- Start Footer -->
-    <footer class="bg-dark" id="tempaltemo_footer">
-        <div class="container">
-            <div class="row">
-
-                <div class="col-md-4 pt-5">
-                    <h2 class="h2 text-success border-bottom pb-3 border-light logo">Xodó da Preta</h2>
-                    <ul class="list-unstyled text-light footer-link-list">
-                        <li>
-                            <i class="fas fa-map-marker-alt fa-fw"></i>
-                            São Paulo
-                        </li>
-                        <li>
-                            <i class="fa fa-phone fa-fw"></i>
-                            <a class="text-decoration-none" href="tel:010-020-0340">+55 11 954375056</a>
-                        </li>
-                        <li>
-                            <i class="fa fa-envelope fa-fw"></i>
-                            <a class="text-decoration-none" href="mailto:info@company.com"></a>
-                        </li>
-                    </ul>
-                </div>
-
-            </div>
-
-            <div class="row text-light mb-4">
-                <div class="col-12 mb-3">
-                    <div class="w-100 my-3 border-top border-light"></div>
-                </div>
-                <div class="col-auto me-auto">
-                    <ul class="list-inline text-left footer-icons">
-                        <li class="list-inline-item border border-light rounded-circle text-center">
-                            <a class="text-light text-decoration-none" target="_blank" href="http://facebook.com/"><i class="fab fa-facebook-f fa-lg fa-fw"></i></a>
-                        </li>
-                        <li class="list-inline-item border border-light rounded-circle text-center">
-                            <a class="text-light text-decoration-none" target="_blank" href="https://www.instagram.com/xododapreta?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="><i class="fab fa-instagram fa-lg fa-fw"></i></a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="col-auto">
-                    <label class="sr-only" for="subscribeEmail">Endereço de E-mail</label>
-                    <div class="input-group mb-2">
-                        <input type="text" class="form-control bg-dark border-light" id="subscribeEmail" placeholder="Endereço de E-mail">
-                        <div class="input-group-text btn-success text-light">Inscreva-se</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="w-100 bg-black py-3">
-            <div class="container">
-                <div class="row pt-2">
-                    <div class="col-12">
-                        <p class="text-left text-light">
-                             &copy; 2025 Company Projeto Aventura
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </footer>
-    <!-- End Footer -->
-
+    {% include 'partials/footer.html' %}
+    
     <!-- Start Script -->
     <script src="{{ url_for('static', filename='zay/assets/js/jquery-1.11.0.min.js') }}"></script>
     <script src="{{ url_for('static', filename='zay/assets/js/jquery-migrate-1.2.1.min.js') }}"></script>
     <script src="{{ url_for('static', filename='zay/assets/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ url_for('static', filename='zay/assets/js/templatemo.js') }}"></script>
     <script src="{{ url_for('static', filename='zay/assets/js/custom.js') }}"></script>
-    <!-- Custom JavaScript -->
-    <script src="{{ url_for('static', filename='zay/assets/js/custom.js') }}"></script>
+
+    <!-- WhatsApp Integration Script -->
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Pegar valores do formulário
+            const name = document.getElementById('name').value.trim();
+            const message = document.getElementById('message').value.trim();
+            
+            // Validar campos
+            if (!name || !message) {
+                alert('Por favor, preencha todos os campos!');
+                return;
+            }
+            
+            // Formatar mensagem para WhatsApp
+            const whatsappMessage = `Olá! Meu nome é ${name}.\n\n${message}`;
+            
+            // Número do WhatsApp (formato internacional sem + e sem espaços)
+            const phoneNumber = '5511954375056';
+            
+            // Criar URL do WhatsApp
+            const whatsappURL = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(whatsappMessage)}`;
+            
+            // Abrir WhatsApp em nova aba
+            window.open(whatsappURL, '_blank');
+            
+            // Limpar formulário
+            document.getElementById('contactForm').reset();
+            
+            // Feedback visual
+            alert('Redirecionando para o WhatsApp...');
+        });
+    </script>
     <!-- End Script -->
 </body>
 
