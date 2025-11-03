@@ -90,6 +90,15 @@ def currency_filter(value):
     except (ValueError, TypeError):
         return "R$ 0,00"
 
+@app.template_filter('from_json')
+def from_json_filter(value):
+    """Converte string JSON para lista Python"""
+    import json
+    try:
+        return json.loads(value) if value else []
+    except (ValueError, TypeError):
+        return []
+
 # ========================================
 # CONTEXTO GLOBAL (disponível em todos os templates)
 # ========================================

@@ -15,7 +15,7 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-key-change-in-production'
     
     # Banco de dados SQLite
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + str(BASE_DIR / 'instance' / 'loja.db')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + str(BASE_DIR / 'loja.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # Upload de imagens
