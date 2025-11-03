@@ -1,276 +1,181 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+{% extends 'base.html' %}
 
-<head>
-    <title>Xodó da Preta - Contato</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+{% block title %}Xodó da Preta - Contato{% endblock %}
 
-    <!-- Ícones -->
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='zay/assets/img/apple-icon.png') }}">
-    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='zay/assets/img/favicon.ico') }}">
-
-    <!-- CSS principal -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='zay/assets/css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='zay/assets/css/templatemo.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='zay/assets/css/custom.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='zay/assets/css/fontawesome.min.css') }}">
-
-    <!-- Google Fonts -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;200;300;400;500;700;900&display=swap">
-
-    <style>
-        .whatsapp-btn {
-            background-color: #25D366;
-            border-color: #25D366;
-            color: white;
-            font-weight: 600;
-            padding: 15px 40px;
-            font-size: 18px;
-            transition: all 0.3s;
-        }
-        
-        .whatsapp-btn:hover {
-            background-color: #128C7E;
-            border-color: #128C7E;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4);
-        }
-        
-        .whatsapp-btn i {
-            margin-right: 10px;
-        }
-        
-        .contact-info-card {
-            background: white;
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-        }
-        
-        .contact-info-card h5 {
-            color: #D4AF37;
-            margin-bottom: 20px;
-        }
-        
-        .contact-info-card p {
-            margin-bottom: 10px;
-        }
-        
-        .contact-info-card i {
-            color: #D4AF37;
-            margin-right: 10px;
-            width: 20px;
-        }
-    </style>
-</head>
-
-<body>
-    <!-- Start Top Nav -->
-    {% include 'partials/topbar.html' %}
-
-    <!-- Header -->
-    <nav class="navbar navbar-expand-lg navbar-light shadow">
-        <div class="container d-flex justify-content-between align-items-center">
-            <a class="navbar-brand text-success logo h1 align-self-center" href="{{ url_for('home') }}">
-                Xodó da Preta
-            </a>
-
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#templatemo_main_nav" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="align-self-center collapse navbar-collapse flex-fill d-lg-flex justify-content-lg-between" id="templatemo_main_nav">
-                <div class="flex-fill">
-                    <ul class="nav navbar-nav d-flex justify-content-between mx-lg-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('home') }}">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('about') }}">Sobre mim</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('shop') }}">Loja</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('contact') }}">Contato</a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="navbar align-self-center d-flex">
-                    <a class="nav-icon d-none d-lg-inline" href="#" data-bs-toggle="modal" data-bs-target="#templatemo_search">
-                        <i class="fa fa-fw fa-search text-dark mr-2"></i>
-                    </a>
-                    <a class="nav-icon position-relative text-decoration-none" href="#">
-                        <i class="fa fa-fw fa-cart-arrow-down text-dark mr-1"></i>
-                        <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">0</span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </nav>
-    <!-- Close Header -->
-
-    <!-- Modal -->
-    <div class="modal fade bg-white" id="templatemo_search" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="w-100 pt-1 mb-5 text-right">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form action="" method="get" class="modal-content modal-body border-0 p-0">
-                <div class="input-group mb-2">
-                    <input type="text" class="form-control" id="inputModalSearch" name="q" placeholder="Search ...">
-                    <button type="submit" class="input-group-text bg-success text-light">
-                        <i class="fa fa-fw fa-search text-white"></i>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Start Content Page -->
-    <div class="container-fluid bg-light py-5">
-        <div class="col-md-6 m-auto text-center">
-            <h1 class="h1">Entre em Contato</h1>
-            <p>
-                Ficou com alguma dúvida? Envie uma mensagem pelo WhatsApp!
-            </p>
-        </div>
-    </div>
-
-    <!-- Start Contact -->
-    <div class="container py-5">
-        <div class="row py-5">
-            <!-- Informações de Contato -->
-            <div class="col-md-4 mb-4">
-                <div class="contact-info-card">
-                    <h5><i class="fas fa-info-circle"></i> Informações</h5>
-                    
-                    <p>
-                        <i class="fab fa-whatsapp"></i>
-                        <strong>WhatsApp:</strong><br>
-                        <a href="https://wa.me/5511954375056" target="_blank" class="text-decoration-none">
-                            +55 11 95437-5056
-                        </a>
-                    </p>
-
-                    <p>
-                        <i class="fab fa-instagram"></i>
-                        <strong>Instagram:</strong><br>
-                        <a href="https://www.instagram.com/xododapreta" target="_blank" class="text-decoration-none">
-                            @xododapreta
-                        </a>
-                    </p>
-
-                    <p>
-                        <i class="fas fa-map-marker-alt"></i>
-                        <strong>Localização:</strong><br>
-                        São Paulo, SP
-                    </p>
-                    
-                    <hr>
-                    
-                    <p class="text-muted small mb-0">
-                        <i class="fas fa-clock"></i>
-                        Respondemos em até 24 horas!
-                    </p>
-                </div>
-            </div>
-            
-            <!-- Formulário -->
-            <div class="col-md-8">
-                <div class="contact-info-card">
-                    <h5><i class="fab fa-whatsapp"></i> Enviar Mensagem via WhatsApp</h5>
-                    
-                    <form id="contactForm">
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Seu Nome *</label>
-                            <input type="text" 
-                                   class="form-control" 
-                                   id="name" 
-                                   placeholder="Digite seu nome"
-                                   required>
-                            <div class="invalid-feedback">
-                                Por favor, digite seu nome.
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <label for="message" class="form-label">Sua Mensagem *</label>
-                            <textarea class="form-control" 
-                                      id="message" 
-                                      rows="6" 
-                                      placeholder="Digite sua mensagem..."
-                                      required></textarea>
-                            <div class="invalid-feedback">
-                                Por favor, digite sua mensagem.
-                            </div>
-                        </div>
-                        
-                        <div class="text-center">
-                            <button type="submit" class="btn whatsapp-btn btn-lg">
-                                <i class="fab fa-whatsapp"></i>
-                                Enviar via WhatsApp
-                            </button>
-                        </div>
-                        
-                        <p class="text-muted text-center mt-3 small">
-                            Ao clicar, você será redirecionado para o WhatsApp com sua mensagem pronta.
-                        </p>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- End Contact -->
-
-    <!-- Start Footer -->
-    {% include 'partials/footer.html' %}
+{% block extra_css %}
+<style>
+    .whatsapp-btn {
+        background-color: #25D366;
+        border-color: #25D366;
+        color: white;
+        font-weight: 600;
+        padding: 15px 40px;
+        font-size: 18px;
+        transition: all 0.3s;
+    }
     
-    <!-- Start Script -->
-    <script src="{{ url_for('static', filename='zay/assets/js/jquery-1.11.0.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='zay/assets/js/jquery-migrate-1.2.1.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='zay/assets/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='zay/assets/js/templatemo.js') }}"></script>
-    <script src="{{ url_for('static', filename='zay/assets/js/custom.js') }}"></script>
+    .whatsapp-btn:hover {
+        background-color: #128C7E;
+        border-color: #128C7E;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4);
+    }
+    
+    .whatsapp-btn i {
+        margin-right: 10px;
+    }
+    
+    .contact-info-card {
+        background: white;
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+    }
+    
+    .contact-info-card h5 {
+        color: #D4AF37;
+        margin-bottom: 20px;
+    }
+    
+    .contact-info-card p {
+        margin-bottom: 10px;
+    }
+    
+    .contact-info-card i {
+        color: #D4AF37;
+        margin-right: 10px;
+        width: 20px;
+    }
+</style>
+{% endblock %}
 
-    <!-- WhatsApp Integration Script -->
-    <script>
-        document.getElementById('contactForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Pegar valores do formulário
-            const name = document.getElementById('name').value.trim();
-            const message = document.getElementById('message').value.trim();
-            
-            // Validar campos
-            if (!name || !message) {
-                alert('Por favor, preencha todos os campos!');
-                return;
-            }
-            
-            // Formatar mensagem para WhatsApp
-            const whatsappMessage = `Olá! Meu nome é ${name}.\n\n${message}`;
-            
-            // Número do WhatsApp (formato internacional sem + e sem espaços)
-            const phoneNumber = '5511954375056';
-            
-            // Criar URL do WhatsApp
-            const whatsappURL = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(whatsappMessage)}`;
-            
-            // Abrir WhatsApp em nova aba
-            window.open(whatsappURL, '_blank');
-            
-            // Limpar formulário
-            document.getElementById('contactForm').reset();
-            
-            // Feedback visual
-            alert('Redirecionando para o WhatsApp...');
-        });
-    </script>
-    <!-- End Script -->
-</body>
+{% block content %}
+<!-- Start Content Page -->
+<div class="container-fluid bg-light py-5">
+    <div class="col-md-6 m-auto text-center">
+        <h1 class="h1">Entre em Contato</h1>
+        <p>Ficou com alguma dúvida? Envie uma mensagem pelo WhatsApp!</p>
+    </div>
+</div>
 
-</html>
+<!-- Start Contact -->
+<div class="container py-5">
+    <div class="row py-5">
+        <!-- Informações de Contato -->
+        <div class="col-md-4 mb-4">
+            <div class="contact-info-card">
+                <h5><i class="fas fa-info-circle"></i> Informações</h5>
+                
+                <p>
+                    <i class="fas fa-phone"></i>
+                    <strong>Telefone/WhatsApp:</strong><br>
+                    <a href="https://wa.me/5511954375056" target="_blank" class="text-decoration-none">
+                        +55 11 95437-5056
+                    </a>
+                </p>
+                
+                <p>
+                    <i class="fas fa-envelope"></i>
+                    <strong>Email:</strong><br>
+                    <a href="mailto:{{ loja_email }}" class="text-decoration-none">
+                        {{ loja_email }}
+                    </a>
+                </p>
+                
+                <p>
+                    <i class="fab fa-instagram"></i>
+                    <strong>Instagram:</strong><br>
+                    <a href="https://www.instagram.com/xododapreta" target="_blank" class="text-decoration-none">
+                        @xododapreta
+                    </a>
+                </p>
+                
+                <p>
+                    <i class="fas fa-map-marker-alt"></i>
+                    <strong>Localização:</strong><br>
+                    São Paulo, SP
+                </p>
+                
+                <hr>
+                
+                <p class="text-muted small mb-0">
+                    <i class="fas fa-clock"></i>
+                    Respondemos em até 24 horas!
+                </p>
+            </div>
+        </div>
+        
+        <!-- Formulário -->
+        <div class="col-md-8">
+            <div class="contact-info-card">
+                <h5><i class="fab fa-whatsapp"></i> Enviar Mensagem via WhatsApp</h5>
+                
+                <form id="contactForm">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Seu Nome *</label>
+                        <input type="text" 
+                               class="form-control" 
+                               id="name" 
+                               placeholder="Digite seu nome"
+                               required>
+                        <div class="invalid-feedback">
+                            Por favor, digite seu nome.
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Sua Mensagem *</label>
+                        <textarea class="form-control" 
+                                  id="message" 
+                                  rows="6" 
+                                  placeholder="Digite sua mensagem..."
+                                  required></textarea>
+                        <div class="invalid-feedback">
+                            Por favor, digite sua mensagem.
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button type="submit" class="btn whatsapp-btn btn-lg">
+                            <i class="fab fa-whatsapp"></i>
+                            Enviar via WhatsApp
+                        </button>
+                    </div>
+                    
+                    <p class="text-muted text-center mt-3 small">
+                        Ao clicar, você será redirecionado para o WhatsApp com sua mensagem pronta.
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Contact -->
+{% endblock %}
+
+{% block extra_js %}
+<!-- WhatsApp Integration Script -->
+<script>
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const name = document.getElementById('name').value.trim();
+        const message = document.getElementById('message').value.trim();
+        
+        if (!name || !message) {
+            alert('Por favor, preencha todos os campos!');
+            return;
+        }
+        
+        const whatsappMessage = `Olá! Meu nome é ${name}.\n\n${message}`;
+        const phoneNumber = '5511954375056';
+        const whatsappURL = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(whatsappMessage)}`;
+        
+        window.open(whatsappURL, '_blank');
+        document.getElementById('contactForm').reset();
+        alert('Redirecionando para o WhatsApp...');
+    });
+</script>
+{% endblock %}
