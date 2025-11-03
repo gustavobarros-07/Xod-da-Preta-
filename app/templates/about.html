@@ -1,176 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'base.html' %}
 
-<head>
-    <title>Xodó da Preta  - Sobre Mim</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+{% block title %}Xodó da Preta - Sobre Mim{% endblock %}
 
-   <!-- Ícones -->
- <link rel="apple-touch-icon" href="{{ url_for('static', filename='zay/assets/img/apple-icon.png') }}">
- <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='zay/assets/img/favicon.ico') }}">
-
- <!-- CSS principal -->
- <link rel="stylesheet" href="{{ url_for('static', filename='zay/assets/css/bootstrap.min.css') }}">
- <link rel="stylesheet" href="{{ url_for('static', filename='zay/assets/css/templatemo.css') }}">
- <link rel="stylesheet" href="{{ url_for('static', filename='zay/assets/css/custom.css') }}">
- <link rel="stylesheet" href="{{ url_for('static', filename='zay/assets/css/fontawesome.min.css') }}">
- <!-- Custom CSS -->
- <link rel="stylesheet" href="{{ url_for('static', filename='zay/assets/css/custom.css') }}">
-
- <!-- Google Fonts -->
- <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;200;300;400;500;700;900&display=swap">
-
- <!-- Font Awesome -->
- <link rel="stylesheet" href="{{ url_for('static', filename='zay/assets/css/fontawesome.min.css') }}">
-
- <!--
-    
- TemplateMo 559 Zay Shop
-
- https://templatemo.com/tm-559-zay-shop
-
- -->
-</head>
-
-<body>
-    <!-- Start Top Nav -->
-    {% include 'partials/topbar.html' %}
-    
-
-    <!-- Header -->
-    <nav class="navbar navbar-expand-lg navbar-light shadow">
-        <div class="container d-flex justify-content-between align-items-center">
-
-            <a class="navbar-brand text-success logo h1 align-self-center" href="{{ url_for('home') }}">
-                Xodó da Preta
-            </a>
-
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#templatemo_main_nav" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="align-self-center collapse navbar-collapse flex-fill  d-lg-flex justify-content-lg-between" id="templatemo_main_nav">
-                <div class="flex-fill">
-                    <ul class="nav navbar-nav d-flex justify-content-between mx-lg-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('home') }}">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('about') }}">Sobre mim</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('shop') }}">Loja</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('contact') }}">Contato</a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="navbar align-self-center d-flex">
-                    <div class="d-lg-none flex-sm-fill mt-3 mb-4 col-7 col-sm-auto pr-3">
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="inputMobileSearch" placeholder="Search ...">
-                            <div class="input-group-text">
-                                <i class="fa fa-fw fa-search"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <a class="nav-icon d-none d-lg-inline" href="#" data-bs-toggle="modal" data-bs-target="#templatemo_search">
-                        <i class="fa fa-fw fa-search text-dark mr-2"></i>
-                    </a>
-                    <a class="nav-icon position-relative text-decoration-none" href="#">
-                        <i class="fa fa-fw fa-cart-arrow-down text-dark mr-1"></i>
-                        <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">!</span>
-                    </a>
-                </div>
+{% block content %}
+<section class="bg-success py-5">
+    <div class="container">
+        <div class="row align-items-center py-5">
+            <div class="col-md-8 text-white">
+                <h1>Sobre Mim</h1>
+                <p>Eu sou Teresa Cristina, cofundadora e estilista e designer de acessórios da Xodó da Preta. Neuropsicopedagoga de formação porém, sempre fui apaixonada por acessórios e sonhava criar minhas próprias roupas.</p>
             </div>
-
-        </div>
-    </nav>
-    <!-- Close Header -->
-
-    <!-- Modal -->
-    <div class="modal fade bg-white" id="templatemo_search" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="w-100 pt-1 mb-5 text-right">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="col-md-4">
+                
             </div>
-            <form action="" method="get" class="modal-content modal-body border-0 p-0">
-                <div class="input-group mb-2">
-                    <input type="text" class="form-control" id="inputModalSearch" name="q" placeholder="Search ...">
-                    <button type="submit" class="input-group-text bg-success text-light">
-                        <i class="fa fa-fw fa-search text-white"></i>
-                    </button>
-                </div>
-            </form>
         </div>
     </div>
+</section>
 
-
-
-    <section class="bg-success py-5">
-        <div class="container">
-            <div class="row align-items-center py-5">
-                <div class="col-md-8 text-white">
-                    <h1>Sobre Mim</h1>
-                    <p>  Eu sou Teresa Cristina, cofundadora e estilista e designer de acessórios da Xodó da Preta. Neuropsicopedagoga de formação porém, sempre fui apaixonada por acessórios e sonhava criar minhas próprias roupas. 
-                    </p>
-                </div>
-                <div class="col-md-4">
-                    
-                </div>
+<!-- Start Section -->
+<section class="container py-5">
+    <div class="row text-center pt-5 pb-3">
+        <div class="col-lg-6 m-auto">
+            <h1 class="h1">Nossos Serviços</h1>
+            <p>
+                A Xodó da Preta disponibiliza a criação e venda de moda e acessórios afro autorais e inclusivos, pensados para vestir todos os corpos e gêneros com representatividade, identidade e versatilidade. Como serviço fundamental, a marca garante a transmissão de alegria através das estampas e cores, e ainda se compromete com a sustentabilidade e a economia circular em sua produção.
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-lg-3 pb-5">
+            <div class="h-100 py-5 services-icon-wap shadow">
+                <div class="h1 text-success text-center"><i class="fa fa-truck fa-lg"></i></div>
+                <h2 class="h5 mt-4 text-center">Servico de Entrega</h2>
             </div>
         </div>
-    </section>
-    <!-- Close Banner -->
 
-    <!-- Start Section -->
-    <section class="container py-5">
-        <div class="row text-center pt-5 pb-3">
-            <div class="col-lg-6 m-auto">
-                <h1 class="h1">Nossos Serviços</h1>
-                <p>
-                    A Xodó da Preta disponibiliza a criação e venda de moda e acessórios afro autorais e inclusivos, pensados para vestir todos os corpos e gêneros com representatividade, identidade e versatilidade. Como serviço fundamental, a marca garante a transmissão de alegria através das estampas e cores, e ainda se compromete com a sustentabilidade e a economia circular em sua produção.
-                </p>
+        <div class="col-md-6 col-lg-3 pb-5">
+            <div class="h-100 py-5 services-icon-wap shadow">
+                <div class="h1 text-success text-center"><i class="fas fa-exchange-alt"></i></div>
+                <h2 class="h5 mt-4 text-center">Shipping & Return</h2>
             </div>
         </div>
-        <div class="row">
-
-        
-
-            <div class="col-md-6 col-lg-3 pb-5">
-                <div class="h-100 py-5 services-icon-wap shadow">
-                    <div class="h1 text-success text-center"><i class="fa fa-truck fa-lg"></i></div>
-                    <h2 class="h5 mt-4 text-center">Servico de Entrega</h2>
-                </div>
-            </div>
-
-            <div class="col-md-6 col-lg-3 pb-5">
-                <div class="h-100 py-5 services-icon-wap shadow">
-                    <div class="h1 text-success text-center"><i class="fas fa-exchange-alt"></i></div>
-                    <h2 class="h5 mt-4 text-center">Shipping & Return</h2>
-                </div>
-            </div>
-
-        
-        </div>
-    </section>
-    <!-- End Section -->
-
-    <!-- Start Footer -->
-    {% include 'partials/footer.html' %}
-    
-
-    <!-- Start Script -->
-    <script src="{{ url_for('static', filename='zay/assets/js/jquery-1.11.0.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='zay/assets/js/jquery-migrate-1.2.1.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='zay/assets/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='zay/assets/js/templatemo.js') }}"></script>
-    <script src="{{ url_for('static', filename='zay/assets/js/custom.js') }}"></script>
-    <!-- Custom JavaScript -->
-    <script src="{{ url_for('static', filename='zay/assets/js/custom.js') }}"></script>
-    <!-- End Script -->
-</body>
-
-</html>
+    </div>
+</section>
+<!-- End Section -->
+{% endblock %}
