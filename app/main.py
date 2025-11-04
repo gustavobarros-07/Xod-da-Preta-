@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from pathlib import Path
 from config import Config
 from database import db, init_db
@@ -49,11 +49,33 @@ def contact():
 
 @app.route("/shop")
 def shop():
-    """Página da loja"""
+    """Página da loja com filtros"""
     from models import Produto
     
-    # Buscar todos os produtos ativos
-    produtos = Produto.query.filter_by(ativo=True).order_by(Produto.ordem).all()
+    # Filtros da URL
+    categoria_filtro = request.args.get('categoria')
+    preco_filtro = request.args.get('preco')
+    
+    # Query base: produtos ativos
+    query = Produto.query.filter_by(ativo=True)
+    
+    # Aplicar filtro de categoria
+    if categoria_filtro:
+        query = query.filter_by(categoria=categoria_filtro)
+    
+    # Aplicar filtro de preço
+    if preco_filtro:
+        if preco_filtro == '0-50':
+            query = query.filter(Produto.preco <= 50)
+        elif preco_filtro == '50-100':
+            query = query.filter(Produto.preco > 50, Produto.preco <= 100)
+        elif preco_filtro == '100-200':
+            query = query.filter(Produto.preco > 100, Produto.preco <= 200)
+        elif preco_filtro == '200+':
+            query = query.filter(Produto.preco > 200)
+    
+    # Ordenar e buscar
+    produtos = query.order_by(Produto.ordem).all()
     
     return render_template("shop.html", produtos=produtos)
 
