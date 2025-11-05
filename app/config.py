@@ -31,7 +31,7 @@ class Config:
     PRODUCTS_PER_PAGE = 9
     
     # Categorias disponíveis
-    CATEGORIES = ['Brincos', 'Roupas', 'Colares']
+    CATEGORIES = ['Brincos', 'Roupas', 'Colares', 'Anéis', 'Pulseiras']
     
     # Tamanhos disponíveis
     SIZES = ['PP', 'P', 'M', 'G', 'GG', 'Único']

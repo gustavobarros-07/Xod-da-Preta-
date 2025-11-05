@@ -266,19 +266,33 @@
             </div>
             
             <div class="filter-dropdown me-2 mb-2">
-                <a href="{{ url_for('shop', categoria='Colares') }}" 
+                <a href="{{ url_for('shop', categoria='Colares') }}"
                    class="filter-btn {% if request.args.get('categoria') == 'Colares' %}active{% endif %}">
                     <i class="fas fa-circle"></i> Colares
                 </a>
             </div>
-            
+
             <div class="filter-dropdown me-2 mb-2">
-                <a href="{{ url_for('shop', categoria='Roupas') }}" 
+                <a href="{{ url_for('shop', categoria='Anéis') }}"
+                   class="filter-btn {% if request.args.get('categoria') == 'Anéis' %}active{% endif %}">
+                    <i class="fas fa-ring"></i> Anéis
+                </a>
+            </div>
+
+            <div class="filter-dropdown me-2 mb-2">
+                <a href="{{ url_for('shop', categoria='Pulseiras') }}"
+                   class="filter-btn {% if request.args.get('categoria') == 'Pulseiras' %}active{% endif %}">
+                    <i class="fas fa-circle-notch"></i> Pulseiras
+                </a>
+            </div>
+
+            <div class="filter-dropdown me-2 mb-2">
+                <a href="{{ url_for('shop', categoria='Roupas') }}"
                    class="filter-btn {% if request.args.get('categoria') == 'Roupas' %}active{% endif %}">
                     <i class="fas fa-tshirt"></i> Roupas
                 </a>
             </div>
-            
+
             <div class="filter-dropdown me-2 mb-2">
                 <a href="{{ url_for('shop', preco='0-50') }}" 
                    class="filter-btn {% if request.args.get('preco') == '0-50' %}active{% endif %}">
@@ -384,9 +398,8 @@
 {% block extra_js %}
 <script>
 function addToCart(produtoId) {
-    // Placeholder - será implementado com o sistema de carrinho
-    alert('Produto adicionado ao carrinho!\n\n(Sistema de carrinho será implementado em breve)');
-    console.log('Produto ID:', produtoId);
+    // Redirecionar para a página do produto para ver detalhes e adicionar ao carrinho
+    window.location.href = `/shop/${produtoId}`;
 }
 </script>
 {% endblock %}

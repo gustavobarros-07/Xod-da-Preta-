@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session, jsonify
 from pathlib import Path
 from config import Config
 from database import db, init_db
 from admin_routes import admin_bp
+import uuid
 
 # Diretório base
 BASE_DIR = Path(__file__).resolve().parent
@@ -83,22 +84,184 @@ def shop():
 def shop_single(produto_id):
     """Página de produto individual"""
     from models import Produto
-    
+
     # Buscar produto pelo ID
     produto = Produto.query.get_or_404(produto_id)
-    
+
     # Buscar produtos relacionados (mesma categoria)
     produtos_relacionados = Produto.query.filter(
         Produto.categoria == produto.categoria,
         Produto.id != produto.id,
         Produto.ativo == True
     ).limit(4).all()
-    
+
     return render_template(
-        "shop-single.html", 
+        "shop-single.html",
         produto=produto,
         produtos_relacionados=produtos_relacionados
     )
+
+# ========================================
+# ROTAS DO CARRINHO
+# ========================================
+
+def get_session_id():
+    """Obtém ou cria um ID de sessão único para o carrinho"""
+    if 'cart_session_id' not in session:
+        session['cart_session_id'] = str(uuid.uuid4())
+    return session['cart_session_id']
+
+@app.route("/carrinho")
+def carrinho():
+    """Página do carrinho de compras"""
+    from models import ItemCarrinho
+
+    session_id = get_session_id()
+    itens = ItemCarrinho.query.filter_by(session_id=session_id).all()
+
+    # Calcular total
+    total = sum(item.produto.preco * item.quantidade for item in itens)
+
+    return render_template("carrinho.html", itens=itens, total=total)
+
+@app.route("/api/carrinho/adicionar", methods=['POST'])
+def adicionar_ao_carrinho():
+    """Adiciona um produto ao carrinho"""
+    from models import ItemCarrinho, Produto
+
+    try:
+        data = request.get_json()
+        produto_id = data.get('produto_id')
+        quantidade = data.get('quantidade', 1)
+        tamanho = data.get('tamanho')
+
+        if not produto_id:
+            return jsonify({'success': False, 'message': 'Produto não especificado'}), 400
+
+        # Verificar se o produto existe
+        produto = Produto.query.get(produto_id)
+        if not produto or not produto.ativo:
+            return jsonify({'success': False, 'message': 'Produto não encontrado'}), 404
+
+        session_id = get_session_id()
+
+        # Verificar se o item já existe no carrinho
+        item_existente = ItemCarrinho.query.filter_by(
+            session_id=session_id,
+            produto_id=produto_id,
+            tamanho=tamanho
+        ).first()
+
+        if item_existente:
+            # Atualizar quantidade
+            item_existente.quantidade += quantidade
+        else:
+            # Criar novo item
+            novo_item = ItemCarrinho(
+                session_id=session_id,
+                produto_id=produto_id,
+                quantidade=quantidade,
+                tamanho=tamanho
+            )
+            db.session.add(novo_item)
+
+        db.session.commit()
+
+        # Contar total de itens no carrinho
+        total_itens = db.session.query(db.func.sum(ItemCarrinho.quantidade)).filter_by(
+            session_id=session_id
+        ).scalar() or 0
+
+        return jsonify({
+            'success': True,
+            'message': 'Produto adicionado ao carrinho',
+            'total_itens': total_itens
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route("/api/carrinho/remover/<int:item_id>", methods=['DELETE'])
+def remover_do_carrinho(item_id):
+    """Remove um item do carrinho"""
+    from models import ItemCarrinho
+
+    try:
+        session_id = get_session_id()
+        item = ItemCarrinho.query.filter_by(id=item_id, session_id=session_id).first()
+
+        if not item:
+            return jsonify({'success': False, 'message': 'Item não encontrado'}), 404
+
+        db.session.delete(item)
+        db.session.commit()
+
+        # Contar total de itens no carrinho
+        total_itens = db.session.query(db.func.sum(ItemCarrinho.quantidade)).filter_by(
+            session_id=session_id
+        ).scalar() or 0
+
+        return jsonify({
+            'success': True,
+            'message': 'Item removido do carrinho',
+            'total_itens': total_itens
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route("/api/carrinho/atualizar/<int:item_id>", methods=['PUT'])
+def atualizar_carrinho(item_id):
+    """Atualiza a quantidade de um item no carrinho"""
+    from models import ItemCarrinho
+
+    try:
+        data = request.get_json()
+        quantidade = data.get('quantidade', 1)
+
+        if quantidade < 1:
+            return jsonify({'success': False, 'message': 'Quantidade inválida'}), 400
+
+        session_id = get_session_id()
+        item = ItemCarrinho.query.filter_by(id=item_id, session_id=session_id).first()
+
+        if not item:
+            return jsonify({'success': False, 'message': 'Item não encontrado'}), 404
+
+        item.quantidade = quantidade
+        db.session.commit()
+
+        # Contar total de itens no carrinho
+        total_itens = db.session.query(db.func.sum(ItemCarrinho.quantidade)).filter_by(
+            session_id=session_id
+        ).scalar() or 0
+
+        subtotal = item.produto.preco * item.quantidade
+
+        return jsonify({
+            'success': True,
+            'message': 'Carrinho atualizado',
+            'subtotal': subtotal,
+            'total_itens': total_itens
+        })
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route("/api/carrinho/total")
+def carrinho_total():
+    """Retorna o total de itens no carrinho"""
+    from models import ItemCarrinho
+
+    session_id = get_session_id()
+    total_itens = db.session.query(db.func.sum(ItemCarrinho.quantidade)).filter_by(
+        session_id=session_id
+    ).scalar() or 0
+
+    return jsonify({'total_itens': total_itens})
 
 # ========================================
 # FILTROS JINJA2 PERSONALIZADOS

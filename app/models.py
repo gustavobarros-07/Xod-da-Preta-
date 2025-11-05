@@ -63,22 +63,22 @@ class Admin(db.Model):
 class Configuracao(db.Model):
     """Modelo para configurações da loja"""
     __tablename__ = 'configuracoes'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     chave = db.Column(db.String(50), unique=True, nullable=False)
     valor = db.Column(db.Text, nullable=True)
     descricao = db.Column(db.String(200), nullable=True)
     data_atualizacao = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+
     def __repr__(self):
         return f'<Configuracao {self.chave}>'
-    
+
     @staticmethod
     def get_valor(chave, default=None):
         """Obtém o valor de uma configuração"""
         config = Configuracao.query.filter_by(chave=chave).first()
         return config.valor if config else default
-    
+
     @staticmethod
     def set_valor(chave, valor, descricao=None):
         """Define o valor de uma configuração"""
@@ -92,3 +92,34 @@ class Configuracao(db.Model):
             db.session.add(config)
         db.session.commit()
         return config
+
+
+class ItemCarrinho(db.Model):
+    """Modelo para itens do carrinho de compras"""
+    __tablename__ = 'itens_carrinho'
+
+    id = db.Column(db.Integer, primary_key=True)
+    session_id = db.Column(db.String(100), nullable=False)  # ID da sessão do usuário
+    produto_id = db.Column(db.Integer, db.ForeignKey('produtos.id'), nullable=False)
+    quantidade = db.Column(db.Integer, default=1)
+    tamanho = db.Column(db.String(10), nullable=True)  # Tamanho selecionado (se aplicável)
+    data_adicao = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relacionamento com Produto
+    produto = db.relationship('Produto', backref='itens_carrinho')
+
+    def __repr__(self):
+        return f'<ItemCarrinho produto_id={self.produto_id} qtd={self.quantidade}>'
+
+    def to_dict(self):
+        """Converte o item do carrinho para dicionário"""
+        return {
+            'id': self.id,
+            'produto_id': self.produto_id,
+            'produto_nome': self.produto.nome,
+            'produto_preco': self.produto.preco,
+            'produto_imagem': self.produto.imagem,
+            'quantidade': self.quantidade,
+            'tamanho': self.tamanho,
+            'subtotal': self.produto.preco * self.quantidade
+        }

@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Xodó da Preta{% endblock %}</title>
 
-    <!-- Ícones -->
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='zay/assets/img/apple-icon.png') }}">
-    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='zay/assets/img/favicon.ico') }}">
+    <!-- Ícones removidos até termos os personalizados da marca -->
 
     <!-- CSS principal -->
     <link rel="stylesheet" href="{{ url_for('static', filename='zay/assets/css/bootstrap.min.css') }}">
@@ -54,10 +52,9 @@
                     </ul>
                 </div>
                 <div class="navbar align-self-center d-flex">
-
-                    <a class="nav-icon position-relative text-decoration-none" href="#">
+                    <a class="nav-icon position-relative text-decoration-none" href="{{ url_for('carrinho') }}">
                         <i class="fa fa-fw fa-cart-arrow-down text-dark mr-1"></i>
-                        <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-light text-dark">!</span>
+                        <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-success text-white" id="cart-badge">0</span>
                     </a>
                 </div>
             </div>
@@ -94,6 +91,25 @@
     <script src="{{ url_for('static', filename='zay/assets/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ url_for('static', filename='zay/assets/js/templatemo.js') }}"></script>
     <script src="{{ url_for('static', filename='zay/assets/js/custom.js') }}"></script>
+
+    <!-- Script do Carrinho -->
+    <script>
+        // Atualizar badge do carrinho ao carregar a página
+        function atualizarBadgeCarrinho() {
+            fetch('/api/carrinho/total')
+                .then(response => response.json())
+                .then(data => {
+                    const badge = document.getElementById('cart-badge');
+                    if (badge) {
+                        badge.textContent = data.total_itens || '0';
+                    }
+                })
+                .catch(error => console.error('Erro ao atualizar badge do carrinho:', error));
+        }
+
+        // Atualizar ao carregar a página
+        document.addEventListener('DOMContentLoaded', atualizarBadgeCarrinho);
+    </script>
 
     {% block extra_js %}{% endblock %}
     <!-- End Script -->

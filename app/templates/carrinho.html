@@ -1,0 +1,336 @@
+{% extends 'base.html' %}
+
+{% block title %}Xodó da Preta - Carrinho{% endblock %}
+
+{% block extra_css %}
+<style>
+    .cart-item {
+        border-bottom: 1px solid #e9ecef;
+        padding: 20px 0;
+    }
+
+    .cart-item:last-child {
+        border-bottom: none;
+    }
+
+    .cart-item-image {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .quantity-input {
+        width: 80px;
+        text-align: center;
+    }
+
+    .btn-remove {
+        color: #dc3545;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .btn-remove:hover {
+        color: #a71d2a;
+    }
+
+    .cart-summary {
+        background: #f8f9fa;
+        padding: 30px;
+        border-radius: 10px;
+        position: sticky;
+        top: 20px;
+    }
+
+    .empty-cart {
+        text-align: center;
+        padding: 60px 20px;
+    }
+
+    .empty-cart i {
+        font-size: 80px;
+        color: #dee2e6;
+        margin-bottom: 20px;
+    }
+
+    .whatsapp-checkout {
+        background-color: #25D366;
+        border-color: #25D366;
+        color: white;
+        font-weight: 600;
+        padding: 15px 30px;
+        font-size: 16px;
+        transition: all 0.3s;
+    }
+
+    .whatsapp-checkout:hover {
+        background-color: #128C7E;
+        border-color: #128C7E;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Start Content Page -->
+<div class="container-fluid bg-light py-5">
+    <div class="col-md-6 m-auto text-center">
+        <h1 class="h1">Meu Carrinho</h1>
+        <p>Revise seus itens antes de finalizar o pedido</p>
+    </div>
+</div>
+
+<!-- Start Cart -->
+<div class="container py-5">
+    {% if itens %}
+    <div class="row">
+        <!-- Lista de itens -->
+        <div class="col-lg-8 mb-4">
+            {% for item in itens %}
+            <div class="cart-item" data-item-id="{{ item.id }}">
+                <div class="row align-items-center">
+                    <div class="col-md-2">
+                        {% if item.produto.imagem %}
+                        <img src="{{ url_for('static', filename='uploads/' + item.produto.imagem) }}"
+                             class="cart-item-image"
+                             alt="{{ item.produto.nome }}">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='zay/assets/img/feature_prod_01.jpg') }}"
+                             class="cart-item-image"
+                             alt="{{ item.produto.nome }}">
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-4">
+                        <h5 class="mb-1">{{ item.produto.nome }}</h5>
+                        <p class="text-muted mb-0 small">{{ item.produto.categoria }}</p>
+                        {% if item.tamanho %}
+                        <p class="text-muted mb-0 small">Tamanho: {{ item.tamanho }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="col-md-2">
+                        <p class="mb-0 fw-bold">{{ item.produto.preco | currency }}</p>
+                    </div>
+
+                    <div class="col-md-2">
+                        <input type="number"
+                               class="form-control quantity-input"
+                               value="{{ item.quantidade }}"
+                               min="1"
+                               max="99"
+                               data-item-id="{{ item.id }}">
+                    </div>
+
+                    <div class="col-md-2 text-end">
+                        <p class="mb-2 fw-bold item-subtotal">{{ (item.produto.preco * item.quantidade) | currency }}</p>
+                        <a href="#" class="btn-remove" data-item-id="{{ item.id }}">
+                            <i class="fas fa-trash"></i> Remover
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Resumo do pedido -->
+        <div class="col-lg-4">
+            <div class="cart-summary">
+                <h4 class="mb-4">Resumo do Pedido</h4>
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Subtotal:</span>
+                    <span class="fw-bold" id="cart-subtotal">{{ total | currency }}</span>
+                </div>
+
+                <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
+                    <span class="text-muted small">Frete calculado no WhatsApp</span>
+                </div>
+
+                <div class="d-flex justify-content-between mb-4">
+                    <span class="h5 mb-0">Total:</span>
+                    <span class="h5 mb-0 text-success" id="cart-total">{{ total | currency }}</span>
+                </div>
+
+                <button class="btn whatsapp-checkout w-100 mb-3" id="checkout-btn">
+                    <i class="fab fa-whatsapp me-2"></i>
+                    Finalizar Pedido
+                </button>
+
+                <a href="{{ url_for('shop') }}" class="btn btn-outline-secondary w-100">
+                    <i class="fas fa-arrow-left me-2"></i>
+                    Continuar Comprando
+                </a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-cart">
+        <i class="fas fa-shopping-cart"></i>
+        <h3 class="mb-3">Seu carrinho está vazio</h3>
+        <p class="text-muted mb-4">Adicione produtos incríveis ao seu carrinho!</p>
+        <a href="{{ url_for('shop') }}" class="btn btn-success btn-lg">
+            Ir à loja
+        </a>
+    </div>
+    {% endif %}
+</div>
+<!-- End Cart -->
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Atualizar quantidade
+document.querySelectorAll('.quantity-input').forEach(input => {
+    input.addEventListener('change', function() {
+        const itemId = this.dataset.itemId;
+        const quantidade = parseInt(this.value);
+
+        if (quantidade < 1) {
+            this.value = 1;
+            return;
+        }
+
+        fetch(`/api/carrinho/atualizar/${itemId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ quantidade: quantidade })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Atualizar subtotal do item
+                const cartItem = document.querySelector(`.cart-item[data-item-id="${itemId}"]`);
+                const subtotalElement = cartItem.querySelector('.item-subtotal');
+
+                // Formatar como moeda brasileira
+                const subtotalFormatado = new Intl.NumberFormat('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL'
+                }).format(data.subtotal);
+
+                subtotalElement.textContent = subtotalFormatado;
+
+                // Recalcular total geral
+                atualizarTotalGeral();
+
+                // Atualizar badge do carrinho
+                atualizarBadgeCarrinho();
+            } else {
+                alert(data.message || 'Erro ao atualizar carrinho');
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao atualizar carrinho');
+        });
+    });
+});
+
+// Remover item
+document.querySelectorAll('.btn-remove').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        if (!confirm('Deseja remover este item do carrinho?')) {
+            return;
+        }
+
+        const itemId = this.dataset.itemId;
+
+        fetch(`/api/carrinho/remover/${itemId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Remover item da interface
+                const cartItem = document.querySelector(`.cart-item[data-item-id="${itemId}"]`);
+                cartItem.remove();
+
+                // Verificar se o carrinho está vazio
+                const remainingItems = document.querySelectorAll('.cart-item');
+                if (remainingItems.length === 0) {
+                    location.reload(); // Recarregar para mostrar mensagem de carrinho vazio
+                } else {
+                    // Recalcular total geral
+                    atualizarTotalGeral();
+                }
+
+                // Atualizar badge do carrinho
+                atualizarBadgeCarrinho();
+            } else {
+                alert(data.message || 'Erro ao remover item');
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao remover item');
+        });
+    });
+});
+
+// Atualizar total geral
+function atualizarTotalGeral() {
+    let total = 0;
+
+    document.querySelectorAll('.cart-item').forEach(item => {
+        const subtotalText = item.querySelector('.item-subtotal').textContent;
+        const subtotalValue = parseFloat(subtotalText.replace('R$', '').replace(/\./g, '').replace(',', '.'));
+        total += subtotalValue;
+    });
+
+    const totalFormatado = new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    }).format(total);
+
+    document.getElementById('cart-subtotal').textContent = totalFormatado;
+    document.getElementById('cart-total').textContent = totalFormatado;
+}
+
+// Finalizar pedido via WhatsApp
+document.getElementById('checkout-btn')?.addEventListener('click', function() {
+    let mensagem = '*Novo Pedido - Xodó da Preta*\n\n';
+
+    document.querySelectorAll('.cart-item').forEach((item, index) => {
+        const nome = item.querySelector('h5').textContent;
+        const quantidade = item.querySelector('.quantity-input').value;
+        const preco = item.querySelector('.item-subtotal').textContent;
+        const tamanhoElement = item.querySelector('.text-muted.small:nth-of-type(2)');
+        const tamanho = tamanhoElement ? tamanhoElement.textContent : '';
+
+        mensagem += `${index + 1}. ${nome}\n`;
+        if (tamanho) mensagem += `   ${tamanho}\n`;
+        mensagem += `   Quantidade: ${quantidade}\n`;
+        mensagem += `   Subtotal: ${preco}\n\n`;
+    });
+
+    const total = document.getElementById('cart-total').textContent;
+    mensagem += `*Total: ${total}*\n\n`;
+    mensagem += 'Aguardo informações sobre o frete!';
+
+    const phoneNumber = '5511954375056';
+    const whatsappURL = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(mensagem)}`;
+
+    window.open(whatsappURL, '_blank');
+});
+
+// Atualizar badge do carrinho no header
+function atualizarBadgeCarrinho() {
+    fetch('/api/carrinho/total')
+        .then(response => response.json())
+        .then(data => {
+            const badge = document.querySelector('.fa-cart-arrow-down + .badge');
+            if (badge) {
+                badge.textContent = data.total_itens || '0';
+            }
+        });
+}
+</script>
+{% endblock %}

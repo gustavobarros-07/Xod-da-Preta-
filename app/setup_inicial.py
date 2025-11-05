@@ -1,6 +1,9 @@
 """
-Script para inicializar o banco de dados
-Execute: python init_db.py
+Script para configuração inicial do projeto Xodó da Preta
+Execute APENAS na primeira vez que instalar o projeto: python setup_inicial.py
+
+⚠️ ATENÇÃO: Este script apaga TODOS os dados existentes!
+Para apenas adicionar produtos de exemplo, use: python populate_products.py
 """
 
 from main import app
@@ -125,11 +128,26 @@ def init_database():
         print("\n🚀 Inicie o servidor com: python main.py")
 
 if __name__ == '__main__':
-    print("\n🎯 INICIALIZANDO BANCO DE DADOS - XODÓ DA PRETA\n")
-    print("⚠️  ATENÇÃO: Isso vai APAGAR todos os dados existentes!")
+    print("\n" + "="*60)
+    print("🎯 SETUP INICIAL - XODÓ DA PRETA")
+    print("="*60)
+    print("\n⚠️  ATENÇÃO: Isso vai APAGAR todos os dados existentes!")
+    print("📋 O que será feito:")
+    print("   - Recriar todas as tabelas do banco")
+    print("   - Criar usuário admin padrão")
+    print("   - Configurar informações da loja")
+    print("   - Adicionar alguns produtos de exemplo")
+    print("\n💡 Dica: Para apenas adicionar produtos, use 'populate_products.py'\n")
+
     resposta = input("Deseja continuar? (s/n): ")
-    
+
     if resposta.lower() == 's':
         init_database()
+        print("\n📝 Próximos passos:")
+        print("   1. Execute: python populate_products.py (para mais produtos)")
+        print("   2. Inicie o servidor: python main.py")
+        print("   3. Acesse http://localhost:5000/admin/login")
+        print("   4. Login: admin / Senha: admin123")
+        print("   5. ⚠️ TROQUE A SENHA IMEDIATAMENTE!")
     else:
-        print("❌ Operação cancelada.")
+        print("\n❌ Operação cancelada.")

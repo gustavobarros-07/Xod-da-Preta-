@@ -537,26 +537,68 @@ function decreaseQty() {
 // Adicionar ao carrinho
 function addToCart() {
     const tamanhos = {{ produto.tamanhos|from_json|tojson }};
-    
+
     // Validar tamanho (se produto tiver tamanhos)
     if (tamanhos.length > 0 && !selectedSize) {
         alert('Por favor, selecione um tamanho!');
         return;
     }
-    
-    // Dados do produto
-    const productData = {
-        id: {{ produto.id }},
-        nome: '{{ produto.nome }}',
-        preco: {{ produto.preco }},
-        tamanho: selectedSize || 'Único',
-        quantidade: quantity
-    };
-    
-    console.log('Adicionando ao carrinho:', productData);
-    
-    // Placeholder - será implementado com sistema de carrinho
-    alert(`✓ Produto adicionado ao carrinho!\n\n${productData.nome}\nTamanho: ${productData.tamanho}\nQuantidade: ${productData.quantidade}`);
+
+    const btn = document.querySelector('.btn-add-cart');
+    const originalText = btn.innerHTML;
+
+    // Mostrar loading
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adicionando...';
+
+    // Enviar para API
+    fetch('/api/carrinho/adicionar', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            produto_id: {{ produto.id }},
+            quantidade: quantity,
+            tamanho: selectedSize
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Sucesso - mostrar feedback
+            btn.innerHTML = '<i class="fas fa-check"></i> Adicionado!';
+            btn.style.background = '#28a745';
+
+            // Atualizar badge do carrinho
+            if (typeof atualizarBadgeCarrinho === 'function') {
+                atualizarBadgeCarrinho();
+            }
+
+            // Resetar botão após 2 segundos
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                btn.style.background = '';
+            }, 2000);
+
+            // Perguntar se quer ir para o carrinho
+            if (confirm('Produto adicionado ao carrinho! Deseja ir para o carrinho agora?')) {
+                window.location.href = '/carrinho';
+            }
+        } else {
+            // Erro
+            alert(data.message || 'Erro ao adicionar produto ao carrinho');
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        alert('Erro ao adicionar produto ao carrinho');
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    });
 }
 </script>
 {% endblock %}
