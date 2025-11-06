@@ -32,7 +32,16 @@ class Config:
     
     # Categorias disponíveis
     CATEGORIES = ['Brincos', 'Roupas', 'Colares', 'Anéis', 'Pulseiras']
-    
+
+    # Hierarquia de Categorias (3 níveis)
+    CATEGORY_HIERARCHY = {
+        'Roupas': {
+            'Feminino': ['Vestido', 'Saia', 'Macacão', 'Jaqueta'],
+            'Masculino': ['Camisa', 'Bata', 'Conjunto', 'Jaqueta']
+        }
+        # Outras categorias não têm hierarquia (apenas 1 nível)
+    }
+
     # Tamanhos disponíveis
     SIZES = ['PP', 'P', 'M', 'G', 'GG', 'Único']
     

@@ -20,11 +20,11 @@ def init_db(app):
     
     with app.app_context():
         # Importar modelos aqui para evitar importação circular
-        from models import Produto, Admin, Configuracao
-        
+        from models import Produto, Admin, Configuracao, Subcategoria
+
         # Criar todas as tabelas
         db.create_all()
-        
+
         print("✅ Banco de dados inicializado com sucesso!")
 
 def get_db():

@@ -8,7 +8,7 @@ from functools import wraps
 import os
 from pathlib import Path
 from database import db
-from models import Produto, Admin, Configuracao
+from models import Produto, Admin, Configuracao, Subcategoria
 from config import Config
 import json
 
@@ -140,35 +140,45 @@ def produto_novo():
         descricao = request.form.get('descricao')
         preco = float(request.form.get('preco'))
         categoria = request.form.get('categoria')
+        subcategoria = request.form.get('subcategoria')  # Feminino/Masculino
+        tipo = request.form.get('tipo')  # Vestido, Camisa, etc.
+        subcategoria_id = request.form.get('subcategoria_id')  # Legado
         tamanhos = request.form.getlist('tamanhos')
         ativo = request.form.get('ativo') == 'on'
         ordem = int(request.form.get('ordem', 0))
-        
+
         # Upload de imagem
         imagem_file = request.files.get('imagem')
         imagem_filename = save_product_image(imagem_file) if imagem_file else None
-        
+
         # Criar produto
         produto = Produto(
             nome=nome,
             descricao=descricao,
             preco=preco,
             categoria=categoria,
+            subcategoria=subcategoria if subcategoria else None,
+            tipo=tipo if tipo else None,
+            subcategoria_id=int(subcategoria_id) if subcategoria_id else None,
             tamanhos=json.dumps(tamanhos),
             imagem=imagem_filename,
             ativo=ativo,
             ordem=ordem
         )
-        
+
         db.session.add(produto)
         db.session.commit()
-        
+
         flash(f'Produto "{nome}" adicionado com sucesso!', 'success')
         return redirect(url_for('admin.produtos'))
-    
+
+    # Buscar todas as subcategorias para o formulário
+    subcategorias = Subcategoria.query.filter_by(ativo=True).order_by(Subcategoria.categoria, Subcategoria.ordem).all()
+
     return render_template('admin/produto_form.html',
                          categorias=Config.CATEGORIES,
                          tamanhos_disponiveis=Config.SIZES,
+                         subcategorias=subcategorias,
                          produto=None)
 
 @admin_bp.route('/produtos/<int:produto_id>/editar', methods=['GET', 'POST'])
@@ -183,10 +193,14 @@ def produto_editar(produto_id):
         produto.descricao = request.form.get('descricao')
         produto.preco = float(request.form.get('preco'))
         produto.categoria = request.form.get('categoria')
+        produto.subcategoria = request.form.get('subcategoria') or None
+        produto.tipo = request.form.get('tipo') or None
+        subcategoria_id = request.form.get('subcategoria_id')
+        produto.subcategoria_id = int(subcategoria_id) if subcategoria_id else None
         produto.tamanhos = json.dumps(request.form.getlist('tamanhos'))
         produto.ativo = request.form.get('ativo') == 'on'
         produto.ordem = int(request.form.get('ordem', 0))
-        
+
         # Upload de nova imagem (opcional)
         imagem_file = request.files.get('imagem')
         if imagem_file and imagem_file.filename:
@@ -195,21 +209,25 @@ def produto_editar(produto_id):
                 old_image_path = Config.UPLOAD_FOLDER / produto.imagem
                 if old_image_path.exists():
                     old_image_path.unlink()
-            
+
             # Salvar nova imagem
             produto.imagem = save_product_image(imagem_file)
-        
+
         db.session.commit()
-        
+
         flash(f'Produto "{produto.nome}" atualizado com sucesso!', 'success')
         return redirect(url_for('admin.produtos'))
-    
+
     # Converter tamanhos de JSON para lista
     tamanhos_produto = json.loads(produto.tamanhos) if produto.tamanhos else []
-    
+
+    # Buscar todas as subcategorias para o formulário
+    subcategorias = Subcategoria.query.filter_by(ativo=True).order_by(Subcategoria.categoria, Subcategoria.ordem).all()
+
     return render_template('admin/produto_form.html',
                          categorias=Config.CATEGORIES,
                          tamanhos_disponiveis=Config.SIZES,
+                         subcategorias=subcategorias,
                          produto=produto,
                          tamanhos_produto=tamanhos_produto)
 
@@ -268,3 +286,124 @@ def configuracoes():
     }
     
     return render_template('admin/config.html', configs=configs)
+
+# ========================================
+# GERENCIAR SUBCATEGORIAS
+# ========================================
+
+@admin_bp.route('/subcategorias')
+@login_required
+def subcategorias():
+    """Lista todas as subcategorias"""
+    subcategorias = Subcategoria.query.order_by(Subcategoria.categoria, Subcategoria.ordem).all()
+
+    # Agrupar por categoria
+    subcategorias_por_categoria = {}
+    for subcat in subcategorias:
+        if subcat.categoria not in subcategorias_por_categoria:
+            subcategorias_por_categoria[subcat.categoria] = []
+        subcategorias_por_categoria[subcat.categoria].append(subcat)
+
+    return render_template('admin/subcategorias.html',
+                         subcategorias_por_categoria=subcategorias_por_categoria,
+                         categorias=Config.CATEGORIES)
+
+@admin_bp.route('/subcategorias/nova', methods=['GET', 'POST'])
+@login_required
+def subcategoria_nova():
+    """Adicionar nova subcategoria"""
+    if request.method == 'POST':
+        nome = request.form.get('nome')
+        categoria = request.form.get('categoria')
+        ativo = request.form.get('ativo') == 'on'
+        ordem = int(request.form.get('ordem', 0))
+
+        # Verificar se já existe
+        existe = Subcategoria.query.filter_by(nome=nome, categoria=categoria).first()
+        if existe:
+            flash(f'Subcategoria "{nome}" já existe para a categoria "{categoria}".', 'warning')
+            return redirect(url_for('admin.subcategoria_nova'))
+
+        # Criar subcategoria
+        subcategoria = Subcategoria(
+            nome=nome,
+            categoria=categoria,
+            ativo=ativo,
+            ordem=ordem
+        )
+
+        db.session.add(subcategoria)
+        db.session.commit()
+
+        flash(f'Subcategoria "{nome}" adicionada com sucesso!', 'success')
+        return redirect(url_for('admin.subcategorias'))
+
+    return render_template('admin/subcategoria_form.html',
+                         categorias=Config.CATEGORIES,
+                         subcategoria=None)
+
+@admin_bp.route('/subcategorias/<int:subcategoria_id>/editar', methods=['GET', 'POST'])
+@login_required
+def subcategoria_editar(subcategoria_id):
+    """Editar subcategoria existente"""
+    subcategoria = Subcategoria.query.get_or_404(subcategoria_id)
+
+    if request.method == 'POST':
+        nome = request.form.get('nome')
+        categoria = request.form.get('categoria')
+
+        # Verificar se já existe (exceto a atual)
+        existe = Subcategoria.query.filter(
+            Subcategoria.nome == nome,
+            Subcategoria.categoria == categoria,
+            Subcategoria.id != subcategoria_id
+        ).first()
+
+        if existe:
+            flash(f'Subcategoria "{nome}" já existe para a categoria "{categoria}".', 'warning')
+            return render_template('admin/subcategoria_form.html',
+                                 categorias=Config.CATEGORIES,
+                                 subcategoria=subcategoria)
+
+        # Atualizar dados
+        subcategoria.nome = nome
+        subcategoria.categoria = categoria
+        subcategoria.ativo = request.form.get('ativo') == 'on'
+        subcategoria.ordem = int(request.form.get('ordem', 0))
+
+        db.session.commit()
+
+        flash(f'Subcategoria "{subcategoria.nome}" atualizada com sucesso!', 'success')
+        return redirect(url_for('admin.subcategorias'))
+
+    return render_template('admin/subcategoria_form.html',
+                         categorias=Config.CATEGORIES,
+                         subcategoria=subcategoria)
+
+@admin_bp.route('/subcategorias/<int:subcategoria_id>/deletar', methods=['POST'])
+@login_required
+def subcategoria_deletar(subcategoria_id):
+    """Deletar subcategoria"""
+    subcategoria = Subcategoria.query.get_or_404(subcategoria_id)
+    nome = subcategoria.nome
+
+    # Verificar se há produtos usando esta subcategoria
+    produtos_com_subcat = Produto.query.filter_by(subcategoria_id=subcategoria_id).count()
+    if produtos_com_subcat > 0:
+        flash(f'Não é possível deletar a subcategoria "{nome}" pois existem {produtos_com_subcat} produto(s) associado(s).', 'danger')
+        return redirect(url_for('admin.subcategorias'))
+
+    db.session.delete(subcategoria)
+    db.session.commit()
+
+    flash(f'Subcategoria "{nome}" deletada com sucesso!', 'success')
+    return redirect(url_for('admin.subcategorias'))
+
+@admin_bp.route('/api/subcategorias/<categoria>')
+@login_required
+def api_subcategorias_por_categoria(categoria):
+    """API para buscar subcategorias por categoria (para uso em AJAX)"""
+    subcategorias = Subcategoria.query.filter_by(categoria=categoria, ativo=True).order_by(Subcategoria.ordem).all()
+    return {
+        'subcategorias': [subcat.to_dict() for subcat in subcategorias]
+    }

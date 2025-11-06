@@ -2,15 +2,47 @@ from datetime import datetime
 from database import db
 from werkzeug.security import generate_password_hash, check_password_hash
 
+
+class Subcategoria(db.Model):
+    """Modelo para subcategorias de produtos"""
+    __tablename__ = 'subcategorias'
+
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(50), nullable=False)
+    categoria = db.Column(db.String(50), nullable=False)  # Categoria pai
+    ativo = db.Column(db.Boolean, default=True)
+    ordem = db.Column(db.Integer, default=0)  # Para ordenação
+    data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relacionamento com produtos
+    produtos = db.relationship('Produto', backref='subcategoria_obj', lazy=True)
+
+    def __repr__(self):
+        return f'<Subcategoria {self.categoria} - {self.nome}>'
+
+    def to_dict(self):
+        """Converte a subcategoria para dicionário"""
+        return {
+            'id': self.id,
+            'nome': self.nome,
+            'categoria': self.categoria,
+            'ativo': self.ativo,
+            'ordem': self.ordem
+        }
+
+
 class Produto(db.Model):
     """Modelo para produtos da loja"""
     __tablename__ = 'produtos'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False)
     descricao = db.Column(db.Text, nullable=True)
     preco = db.Column(db.Float, nullable=False)
-    categoria = db.Column(db.String(50), nullable=False)  # Brincos, Roupas, Colares
+    categoria = db.Column(db.String(50), nullable=False)  # Nível 1: Brincos, Roupas, Colares, etc.
+    subcategoria = db.Column(db.String(50), nullable=True)  # Nível 2: Feminino, Masculino (para Roupas)
+    tipo = db.Column(db.String(50), nullable=True)  # Nível 3: Vestido, Camisa, Saia, etc.
+    subcategoria_id = db.Column(db.Integer, db.ForeignKey('subcategorias.id'), nullable=True)  # Legado - manter por compatibilidade
     tamanhos = db.Column(db.String(200), nullable=True)  # JSON string: ["P", "M", "G"]
     imagem = db.Column(db.String(200), nullable=True)  # Nome do arquivo
     ordem = db.Column(db.Integer, default=0)  # Para ordenação personalizada
@@ -29,6 +61,10 @@ class Produto(db.Model):
             'descricao': self.descricao,
             'preco': self.preco,
             'categoria': self.categoria,
+            'subcategoria': self.subcategoria,
+            'tipo': self.tipo,
+            'subcategoria_id': self.subcategoria_id,
+            'subcategoria_nome': self.subcategoria_obj.nome if self.subcategoria_obj else None,
             'tamanhos': self.tamanhos,
             'imagem': self.imagem,
             'ordem': self.ordem,

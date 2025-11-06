@@ -22,43 +22,170 @@
         margin: 10px 0 0;
     }
     
-    /* Filtros Modernos */
-    .filter-section {
+    /* Sidebar de Filtros */
+    .shop-container {
+        display: flex;
+        gap: 30px;
+    }
+
+    .filters-sidebar {
+        width: 280px;
+        flex-shrink: 0;
         background: #fff;
-        padding: 20px;
         border-radius: 10px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        margin-bottom: 30px;
+        padding: 20px;
+        height: fit-content;
+        position: sticky;
+        top: 20px;
     }
-    
-    .filter-dropdown {
-        position: relative;
-        display: inline-block;
-        margin-right: 15px;
-    }
-    
-    .filter-btn {
-        background: #fff;
-        border: 2px solid #ddd;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-weight: 500;
-        transition: all 0.3s;
-        display: inline-flex;
+
+    .sidebar-header {
+        display: flex;
         align-items: center;
-        gap: 8px;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f0f0f0;
     }
-    
-    .filter-btn:hover,
-    .filter-btn.active {
-        border-color: #D4AF37;
+
+    .sidebar-header h5 {
+        font-weight: 700;
+        color: #000;
+        margin: 0;
+        font-size: 18px;
+    }
+
+    .clear-all-filters {
+        color: #D4AF37;
+        font-size: 13px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s;
+    }
+
+    .clear-all-filters:hover {
+        color: #C48835;
+        text-decoration: underline;
+    }
+
+    /* Accordion Customizado */
+    .filter-accordion {
+        border: none;
+    }
+
+    .filter-accordion .accordion-item {
+        border: none;
+        border-bottom: 1px solid #f0f0f0;
+        background: transparent;
+    }
+
+    .filter-accordion .accordion-item:last-child {
+        border-bottom: none;
+    }
+
+    .filter-accordion .accordion-button {
+        background: transparent;
+        color: #000;
+        font-weight: 600;
+        font-size: 15px;
+        padding: 15px 0;
+        box-shadow: none;
+        border: none;
+    }
+
+    .filter-accordion .accordion-button:not(.collapsed) {
+        background: transparent;
+        color: #D4AF37;
+    }
+
+    .filter-accordion .accordion-button:focus {
+        border: none;
+        box-shadow: none;
+    }
+
+    .filter-accordion .accordion-button::after {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+    }
+
+    .filter-accordion .accordion-button:not(.collapsed)::after {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23D4AF37'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+    }
+
+    .filter-accordion .accordion-body {
+        padding: 0 0 15px 0;
+    }
+
+    /* Links de Filtro */
+    .filter-link {
+        display: block;
+        padding: 8px 12px;
+        color: #666;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 14px;
+        transition: all 0.2s;
+        margin-bottom: 4px;
+    }
+
+    .filter-link:hover {
+        background: #f8f8f8;
+        color: #000;
+        padding-left: 16px;
+    }
+
+    .filter-link.active {
         background: #D4AF37;
         color: #000;
+        font-weight: 600;
     }
-    
-    .filter-btn i {
-        font-size: 14px;
+
+    .filter-link i {
+        width: 20px;
+        margin-right: 8px;
+        font-size: 13px;
+    }
+
+    /* Sub-filtros (3º nível) */
+    .sub-filter-link {
+        display: block;
+        padding: 6px 12px 6px 32px;
+        color: #888;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 13px;
+        transition: all 0.2s;
+        margin-bottom: 3px;
+    }
+
+    .sub-filter-link:hover {
+        background: #f8f8f8;
+        color: #000;
+        padding-left: 36px;
+    }
+
+    .sub-filter-link.active {
+        background: #C48835;
+        color: #000;
+        font-weight: 600;
+    }
+
+    /* Conteúdo Principal */
+    .products-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    /* Responsividade */
+    @media (max-width: 992px) {
+        .shop-container {
+            flex-direction: column;
+        }
+
+        .filters-sidebar {
+            width: 100%;
+            position: static;
+        }
     }
     
     /* Cards de Produto */
@@ -104,6 +231,19 @@
         padding: 5px 15px;
         border-radius: 20px;
         font-size: 12px;
+        font-weight: 600;
+        z-index: 2;
+    }
+
+    .product-subcategory-badge {
+        position: absolute;
+        top: 50px;
+        left: 15px;
+        background: #C48835;
+        color: #000;
+        padding: 4px 12px;
+        border-radius: 15px;
+        font-size: 11px;
         font-weight: 600;
         z-index: 2;
     }
@@ -248,80 +388,136 @@
 </div>
 
 <div class="container pb-5">
-    <!-- Filtros -->
-    <div class="filter-section">
-        <div class="d-flex flex-wrap align-items-center">
-            <div class="filter-dropdown me-2 mb-2">
-                <a href="{{ url_for('shop') }}" 
-                   class="filter-btn {% if not request.args.get('categoria') and not request.args.get('preco') %}active{% endif %}">
-                    <i class="fas fa-th"></i> Todos
+    <div class="shop-container">
+        <!-- Sidebar de Filtros -->
+        <aside class="filters-sidebar">
+            <div class="sidebar-header">
+                <h5><i class="fas fa-filter"></i> Filtros</h5>
+                {% if request.args.get('categoria') or request.args.get('subcategoria') or request.args.get('tipo') or request.args.get('preco') %}
+                <a href="{{ url_for('shop') }}" class="clear-all-filters">
+                    Limpar
                 </a>
-            </div>
-            
-            <div class="filter-dropdown me-2 mb-2">
-                <a href="{{ url_for('shop', categoria='Brincos') }}" 
-                   class="filter-btn {% if request.args.get('categoria') == 'Brincos' %}active{% endif %}">
-                    <i class="fas fa-gem"></i> Brincos
-                </a>
-            </div>
-            
-            <div class="filter-dropdown me-2 mb-2">
-                <a href="{{ url_for('shop', categoria='Colares') }}"
-                   class="filter-btn {% if request.args.get('categoria') == 'Colares' %}active{% endif %}">
-                    <i class="fas fa-circle"></i> Colares
-                </a>
+                {% endif %}
             </div>
 
-            <div class="filter-dropdown me-2 mb-2">
-                <a href="{{ url_for('shop', categoria='Anéis') }}"
-                   class="filter-btn {% if request.args.get('categoria') == 'Anéis' %}active{% endif %}">
-                    <i class="fas fa-ring"></i> Anéis
-                </a>
-            </div>
+            <div class="accordion filter-accordion" id="filterAccordion">
+                <!-- Categorias -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#categoriaCollapse" aria-expanded="true">
+                            Categorias
+                        </button>
+                    </h2>
+                    <div id="categoriaCollapse" class="accordion-collapse collapse show">
+                        <div class="accordion-body">
+                            <a href="{{ url_for('shop') }}"
+                               class="filter-link {% if not request.args.get('categoria') %}active{% endif %}">
+                                <i class="fas fa-th"></i> Todos os Produtos
+                            </a>
 
-            <div class="filter-dropdown me-2 mb-2">
-                <a href="{{ url_for('shop', categoria='Pulseiras') }}"
-                   class="filter-btn {% if request.args.get('categoria') == 'Pulseiras' %}active{% endif %}">
-                    <i class="fas fa-circle-notch"></i> Pulseiras
-                </a>
-            </div>
+                            <a href="{{ url_for('shop', categoria='Brincos') }}"
+                               class="filter-link {% if categoria_filtro == 'Brincos' %}active{% endif %}">
+                                <i class="fas fa-gem"></i> Brincos
+                            </a>
 
-            <div class="filter-dropdown me-2 mb-2">
-                <a href="{{ url_for('shop', categoria='Roupas') }}"
-                   class="filter-btn {% if request.args.get('categoria') == 'Roupas' %}active{% endif %}">
-                    <i class="fas fa-tshirt"></i> Roupas
-                </a>
-            </div>
+                            <a href="{{ url_for('shop', categoria='Colares') }}"
+                               class="filter-link {% if categoria_filtro == 'Colares' %}active{% endif %}">
+                                <i class="fas fa-circle"></i> Colares
+                            </a>
 
-            <div class="filter-dropdown me-2 mb-2">
-                <a href="{{ url_for('shop', preco='0-50') }}" 
-                   class="filter-btn {% if request.args.get('preco') == '0-50' %}active{% endif %}">
-                    <i class="fas fa-tags"></i> Até R$ 50
-                </a>
+                            <a href="{{ url_for('shop', categoria='Anéis') }}"
+                               class="filter-link {% if categoria_filtro == 'Anéis' %}active{% endif %}">
+                                <i class="fas fa-ring"></i> Anéis
+                            </a>
+
+                            <a href="{{ url_for('shop', categoria='Pulseiras') }}"
+                               class="filter-link {% if categoria_filtro == 'Pulseiras' %}active{% endif %}">
+                                <i class="fas fa-circle-notch"></i> Pulseiras
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Roupas (com hierarquia de 3 níveis) -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button {% if categoria_filtro != 'Roupas' %}collapsed{% endif %}"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#roupasCollapse"
+                                aria-expanded="{% if categoria_filtro == 'Roupas' %}true{% else %}false{% endif %}">
+                            <i class="fas fa-tshirt me-2"></i> Roupas
+                        </button>
+                    </h2>
+                    <div id="roupasCollapse" class="accordion-collapse collapse {% if categoria_filtro == 'Roupas' %}show{% endif %}">
+                        <div class="accordion-body">
+                            <!-- Link para ver todas as roupas -->
+                            <a href="{{ url_for('shop', categoria='Roupas') }}"
+                               class="filter-link {% if categoria_filtro == 'Roupas' and not subcategoria_filtro %}active{% endif %}">
+                                <i class="fas fa-th"></i> Todas as Roupas
+                            </a>
+
+                            {% if hierarchy and 'Roupas' in hierarchy %}
+                                {% for subcategoria, tipos in hierarchy['Roupas'].items() %}
+                                    <!-- Subcategoria (Nível 2: Feminino/Masculino) -->
+                                    <a href="{{ url_for('shop', categoria='Roupas', subcategoria=subcategoria) }}"
+                                       class="filter-link {% if subcategoria_filtro == subcategoria and not tipo_filtro %}active{% endif %}">
+                                        <i class="fas fa-{% if subcategoria == 'Feminino' %}venus{% else %}mars{% endif %}"></i> {{ subcategoria }}
+                                    </a>
+
+                                    <!-- Tipos (Nível 3: Vestido, Camisa, etc.) -->
+                                    {% if subcategoria_filtro == subcategoria %}
+                                        {% for tipo in tipos %}
+                                            <a href="{{ url_for('shop', categoria='Roupas', subcategoria=subcategoria, tipo=tipo) }}"
+                                               class="sub-filter-link {% if tipo_filtro == tipo %}active{% endif %}">
+                                                {{ tipo }}
+                                            </a>
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Faixa de Preço -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#precoCollapse">
+                            Faixa de Preço
+                        </button>
+                    </h2>
+                    <div id="precoCollapse" class="accordion-collapse collapse">
+                        <div class="accordion-body">
+                            <a href="{{ url_for('shop', preco='0-50') }}"
+                               class="filter-link {% if request.args.get('preco') == '0-50' %}active{% endif %}">
+                                <i class="fas fa-tags"></i> Até R$ 50
+                            </a>
+
+                            <a href="{{ url_for('shop', preco='50-100') }}"
+                               class="filter-link {% if request.args.get('preco') == '50-100' %}active{% endif %}">
+                                <i class="fas fa-tags"></i> R$ 50 - R$ 100
+                            </a>
+
+                            <a href="{{ url_for('shop', preco='100+') }}"
+                               class="filter-link {% if request.args.get('preco') == '100+' %}active{% endif %}">
+                                <i class="fas fa-tags"></i> Acima de R$ 100
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
-            
-            <div class="filter-dropdown me-2 mb-2">
-                <a href="{{ url_for('shop', preco='50-100') }}" 
-                   class="filter-btn {% if request.args.get('preco') == '50-100' %}active{% endif %}">
-                    <i class="fas fa-tags"></i> R$ 50-100
-                </a>
-            </div>
-            
-            <div class="filter-dropdown me-2 mb-2">
-                <a href="{{ url_for('shop', preco='100+') }}" 
-                   class="filter-btn {% if request.args.get('preco') == '100+' %}active{% endif %}">
-                    <i class="fas fa-tags"></i> Acima de R$ 100
-                </a>
-            </div>
-        </div>
-    </div>
-    
+        </aside>
+
+        <!-- Conteúdo Principal (Produtos) -->
+        <div class="products-content">
+
     <!-- Informações de Resultado -->
     <div class="results-info">
         <span class="results-count">
             <strong>{{ produtos|length }}</strong> produto{% if produtos|length != 1 %}s{% endif %} encontrado{% if produtos|length != 1 %}s{% endif %}
         </span>
-        {% if request.args.get('categoria') or request.args.get('preco') %}
+        {% if request.args.get('categoria') or request.args.get('preco') or request.args.get('subcategoria') %}
         <a href="{{ url_for('shop') }}" class="clear-filters">
             <i class="fas fa-times"></i> Limpar filtros
         </a>
@@ -343,8 +539,23 @@
                                 <i class="fas fa-image fa-3x text-muted"></i>
                             </div>
                         {% endif %}
-                        
+
+                        <!-- Badge de Categoria (Nível 1) -->
                         <span class="product-badge">{{ produto.categoria }}</span>
+
+                        <!-- Badge de Subcategoria (Nível 2: Feminino/Masculino) -->
+                        {% if produto.subcategoria %}
+                            <span class="product-subcategory-badge">
+                                {{ produto.subcategoria }}
+                            </span>
+                        {% endif %}
+
+                        <!-- Badge de Tipo (Nível 3: Vestido/Camisa/etc.) - Se aplicável -->
+                        {% if produto.tipo %}
+                            <span class="product-subcategory-badge" style="top: 85px;">
+                                {{ produto.tipo }}
+                            </span>
+                        {% endif %}
                         
                         <div class="product-actions">
                             <a href="{{ url_for('shop_single', produto_id=produto.id) }}" 
@@ -392,7 +603,9 @@
             </div>
         {% endif %}
     </div>
-</div>
+        </div><!-- /products-content -->
+    </div><!-- /shop-container -->
+</div><!-- /container -->
 {% endblock %}
 
 {% block extra_js %}

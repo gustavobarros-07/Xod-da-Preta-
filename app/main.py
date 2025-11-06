@@ -24,6 +24,8 @@ db.init_app(app)
 
 # Criar tabelas se não existirem
 with app.app_context():
+    # Importar modelos para garantir que sejam registrados
+    from models import Produto, Admin, Configuracao, Subcategoria
     db.create_all()
 
 # Registrar Blueprint do Admin
@@ -50,20 +52,31 @@ def contact():
 
 @app.route("/shop")
 def shop():
-    """Página da loja com filtros"""
-    from models import Produto
-    
-    # Filtros da URL
-    categoria_filtro = request.args.get('categoria')
+    """Página da loja com filtros hierárquicos (3 níveis)"""
+    from models import Produto, Subcategoria
+    from config import Config
+
+    # Filtros da URL (3 níveis)
+    categoria_filtro = request.args.get('categoria')  # Nível 1: Roupas, Brincos, etc.
+    subcategoria_filtro = request.args.get('subcategoria')  # Nível 2: Feminino, Masculino
+    tipo_filtro = request.args.get('tipo')  # Nível 3: Vestido, Camisa, etc.
     preco_filtro = request.args.get('preco')
-    
+
     # Query base: produtos ativos
     query = Produto.query.filter_by(ativo=True)
-    
-    # Aplicar filtro de categoria
+
+    # Aplicar filtro de categoria (Nível 1)
     if categoria_filtro:
         query = query.filter_by(categoria=categoria_filtro)
-    
+
+    # Aplicar filtro de subcategoria (Nível 2 - Feminino/Masculino)
+    if subcategoria_filtro:
+        query = query.filter_by(subcategoria=subcategoria_filtro)
+
+    # Aplicar filtro de tipo (Nível 3 - Vestido/Camisa/etc.)
+    if tipo_filtro:
+        query = query.filter_by(tipo=tipo_filtro)
+
     # Aplicar filtro de preço
     if preco_filtro:
         if preco_filtro == '0-50':
@@ -74,11 +87,23 @@ def shop():
             query = query.filter(Produto.preco > 100, Produto.preco <= 200)
         elif preco_filtro == '200+':
             query = query.filter(Produto.preco > 200)
-    
+
     # Ordenar e buscar
     produtos = query.order_by(Produto.ordem).all()
-    
-    return render_template("shop.html", produtos=produtos)
+
+    # Buscar subcategorias antigas (legado - manter compatibilidade)
+    subcategorias_legado = Subcategoria.query.filter_by(ativo=True).order_by(Subcategoria.categoria, Subcategoria.ordem).all()
+
+    return render_template(
+        "shop.html",
+        produtos=produtos,
+        categoria_filtro=categoria_filtro,
+        subcategoria_filtro=subcategoria_filtro,
+        tipo_filtro=tipo_filtro,
+        preco_filtro=preco_filtro,
+        subcategorias=subcategorias_legado,  # Legado
+        hierarchy=Config.CATEGORY_HIERARCHY
+    )
 
 @app.route("/shop/<int:produto_id>")
 def shop_single(produto_id):

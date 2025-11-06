@@ -158,6 +158,11 @@
                 </a>
             </li>
             <li>
+                <a href="{{ url_for('admin.subcategorias') }}">
+                    <i class="fas fa-tags"></i> Subcategorias
+                </a>
+            </li>
+            <li>
                 <a href="{{ url_for('admin.configuracoes') }}">
                     <i class="fas fa-cog"></i> Configurações
                 </a>
@@ -250,7 +255,44 @@
                                 </select>
                             </div>
                         </div>
-                        
+
+                        <!-- Campos de Hierarquia (aparecem apenas para Roupas) -->
+                        <div id="hierarquia-roupas" style="display: {% if produto and produto.categoria == 'Roupas' %}block{% else %}none{% endif %};">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="subcategoria" class="form-label">
+                                        <i class="fas fa-venus-mars"></i> Subcategoria (Gênero)
+                                    </label>
+                                    <select class="form-select" id="subcategoria" name="subcategoria">
+                                        <option value="">Selecione...</option>
+                                        <option value="Feminino" {% if produto and produto.subcategoria == 'Feminino' %}selected{% endif %}>Feminino</option>
+                                        <option value="Masculino" {% if produto and produto.subcategoria == 'Masculino' %}selected{% endif %}>Masculino</option>
+                                    </select>
+                                    <small class="text-muted">Selecione o gênero do produto</small>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label for="tipo" class="form-label">
+                                        <i class="fas fa-tag"></i> Tipo
+                                    </label>
+                                    <select class="form-select" id="tipo" name="tipo">
+                                        <option value="">Selecione primeiro a subcategoria...</option>
+                                        <!-- Feminino -->
+                                        <option value="Vestido" data-subcategoria="Feminino" {% if produto and produto.tipo == 'Vestido' %}selected{% endif %}>Vestido</option>
+                                        <option value="Saia" data-subcategoria="Feminino" {% if produto and produto.tipo == 'Saia' %}selected{% endif %}>Saia</option>
+                                        <option value="Macacão" data-subcategoria="Feminino" {% if produto and produto.tipo == 'Macacão' %}selected{% endif %}>Macacão</option>
+                                        <option value="Jaqueta" data-subcategoria="Feminino" {% if produto and produto.tipo == 'Jaqueta' %}selected{% endif %}>Jaqueta</option>
+                                        <!-- Masculino -->
+                                        <option value="Camisa" data-subcategoria="Masculino" {% if produto and produto.tipo == 'Camisa' %}selected{% endif %}>Camisa</option>
+                                        <option value="Bata" data-subcategoria="Masculino" {% if produto and produto.tipo == 'Bata' %}selected{% endif %}>Bata</option>
+                                        <option value="Conjunto" data-subcategoria="Masculino" {% if produto and produto.tipo == 'Conjunto' %}selected{% endif %}>Conjunto</option>
+                                        <option value="Jaqueta" data-subcategoria="Masculino" {% if produto and produto.tipo == 'Jaqueta' %}selected{% endif %}>Jaqueta</option>
+                                    </select>
+                                    <small class="text-muted">Tipo específico do produto</small>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="mb-3">
                             <label class="form-label">
                                 <i class="fas fa-ruler"></i> Tamanhos Disponíveis
@@ -348,7 +390,7 @@
         function previewImage(event) {
             const file = event.target.files[0];
             const preview = document.getElementById('imagePreview');
-            
+
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
@@ -360,6 +402,67 @@
                 reader.readAsDataURL(file);
             }
         }
+
+        // Controlar exibição da hierarquia de roupas
+        document.addEventListener('DOMContentLoaded', function() {
+            const categoriaSelect = document.getElementById('categoria');
+            const hierarquiaDiv = document.getElementById('hierarquia-roupas');
+            const subcategoriaSelect = document.getElementById('subcategoria');
+            const tipoSelect = document.getElementById('tipo');
+
+            // Função para mostrar/ocultar hierarquia baseado na categoria
+            function toggleHierarquia() {
+                if (categoriaSelect.value === 'Roupas') {
+                    hierarquiaDiv.style.display = 'block';
+                } else {
+                    hierarquiaDiv.style.display = 'none';
+                    // Limpar valores quando não é Roupas
+                    if (subcategoriaSelect) subcategoriaSelect.value = '';
+                    if (tipoSelect) tipoSelect.value = '';
+                }
+            }
+
+            // Função para filtrar tipos baseado na subcategoria selecionada
+            function filtrarTipos() {
+                const subcategoriaSelecionada = subcategoriaSelect.value;
+                const tipoOptions = tipoSelect.querySelectorAll('option');
+
+                tipoOptions.forEach(option => {
+                    if (option.value === '') {
+                        option.style.display = 'block';
+                        option.textContent = subcategoriaSelecionada ?
+                            'Selecione o tipo...' :
+                            'Selecione primeiro a subcategoria...';
+                    } else {
+                        const optionSubcat = option.getAttribute('data-subcategoria');
+                        if (optionSubcat === subcategoriaSelecionada) {
+                            option.style.display = 'block';
+                        } else {
+                            option.style.display = 'none';
+                        }
+                    }
+                });
+
+                // Resetar seleção se o tipo atual não pertence à nova subcategoria
+                const selectedTipo = tipoSelect.options[tipoSelect.selectedIndex];
+                if (selectedTipo && selectedTipo.getAttribute('data-subcategoria') !== subcategoriaSelecionada) {
+                    tipoSelect.value = '';
+                }
+            }
+
+            // Event listeners
+            if (categoriaSelect) {
+                categoriaSelect.addEventListener('change', toggleHierarquia);
+                // Trigger no load
+                toggleHierarquia();
+            }
+
+            if (subcategoriaSelect && tipoSelect) {
+                subcategoriaSelect.addEventListener('change', filtrarTipos);
+                // Trigger no load para mostrar tipos corretos
+                filtrarTipos();
+            }
+        });
     </script>
 </body>
 </html>
