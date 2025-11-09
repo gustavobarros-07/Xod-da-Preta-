@@ -253,4 +253,4 @@ if __name__ == '__main__':
         print("\nVocê pode agora:")
         print("  1. Acessar a loja em: http://localhost:5000/shop")
         print("  2. Testar os filtros por categoria")
-        print("  3. Gerenciar produtos no painel admin em: http://localhost:5000/admin")
+        print("  3. Gerenciar produtos no painel admin em: http://localhost:5000/admin/login")
