@@ -1,15 +1,3 @@
-# Ambiente Virtual Python
-venv/
-env/
-.venv/
-ENV/
-
-# Banco de Dados
-instance/
-*.db
-*.sqlite
-*.sqlite3
-
 # Python
 __pycache__/
 *.py[cod]
@@ -17,35 +5,30 @@ __pycache__/
 *.so
 .Python
 
+# Ambientes virtuais
+venv/
+env/
+ENV/
+.venv
+
 # Flask
 instance/
-.webassets-cache
+.env
+*.db
 
-# Uploads de usuários
-app/static/uploads/*
-!app/static/uploads/.gitkeep
-
-# IDEs e Editores
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
-.DS_Store
 
 # Sistema Operacional
-Thumbs.db
 .DS_Store
+Thumbs.db
+
+# Uploads (ignorar imagens mas manter a estrutura)
+app/static/uploads/*
+!app/static/uploads/.gitkeep
 
 # Logs
 *.log
-
-# Variáveis de ambiente
-.env
-.env.local
-*.env
-
-# Arquivos temporários
-*.tmp
-*.bak
-*.cache

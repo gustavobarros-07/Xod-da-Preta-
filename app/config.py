@@ -43,7 +43,7 @@ class Config:
     }
 
     # Tamanhos disponíveis
-    SIZES = ['PP', 'P', 'M', 'G', 'GG', 'Único']
+    SIZES = ['PP', 'P', 'M', 'G', 'GG', 'GG1', 'GG2', 'GG3', 'Único']
     
     @staticmethod
     def init_app(app):
