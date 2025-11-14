@@ -97,27 +97,83 @@ def logout():
 @admin_bp.route('/dashboard')
 @login_required
 def dashboard():
-    """Dashboard principal do admin"""
-    # Estatísticas
+    """Dashboard principal do admin com métricas avançadas"""
+    from datetime import datetime, timedelta
+    from models import ProdutoVisualizacao
+
+    # ===== ESTATÍSTICAS BÁSICAS =====
     total_produtos = Produto.query.count()
     produtos_ativos = Produto.query.filter_by(ativo=True).count()
     produtos_inativos = Produto.query.filter_by(ativo=False).count()
-    
-    # Produtos por categoria
-    categorias = {}
-    for categoria in Config.CATEGORIES:
-        count = Produto.query.filter_by(categoria=categoria).count()
-        categorias[categoria] = count
-    
-    # Últimos produtos adicionados
+    produtos_sem_imagem = Produto.query.filter(
+        (Produto.imagem == None) | (Produto.imagem == '')
+    ).count()
+    produtos_destaque = Produto.query.filter_by(destaque=True).count()
+
+    # ===== ANÁLISE DE PREÇOS =====
+    produto_mais_caro = Produto.query.order_by(Produto.preco.desc()).first()
+    produto_mais_barato = Produto.query.filter(Produto.preco > 0).order_by(Produto.preco.asc()).first()
+    preco_medio = db.session.query(db.func.avg(Produto.preco)).scalar() or 0
+
+    # ===== PRODUTOS POR CATEGORIA (para gráfico de pizza) =====
+    categorias_stats = db.session.query(
+        Produto.categoria,
+        db.func.count(Produto.id).label('total')
+    ).group_by(Produto.categoria).all()
+
+    # Formatar para Chart.js
+    categorias_labels = [cat for cat, _ in categorias_stats]
+    categorias_valores = [total for _, total in categorias_stats]
+
+    # ===== PRODUTOS MAIS VISUALIZADOS (Top 10) =====
+    produtos_mais_vistos = Produto.query.filter(
+        Produto.visualizacoes > 0
+    ).order_by(Produto.visualizacoes.desc()).limit(10).all()
+
+    # ===== VISUALIZAÇÕES POR DIA (últimos 30 dias) =====
+    trinta_dias_atras = datetime.utcnow() - timedelta(days=30)
+    visualizacoes_por_dia = db.session.query(
+        db.func.date(ProdutoVisualizacao.data_visualizacao).label('dia'),
+        db.func.count(ProdutoVisualizacao.id).label('total')
+    ).filter(
+        ProdutoVisualizacao.data_visualizacao >= trinta_dias_atras
+    ).group_by('dia').order_by('dia').all()
+
+    # Formatar para Chart.js
+    visualizacoes_labels = [dia.strftime('%d/%m') for dia, _ in visualizacoes_por_dia]
+    visualizacoes_valores = [total for _, total in visualizacoes_por_dia]
+
+    # ===== ÚLTIMOS PRODUTOS ADICIONADOS =====
     ultimos_produtos = Produto.query.order_by(Produto.data_criacao.desc()).limit(5).all()
-    
+
+    # ===== TOTAL DE VISUALIZAÇÕES (últimos 30 dias) =====
+    total_visualizacoes = db.session.query(
+        db.func.count(ProdutoVisualizacao.id)
+    ).filter(
+        ProdutoVisualizacao.data_visualizacao >= trinta_dias_atras
+    ).scalar() or 0
+
     return render_template('admin/dashboard.html',
+                         # Estatísticas básicas
                          total_produtos=total_produtos,
                          produtos_ativos=produtos_ativos,
                          produtos_inativos=produtos_inativos,
-                         categorias=categorias,
-                         ultimos_produtos=ultimos_produtos)
+                         produtos_sem_imagem=produtos_sem_imagem,
+                         produtos_destaque=produtos_destaque,
+                         # Análise de preços
+                         produto_mais_caro=produto_mais_caro,
+                         produto_mais_barato=produto_mais_barato,
+                         preco_medio=preco_medio,
+                         # Dados para gráficos
+                         categorias_labels=categorias_labels,
+                         categorias_valores=categorias_valores,
+                         visualizacoes_labels=visualizacoes_labels,
+                         visualizacoes_valores=visualizacoes_valores,
+                         # Listas
+                         produtos_mais_vistos=produtos_mais_vistos,
+                         ultimos_produtos=ultimos_produtos,
+                         # Analytics
+                         total_visualizacoes=total_visualizacoes)
 
 # ========================================
 # GERENCIAR PRODUTOS

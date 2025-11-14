@@ -47,6 +47,8 @@ class Produto(db.Model):
     imagem = db.Column(db.String(200), nullable=True)  # Nome do arquivo
     ordem = db.Column(db.Integer, default=0)  # Para ordenação personalizada
     ativo = db.Column(db.Boolean, default=True)  # Produto visível ou não
+    destaque = db.Column(db.Boolean, default=False)  # Produto em destaque na home
+    visualizacoes = db.Column(db.Integer, default=0)  # Contador de visualizações
     data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
     data_atualizacao = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -159,3 +161,18 @@ class ItemCarrinho(db.Model):
             'tamanho': self.tamanho,
             'subtotal': self.produto.preco * self.quantidade
         }
+
+
+class ProdutoVisualizacao(db.Model):
+    """Modelo para rastreamento de visualizações de produtos (Analytics)"""
+    __tablename__ = 'produto_visualizacoes'
+
+    id = db.Column(db.Integer, primary_key=True)
+    produto_id = db.Column(db.Integer, db.ForeignKey('produtos.id'), nullable=False)
+    data_visualizacao = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relacionamento
+    produto = db.relationship('Produto', backref='visualizacoes_registro')
+
+    def __repr__(self):
+        return f'<ProdutoVisualizacao produto_id={self.produto_id} em {self.data_visualizacao}>'
