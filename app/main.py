@@ -38,7 +38,15 @@ app.register_blueprint(admin_bp)
 @app.route("/")
 def home():
     """Página inicial"""
-    return render_template("index.html")
+    from models import Produto
+
+    # Buscar produtos em destaque (máximo 4)
+    produtos_destaque = Produto.query.filter_by(
+        ativo=True,
+        destaque=True
+    ).order_by(Produto.ordem).limit(4).all()
+
+    return render_template("index.html", produtos_destaque=produtos_destaque)
 
 @app.route("/about")
 def about():
@@ -108,10 +116,19 @@ def shop():
 @app.route("/shop/<int:produto_id>")
 def shop_single(produto_id):
     """Página de produto individual"""
-    from models import Produto
+    from models import Produto, ProdutoVisualizacao
 
     # Buscar produto pelo ID
     produto = Produto.query.get_or_404(produto_id)
+
+    # Registrar visualização (analytics)
+    visualizacao = ProdutoVisualizacao()
+    visualizacao.produto_id = produto_id
+    db.session.add(visualizacao)
+
+    # Incrementar contador de visualizações
+    produto.visualizacoes += 1
+    db.session.commit()
 
     # Buscar produtos relacionados (mesma categoria)
     produtos_relacionados = Produto.query.filter(

@@ -201,6 +201,7 @@ def produto_novo():
         subcategoria_id = request.form.get('subcategoria_id')  # Legado
         tamanhos = request.form.getlist('tamanhos')
         ativo = request.form.get('ativo') == 'on'
+        destaque = request.form.get('destaque') == 'on'
         ordem = int(request.form.get('ordem', 0))
 
         # Upload de imagem
@@ -219,6 +220,7 @@ def produto_novo():
             tamanhos=json.dumps(tamanhos),
             imagem=imagem_filename,
             ativo=ativo,
+            destaque=destaque,
             ordem=ordem
         )
 
@@ -255,6 +257,7 @@ def produto_editar(produto_id):
         produto.subcategoria_id = int(subcategoria_id) if subcategoria_id else None
         produto.tamanhos = json.dumps(request.form.getlist('tamanhos'))
         produto.ativo = request.form.get('ativo') == 'on'
+        produto.destaque = request.form.get('destaque') == 'on'
         produto.ordem = int(request.form.get('ordem', 0))
 
         # Upload de nova imagem (opcional)
