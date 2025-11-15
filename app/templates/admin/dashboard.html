@@ -630,7 +630,7 @@
                             <td>
                                 <i class="fas fa-eye text-muted"></i> {{ produto.visualizacoes }}
                             </td>
-                            <td>{{ produto.data_criacao.strftime('%d/%m/%Y') }}</td>
+                            <td>{{ produto.data_criacao.strftime('%d/%m/%Y') if produto.data_criacao is not string else produto.data_criacao }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>

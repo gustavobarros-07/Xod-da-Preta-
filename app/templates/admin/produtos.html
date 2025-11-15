@@ -245,7 +245,7 @@
                                     <span class="badge bg-secondary">Inativo</span>
                                 {% endif %}
                             </td>
-                            <td>{{ produto.data_criacao.strftime('%d/%m/%Y') }}</td>
+                            <td>{{ produto.data_criacao.strftime('%d/%m/%Y') if produto.data_criacao is not string else produto.data_criacao }}</td>
                             <td>
                                 <a href="{{ url_for('shop_single', produto_id=produto.id) }}" 
                                    class="btn btn-sm btn-info btn-action" 

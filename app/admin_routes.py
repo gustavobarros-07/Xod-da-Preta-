@@ -140,7 +140,7 @@ def dashboard():
     ).group_by('dia').order_by('dia').all()
 
     # Formatar para Chart.js
-    visualizacoes_labels = [dia.strftime('%d/%m') for dia, _ in visualizacoes_por_dia]
+    visualizacoes_labels = [dia.strftime('%d/%m') if hasattr(dia, 'strftime') else str(dia) for dia, _ in visualizacoes_por_dia]
     visualizacoes_valores = [total for _, total in visualizacoes_por_dia]
 
     # ===== ÚLTIMOS PRODUTOS ADICIONADOS =====
