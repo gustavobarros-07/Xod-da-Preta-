@@ -352,27 +352,29 @@
     </div>
     
     <div class="row">
-        <!-- Galeria de Imagens (APENAS 2 FOTOS) -->
+        <!-- Galeria de Imagens (Múltiplas Fotos) -->
         <div class="col-lg-6">
             <div class="product-gallery">
                 <!-- Imagem Principal -->
-                <img id="mainImage" 
-                     src="{{ url_for('static', filename='uploads/' + produto.imagem) if produto.imagem else url_for('static', filename='zay/assets/img/product_single_10.jpg') }}" 
-                     alt="{{ produto.nome }}" 
+                {% set todas_imagens = produto.get_todas_imagens() %}
+                {% set primeira_imagem = todas_imagens[0] if todas_imagens else None %}
+
+                <img id="mainImage"
+                     src="{{ url_for('static', filename='uploads/' + primeira_imagem) if primeira_imagem else url_for('static', filename='zay/assets/img/product_single_10.jpg') }}"
+                     alt="{{ produto.nome }}"
                      class="main-image">
-                
-                <!-- Miniaturas (2 fotos) -->
+
+                <!-- Miniaturas (Todas as imagens) -->
+                {% if todas_imagens|length > 1 %}
                 <div class="thumbnail-container">
-                    <img src="{{ url_for('static', filename='uploads/' + produto.imagem) if produto.imagem else url_for('static', filename='zay/assets/img/product_single_10.jpg') }}" 
-                         alt="{{ produto.nome }}" 
-                         class="thumbnail active"
+                    {% for imagem in todas_imagens %}
+                    <img src="{{ url_for('static', filename='uploads/' + imagem) }}"
+                         alt="{{ produto.nome }}"
+                         class="thumbnail {% if loop.first %}active{% endif %}"
                          onclick="changeImage(this.src)">
-                    
-                    <img src="{{ url_for('static', filename='uploads/' + produto.imagem) if produto.imagem else url_for('static', filename='zay/assets/img/product_single_10.jpg') }}" 
-                         alt="{{ produto.nome }} - Alternativa" 
-                         class="thumbnail"
-                         onclick="changeImage(this.src)">
+                    {% endfor %}
                 </div>
+                {% endif %}
             </div>
         </div>
         

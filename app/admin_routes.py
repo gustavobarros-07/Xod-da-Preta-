@@ -204,9 +204,18 @@ def produto_novo():
         destaque = request.form.get('destaque') == 'on'
         ordem = int(request.form.get('ordem', 0))
 
-        # Upload de imagem
+        # Upload de imagem principal
         imagem_file = request.files.get('imagem')
         imagem_filename = save_product_image(imagem_file) if imagem_file else None
+
+        # Upload de imagens adicionais (galeria)
+        imagens_adicionais_files = request.files.getlist('imagens_adicionais')
+        imagens_adicionais_list = []
+        for img_file in imagens_adicionais_files:
+            if img_file and img_file.filename:
+                filename = save_product_image(img_file)
+                if filename:
+                    imagens_adicionais_list.append(filename)
 
         # Criar produto
         produto = Produto(
@@ -223,6 +232,10 @@ def produto_novo():
             destaque=destaque,
             ordem=ordem
         )
+
+        # Adicionar imagens adicionais ao produto
+        if imagens_adicionais_list:
+            produto.set_imagens_adicionais(imagens_adicionais_list)
 
         db.session.add(produto)
         db.session.commit()
@@ -260,7 +273,7 @@ def produto_editar(produto_id):
         produto.destaque = request.form.get('destaque') == 'on'
         produto.ordem = int(request.form.get('ordem', 0))
 
-        # Upload de nova imagem (opcional)
+        # Upload de nova imagem principal (opcional)
         imagem_file = request.files.get('imagem')
         if imagem_file and imagem_file.filename:
             # Deletar imagem antiga se existir
@@ -271,6 +284,34 @@ def produto_editar(produto_id):
 
             # Salvar nova imagem
             produto.imagem = save_product_image(imagem_file)
+
+        # Upload de novas imagens adicionais (galeria) - opcional
+        imagens_adicionais_files = request.files.getlist('imagens_adicionais')
+        if imagens_adicionais_files and any(f.filename for f in imagens_adicionais_files):
+            # Deletar imagens adicionais antigas se existir
+            if produto.imagens_adicionais:
+                import json as json_module
+                try:
+                    old_images = json_module.loads(produto.imagens_adicionais)
+                    for old_img in old_images:
+                        old_img_path = Config.UPLOAD_FOLDER / old_img
+                        if old_img_path.exists():
+                            old_img_path.unlink()
+                except:
+                    pass
+
+            # Salvar novas imagens
+            imagens_adicionais_list = []
+            for img_file in imagens_adicionais_files:
+                if img_file and img_file.filename:
+                    filename = save_product_image(img_file)
+                    if filename:
+                        imagens_adicionais_list.append(filename)
+
+            if imagens_adicionais_list:
+                produto.set_imagens_adicionais(imagens_adicionais_list)
+            else:
+                produto.imagens_adicionais = None
 
         db.session.commit()
 

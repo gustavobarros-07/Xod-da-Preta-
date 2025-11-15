@@ -1,6 +1,6 @@
 """
 Script para migrar o banco de dados
-Adiciona campos 'destaque' e 'visualizacoes' a tabela Produto
+Adiciona campos 'destaque', 'visualizacoes' e 'imagens_adicionais' a tabela Produto
 Cria tabelas ProdutoVisualizacao e ConteudoPagina
 """
 
@@ -35,6 +35,15 @@ def migrate_database():
                 print("[OK] Campo 'visualizacoes' adicionado")
             else:
                 print("[OK] Campo 'visualizacoes' ja existe")
+
+            # Adicionar campo 'imagens_adicionais' se nao existir
+            if 'imagens_adicionais' not in columns:
+                print("Adicionando campo 'imagens_adicionais' a tabela produtos...")
+                db.session.execute(db.text('ALTER TABLE produtos ADD COLUMN imagens_adicionais TEXT'))
+                db.session.commit()
+                print("[OK] Campo 'imagens_adicionais' adicionado (galeria de imagens)")
+            else:
+                print("[OK] Campo 'imagens_adicionais' ja existe")
 
         # Criar tabela produto_visualizacoes se nao existir
         if 'produto_visualizacoes' not in inspector.get_table_names():

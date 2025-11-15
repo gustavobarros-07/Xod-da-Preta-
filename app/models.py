@@ -44,7 +44,8 @@ class Produto(db.Model):
     tipo = db.Column(db.String(50), nullable=True)  # Nível 3: Vestido, Camisa, Saia, etc.
     subcategoria_id = db.Column(db.Integer, db.ForeignKey('subcategorias.id'), nullable=True)  # Legado - manter por compatibilidade
     tamanhos = db.Column(db.String(200), nullable=True)  # JSON string: ["P", "M", "G"]
-    imagem = db.Column(db.String(200), nullable=True)  # Nome do arquivo
+    imagem = db.Column(db.String(200), nullable=True)  # Nome do arquivo (imagem principal)
+    imagens_adicionais = db.Column(db.Text, nullable=True)  # JSON string: ["img1.jpg", "img2.jpg", "img3.jpg"]
     ordem = db.Column(db.Integer, default=0)  # Para ordenação personalizada
     ativo = db.Column(db.Boolean, default=True)  # Produto visível ou não
     destaque = db.Column(db.Boolean, default=False)  # Produto em destaque na home
@@ -73,6 +74,24 @@ class Produto(db.Model):
             'ativo': self.ativo,
             'data_criacao': self.data_criacao.strftime('%d/%m/%Y') if isinstance(self.data_criacao, datetime) else (self.data_criacao if self.data_criacao else None)
         }
+
+    def get_todas_imagens(self):
+        """Retorna lista com todas as imagens (principal + adicionais)"""
+        import json
+        imagens = []
+        if self.imagem:
+            imagens.append(self.imagem)
+        if self.imagens_adicionais:
+            try:
+                imagens.extend(json.loads(self.imagens_adicionais))
+            except:
+                pass
+        return imagens
+
+    def set_imagens_adicionais(self, lista_imagens):
+        """Define imagens adicionais a partir de uma lista"""
+        import json
+        self.imagens_adicionais = json.dumps(lista_imagens) if lista_imagens else None
 
 
 class Admin(db.Model):

@@ -69,6 +69,9 @@ def shop():
     subcategoria_filtro = request.args.get('subcategoria')  # Nível 2: Feminino, Masculino
     tipo_filtro = request.args.get('tipo')  # Nível 3: Vestido, Camisa, etc.
     preco_filtro = request.args.get('preco')
+    preco_min = request.args.get('preco_min', type=int)
+    preco_max = request.args.get('preco_max', type=int)
+    ordenar = request.args.get('ordenar', 'padrao')  # Ordenação
 
     # Query base: produtos ativos
     query = Produto.query.filter_by(ativo=True)
@@ -85,7 +88,7 @@ def shop():
     if tipo_filtro:
         query = query.filter_by(tipo=tipo_filtro)
 
-    # Aplicar filtro de preço
+    # Aplicar filtro de preço por faixas rápidas
     if preco_filtro:
         if preco_filtro == '0-50':
             query = query.filter(Produto.preco <= 50)
@@ -93,11 +96,31 @@ def shop():
             query = query.filter(Produto.preco > 50, Produto.preco <= 100)
         elif preco_filtro == '100-200':
             query = query.filter(Produto.preco > 100, Produto.preco <= 200)
+        elif preco_filtro == '100+':
+            query = query.filter(Produto.preco > 100)
         elif preco_filtro == '200+':
             query = query.filter(Produto.preco > 200)
 
-    # Ordenar e buscar
-    produtos = query.order_by(Produto.ordem).all()
+    # Aplicar filtro de preço customizado (slider)
+    if preco_min is not None and preco_max is not None:
+        query = query.filter(Produto.preco >= preco_min, Produto.preco <= preco_max)
+
+    # Aplicar ordenação
+    if ordenar == 'preco_asc':
+        query = query.order_by(Produto.preco.asc())
+    elif ordenar == 'preco_desc':
+        query = query.order_by(Produto.preco.desc())
+    elif ordenar == 'nome':
+        query = query.order_by(Produto.nome.asc())
+    elif ordenar == 'recentes':
+        query = query.order_by(Produto.data_criacao.desc())
+    elif ordenar == 'visualizacoes':
+        query = query.order_by(Produto.visualizacoes.desc())
+    else:  # padrao
+        query = query.order_by(Produto.ordem, Produto.id.desc())
+
+    # Buscar produtos
+    produtos = query.all()
 
     # Buscar subcategorias antigas (legado - manter compatibilidade)
     subcategorias_legado = Subcategoria.query.filter_by(ativo=True).order_by(Subcategoria.categoria, Subcategoria.ordem).all()

@@ -369,11 +369,105 @@
         text-align: center;
         padding: 80px 20px;
     }
-    
+
     .empty-state i {
         font-size: 80px;
         color: #ddd;
         margin-bottom: 20px;
+    }
+
+    /* Price Slider */
+    .price-slider-wrapper {
+        position: relative;
+        height: 40px;
+        margin-bottom: 10px;
+    }
+
+    .price-slider {
+        position: absolute;
+        width: 100%;
+        height: 5px;
+        -webkit-appearance: none;
+        appearance: none;
+        background: transparent;
+        outline: none;
+        pointer-events: none;
+    }
+
+    .price-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        background: #D4AF37;
+        cursor: pointer;
+        border-radius: 50%;
+        pointer-events: all;
+        position: relative;
+        z-index: 3;
+    }
+
+    .price-slider::-moz-range-thumb {
+        width: 18px;
+        height: 18px;
+        background: #D4AF37;
+        cursor: pointer;
+        border-radius: 50%;
+        pointer-events: all;
+        border: none;
+    }
+
+    .price-slider-wrapper::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: #e0e0e0;
+        border-radius: 5px;
+        z-index: 1;
+    }
+
+    #minPriceSlider {
+        z-index: 2;
+    }
+
+    #maxPriceSlider {
+        z-index: 2;
+    }
+
+    .filter-link-sm {
+        display: inline-block;
+        padding: 4px 10px;
+        margin: 4px 4px 4px 0;
+        background: #f5f5f5;
+        color: #666;
+        text-decoration: none;
+        border-radius: 4px;
+        font-size: 12px;
+        transition: all 0.3s;
+    }
+
+    .filter-link-sm:hover,
+    .filter-link-sm.active {
+        background: #D4AF37;
+        color: #1a1a1a;
+    }
+
+    /* Ordenação */
+    .sort-dropdown {
+        background: #fff;
+        border: 1px solid #ddd;
+        padding: 8px 12px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .sort-dropdown:hover {
+        border-color: #D4AF37;
     }
 </style>
 {% endblock %}
@@ -480,7 +574,7 @@
                     </div>
                 </div>
 
-                <!-- Faixa de Preço -->
+                <!-- Faixa de Preço com Slider -->
                 <div class="accordion-item">
                     <h2 class="accordion-header">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#precoCollapse">
@@ -489,20 +583,57 @@
                     </h2>
                     <div id="precoCollapse" class="accordion-collapse collapse">
                         <div class="accordion-body">
-                            <a href="{{ url_for('shop', preco='0-50') }}"
-                               class="filter-link {% if request.args.get('preco') == '0-50' %}active{% endif %}">
-                                <i class="fas fa-tags"></i> Até R$ 50
-                            </a>
+                            <form id="priceFilterForm" method="GET" action="{{ url_for('shop') }}">
+                                <!-- Preservar filtros existentes -->
+                                {% if request.args.get('categoria') %}
+                                <input type="hidden" name="categoria" value="{{ request.args.get('categoria') }}">
+                                {% endif %}
+                                {% if request.args.get('subcategoria') %}
+                                <input type="hidden" name="subcategoria" value="{{ request.args.get('subcategoria') }}">
+                                {% endif %}
+                                {% if request.args.get('tipo') %}
+                                <input type="hidden" name="tipo" value="{{ request.args.get('tipo') }}">
+                                {% endif %}
+                                {% if request.args.get('ordenar') %}
+                                <input type="hidden" name="ordenar" value="{{ request.args.get('ordenar') }}">
+                                {% endif %}
 
-                            <a href="{{ url_for('shop', preco='50-100') }}"
-                               class="filter-link {% if request.args.get('preco') == '50-100' %}active{% endif %}">
-                                <i class="fas fa-tags"></i> R$ 50 - R$ 100
-                            </a>
+                                <div class="price-filter-container">
+                                    <div class="price-range-display mb-3">
+                                        <span id="priceRangeText" style="color: #D4AF37; font-weight: 600; font-size: 14px;">
+                                            R$ <span id="minPriceDisplay">0</span> - R$ <span id="maxPriceDisplay">500</span>
+                                        </span>
+                                    </div>
 
-                            <a href="{{ url_for('shop', preco='100+') }}"
-                               class="filter-link {% if request.args.get('preco') == '100+' %}active{% endif %}">
-                                <i class="fas fa-tags"></i> Acima de R$ 100
-                            </a>
+                                    <div class="price-slider-wrapper mb-4">
+                                        <input type="range" id="minPriceSlider" class="price-slider" min="0" max="500" step="10" value="0">
+                                        <input type="range" id="maxPriceSlider" class="price-slider" min="0" max="500" step="10" value="500">
+                                        <input type="hidden" name="preco_min" id="preco_min" value="0">
+                                        <input type="hidden" name="preco_max" id="preco_max" value="500">
+                                    </div>
+
+                                    <button type="submit" class="btn btn-sm w-100" style="background: #D4AF37; color: #1a1a1a; font-weight: 600;">
+                                        <i class="fas fa-filter"></i> Aplicar Filtro
+                                    </button>
+                                </div>
+                            </form>
+
+                            <!-- Opções rápidas de preço -->
+                            <div class="mt-3 pt-3" style="border-top: 1px solid #e0e0e0;">
+                                <small class="text-muted d-block mb-2">Filtros rápidos:</small>
+                                <a href="{{ url_for('shop', preco='0-50', categoria=request.args.get('categoria'), subcategoria=request.args.get('subcategoria'), tipo=request.args.get('tipo')) }}"
+                                   class="filter-link-sm {% if request.args.get('preco') == '0-50' %}active{% endif %}">
+                                    Até R$ 50
+                                </a>
+                                <a href="{{ url_for('shop', preco='50-100', categoria=request.args.get('categoria'), subcategoria=request.args.get('subcategoria'), tipo=request.args.get('tipo')) }}"
+                                   class="filter-link-sm {% if request.args.get('preco') == '50-100' %}active{% endif %}">
+                                    R$ 50-100
+                                </a>
+                                <a href="{{ url_for('shop', preco='100+', categoria=request.args.get('categoria'), subcategoria=request.args.get('subcategoria'), tipo=request.args.get('tipo')) }}"
+                                   class="filter-link-sm {% if request.args.get('preco') == '100+' %}active{% endif %}">
+                                    R$ 100+
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -512,18 +643,36 @@
         <!-- Conteúdo Principal (Produtos) -->
         <div class="products-content">
 
-    <!-- Informações de Resultado -->
-    <div class="results-info">
+    <!-- Informações de Resultado e Ordenação -->
+    <div class="results-info" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
         <span class="results-count">
             <strong>{{ produtos|length }}</strong> produto{% if produtos|length != 1 %}s{% endif %} encontrado{% if produtos|length != 1 %}s{% endif %}
         </span>
-        {% if request.args.get('categoria') or request.args.get('preco') or request.args.get('subcategoria') %}
-        <a href="{{ url_for('shop') }}" class="clear-filters">
-            <i class="fas fa-times"></i> Limpar filtros
-        </a>
-        {% endif %}
+
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <!-- Ordenar por -->
+            <div class="sort-container">
+                <label for="sortSelect" style="margin-right: 8px; color: #666; font-size: 14px;">
+                    <i class="fas fa-sort"></i> Ordenar:
+                </label>
+                <select id="sortSelect" class="sort-dropdown" onchange="applySort(this.value)">
+                    <option value="padrao" {% if request.args.get('ordenar') == 'padrao' or not request.args.get('ordenar') %}selected{% endif %}>Padrão</option>
+                    <option value="recentes" {% if request.args.get('ordenar') == 'recentes' %}selected{% endif %}>Mais Recentes</option>
+                    <option value="preco_asc" {% if request.args.get('ordenar') == 'preco_asc' %}selected{% endif %}>Menor Preço</option>
+                    <option value="preco_desc" {% if request.args.get('ordenar') == 'preco_desc' %}selected{% endif %}>Maior Preço</option>
+                    <option value="nome" {% if request.args.get('ordenar') == 'nome' %}selected{% endif %}>Nome (A-Z)</option>
+                    <option value="visualizacoes" {% if request.args.get('ordenar') == 'visualizacoes' %}selected{% endif %}>Mais Vistos</option>
+                </select>
+            </div>
+
+            {% if request.args.get('categoria') or request.args.get('preco') or request.args.get('subcategoria') or request.args.get('preco_min') %}
+            <a href="{{ url_for('shop') }}" class="clear-filters" style="white-space: nowrap;">
+                <i class="fas fa-times"></i> Limpar filtros
+            </a>
+            {% endif %}
+        </div>
     </div>
-    
+
     <!-- Grid de Produtos -->
     <div class="row g-4">
         {% if produtos %}
@@ -614,5 +763,66 @@ function addToCart(produtoId) {
     // Redirecionar para a página do produto para ver detalhes e adicionar ao carrinho
     window.location.href = `/shop/${produtoId}`;
 }
+
+// Função de ordenação
+function applySort(sortValue) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('ordenar', sortValue);
+    window.location.href = url.toString();
+}
+
+// Price Slider Logic
+document.addEventListener('DOMContentLoaded', function() {
+    const minSlider = document.getElementById('minPriceSlider');
+    const maxSlider = document.getElementById('maxPriceSlider');
+    const minDisplay = document.getElementById('minPriceDisplay');
+    const maxDisplay = document.getElementById('maxPriceDisplay');
+    const minInput = document.getElementById('preco_min');
+    const maxInput = document.getElementById('preco_max');
+
+    if (minSlider && maxSlider) {
+        function updatePriceDisplay() {
+            let minVal = parseInt(minSlider.value);
+            let maxVal = parseInt(maxSlider.value);
+
+            // Garantir que min não ultrapasse max
+            if (minVal > maxVal - 10) {
+                minVal = maxVal - 10;
+                minSlider.value = minVal;
+            }
+
+            // Garantir que max não fique abaixo de min
+            if (maxVal < minVal + 10) {
+                maxVal = minVal + 10;
+                maxSlider.value = maxVal;
+            }
+
+            minDisplay.textContent = minVal;
+            maxDisplay.textContent = maxVal;
+            minInput.value = minVal;
+            maxInput.value = maxVal;
+        }
+
+        minSlider.addEventListener('input', updatePriceDisplay);
+        maxSlider.addEventListener('input', updatePriceDisplay);
+
+        // Inicializar com valores da URL se existirem
+        const urlParams = new URLSearchParams(window.location.search);
+        const precoMin = urlParams.get('preco_min');
+        const precoMax = urlParams.get('preco_max');
+
+        if (precoMin) {
+            minSlider.value = precoMin;
+            minInput.value = precoMin;
+            minDisplay.textContent = precoMin;
+        }
+
+        if (precoMax) {
+            maxSlider.value = precoMax;
+            maxInput.value = precoMax;
+            maxDisplay.textContent = precoMax;
+        }
+    }
+});
 </script>
 {% endblock %}
