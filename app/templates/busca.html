@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if termo %}Busca: {{ termo }}{% else %}Buscar Produtos{% endif %} - Xodó da Preta{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="container-fluid bg-light py-5">
+    <div class="col-md-8 m-auto text-center">
+        <h1 class="h1">
+            <i class="fas fa-search"></i>
+            {% if termo %}
+                Resultados para "{{ termo }}"
+            {% else %}
+                Buscar Produtos
+            {% endif %}
+        </h1>
+        {% if termo %}
+        <p class="text-muted">
+            {% if produtos %}
+                Encontramos {{ produtos|length }} produto(s) para sua busca
+            {% else %}
+                Nenhum produto encontrado para sua busca
+            {% endif %}
+        </p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Formulário de Busca -->
+<section class="container py-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <form action="{{ url_for('busca') }}" method="GET" class="mb-4">
+                <div class="input-group input-group-lg shadow-sm">
+                    <input type="text"
+                           name="q"
+                           class="form-control"
+                           placeholder="Digite o nome do produto, categoria ou descrição..."
+                           value="{{ termo }}"
+                           required
+                           autofocus>
+                    <button class="btn btn-success" type="submit">
+                        <i class="fas fa-search"></i> Buscar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Resultados -->
+{% if termo %}
+<section class="container pb-5">
+    {% if produtos %}
+    <!-- Lista de Produtos -->
+    <div class="row">
+        {% for produto in produtos %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm produto-card">
+                <a href="{{ url_for('shop_single', produto_id=produto.id) }}">
+                    {% if produto.imagem %}
+                    <img src="{{ url_for('static', filename='uploads/' + produto.imagem) }}"
+                         class="card-img-top"
+                         alt="{{ produto.nome }}"
+                         style="height: 300px; object-fit: cover;">
+                    {% else %}
+                    <div style="height: 300px; background: #f5f5f5; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-image fa-3x text-muted"></i>
+                    </div>
+                    {% endif %}
+                </a>
+
+                <div class="card-body d-flex flex-column">
+                    <a href="{{ url_for('shop_single', produto_id=produto.id) }}"
+                       class="text-decoration-none text-dark">
+                        <h5 class="card-title">{{ produto.nome }}</h5>
+                    </a>
+
+                    <span class="badge badge-primary mb-2">{{ produto.categoria }}</span>
+
+                    {% if produto.descricao %}
+                    <p class="card-text text-muted small">
+                        {{ produto.descricao[:100] }}{% if produto.descricao|length > 100 %}...{% endif %}
+                    </p>
+                    {% endif %}
+
+                    <div class="mt-auto">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="text-success mb-0 preco">{{ produto.preco|currency }}</h5>
+                            <a href="{{ url_for('shop_single', produto_id=produto.id) }}"
+                               class="btn btn-success btn-sm">
+                                Ver Detalhes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <!-- Nenhum Resultado -->
+    <div class="row">
+        <div class="col-md-8 mx-auto text-center py-5">
+            <i class="fas fa-search fa-4x text-muted mb-4"></i>
+            <h3 class="mb-3">Nenhum produto encontrado</h3>
+            <p class="text-muted mb-4">
+                Não encontramos produtos que correspondam à sua busca "<strong>{{ termo }}</strong>".<br>
+                Tente usar outras palavras-chave ou navegue pelas nossas categorias.
+            </p>
+
+            <div class="d-flex justify-content-center gap-2 flex-wrap">
+                <a href="{{ url_for('shop') }}" class="btn btn-success me-2">
+                    <i class="fas fa-th"></i> Ver Todos os Produtos
+                </a>
+                <a href="{{ url_for('home') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-home"></i> Voltar à Home
+                </a>
+            </div>
+
+            <!-- Sugestões -->
+            <div class="mt-5">
+                <h5 class="mb-3">Categorias populares:</h5>
+                <div class="d-flex justify-content-center gap-2 flex-wrap">
+                    <a href="{{ url_for('shop', categoria='Colares') }}"
+                       class="btn btn-outline-success btn-sm">
+                        Colares
+                    </a>
+                    <a href="{{ url_for('shop', categoria='Anéis') }}"
+                       class="btn btn-outline-success btn-sm">
+                        Anéis
+                    </a>
+                    <a href="{{ url_for('shop', categoria='Brincos') }}"
+                       class="btn btn-outline-success btn-sm">
+                        Brincos
+                    </a>
+                    <a href="{{ url_for('shop', categoria='Pulseiras') }}"
+                       class="btn btn-outline-success btn-sm">
+                        Pulseiras
+                    </a>
+                    <a href="{{ url_for('shop', categoria='Roupas') }}"
+                       class="btn btn-outline-success btn-sm">
+                        Roupas
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</section>
+{% else %}
+<!-- Página inicial de busca (sem termo) -->
+<section class="container pb-5">
+    <div class="row">
+        <div class="col-md-8 mx-auto text-center">
+            <i class="fas fa-search fa-4x text-muted mb-4"></i>
+            <h3 class="mb-3">O que você está procurando?</h3>
+            <p class="text-muted mb-4">
+                Digite na caixa de busca acima para encontrar produtos por nome, categoria ou descrição.
+            </p>
+
+            <div class="mt-4">
+                <h5 class="mb-3">Navegue por categoria:</h5>
+                <div class="row g-3">
+                    <div class="col-6 col-md-4">
+                        <a href="{{ url_for('shop', categoria='Colares') }}"
+                           class="card card-body text-center text-decoration-none hover-lift">
+                            <i class="fas fa-gem fa-2x text-success mb-2"></i>
+                            <h6 class="mb-0">Colares</h6>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <a href="{{ url_for('shop', categoria='Anéis') }}"
+                           class="card card-body text-center text-decoration-none hover-lift">
+                            <i class="fas fa-ring fa-2x text-success mb-2"></i>
+                            <h6 class="mb-0">Anéis</h6>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <a href="{{ url_for('shop', categoria='Brincos') }}"
+                           class="card card-body text-center text-decoration-none hover-lift">
+                            <i class="fas fa-circle fa-2x text-success mb-2"></i>
+                            <h6 class="mb-0">Brincos</h6>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <a href="{{ url_for('shop', categoria='Pulseiras') }}"
+                           class="card card-body text-center text-decoration-none hover-lift">
+                            <i class="fas fa-hand-sparkles fa-2x text-success mb-2"></i>
+                            <h6 class="mb-0">Pulseiras</h6>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <a href="{{ url_for('shop', categoria='Roupas') }}"
+                           class="card card-body text-center text-decoration-none hover-lift">
+                            <i class="fas fa-tshirt fa-2x text-success mb-2"></i>
+                            <h6 class="mb-0">Roupas</h6>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <a href="{{ url_for('shop') }}"
+                           class="card card-body text-center text-decoration-none hover-lift">
+                            <i class="fas fa-th fa-2x text-success mb-2"></i>
+                            <h6 class="mb-0">Ver Tudo</h6>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<style>
+    .hover-lift {
+        transition: all 0.3s ease;
+    }
+
+    .hover-lift:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .input-group-lg .form-control {
+        border-radius: 8px 0 0 8px;
+    }
+
+    .input-group-lg .btn {
+        border-radius: 0 8px 8px 0;
+        padding: 0.5rem 2rem;
+    }
+</style>
+{% endblock %}

@@ -306,6 +306,33 @@ def carrinho_total():
     return jsonify({'total_itens': total_itens})
 
 # ========================================
+# BUSCA
+# ========================================
+
+@app.route("/busca")
+def busca():
+    """Busca de produtos"""
+    from models import Produto
+
+    # Termo de busca
+    termo = request.args.get('q', '').strip()
+
+    if not termo:
+        return render_template("busca.html", produtos=[], termo='')
+
+    # Buscar produtos por nome ou descrição
+    produtos = Produto.query.filter(
+        Produto.ativo == True,
+        db.or_(
+            Produto.nome.ilike(f'%{termo}%'),
+            Produto.descricao.ilike(f'%{termo}%'),
+            Produto.categoria.ilike(f'%{termo}%')
+        )
+    ).order_by(Produto.ordem).all()
+
+    return render_template("busca.html", produtos=produtos, termo=termo)
+
+# ========================================
 # FILTROS JINJA2 PERSONALIZADOS
 # ========================================
 

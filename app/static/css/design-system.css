@@ -1,0 +1,651 @@
+/**
+ * XODÓ DA PRETA - DESIGN SYSTEM
+ * Sistema de design unificado para garantir consistência visual
+ * em todo o site e painel administrativo
+ */
+
+/* ========================================
+   VARIÁVEIS CSS (Design Tokens)
+   ======================================== */
+
+:root {
+    /* Cores Principais */
+    --cor-dourada: #D4AF37;
+    --cor-dourada-escura: #B8941E;
+    --cor-dourada-clara: #E8D499;
+    --cor-preta: #1a1a1a;
+    --cor-cinza-escuro: #2c2c2c;
+    --cor-cinza-medio: #4a4a4a;
+    --cor-cinza-claro: #f5f5f5;
+    --cor-bege: #F5E6D3;
+    --cor-bege-escuro: #E8D4B8;
+    --cor-branco: #ffffff;
+
+    /* Cores de Feedback */
+    --cor-sucesso: #28a745;
+    --cor-sucesso-hover: #218838;
+    --cor-info: #17a2b8;
+    --cor-info-hover: #138496;
+    --cor-alerta: #ffc107;
+    --cor-alerta-hover: #e0a800;
+    --cor-erro: #dc3545;
+    --cor-erro-hover: #c82333;
+
+    /* Tipografia */
+    --fonte-principal: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --fonte-secundaria: Georgia, 'Times New Roman', serif;
+
+    /* Tamanhos de Fonte */
+    --fonte-xs: 0.75rem;      /* 12px */
+    --fonte-sm: 0.875rem;     /* 14px */
+    --fonte-base: 1rem;       /* 16px */
+    --fonte-md: 1.125rem;     /* 18px */
+    --fonte-lg: 1.25rem;      /* 20px */
+    --fonte-xl: 1.5rem;       /* 24px */
+    --fonte-2xl: 2rem;        /* 32px */
+    --fonte-3xl: 2.5rem;      /* 40px */
+    --fonte-4xl: 3rem;        /* 48px */
+
+    /* Pesos de Fonte */
+    --peso-leve: 300;
+    --peso-normal: 400;
+    --peso-medio: 500;
+    --peso-semibold: 600;
+    --peso-bold: 700;
+    --peso-extrabold: 800;
+
+    /* Espaçamentos */
+    --espacamento-xs: 0.25rem;   /* 4px */
+    --espacamento-sm: 0.5rem;    /* 8px */
+    --espacamento-md: 1rem;      /* 16px */
+    --espacamento-lg: 1.5rem;    /* 24px */
+    --espacamento-xl: 2rem;      /* 32px */
+    --espacamento-2xl: 3rem;     /* 48px */
+    --espacamento-3xl: 4rem;     /* 64px */
+
+    /* Bordas */
+    --borda-radius-sm: 4px;
+    --borda-radius-md: 8px;
+    --borda-radius-lg: 12px;
+    --borda-radius-xl: 16px;
+    --borda-radius-circular: 50%;
+
+    /* Sombras */
+    --sombra-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    --sombra-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+    --sombra-lg: 0 10px 25px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.05);
+    --sombra-xl: 0 20px 40px rgba(0, 0, 0, 0.2), 0 10px 20px rgba(0, 0, 0, 0.1);
+    --sombra-dourada: 0 6px 20px rgba(212, 175, 55, 0.3);
+
+    /* Transições */
+    --transicao-rapida: 0.15s ease;
+    --transicao-media: 0.3s ease;
+    --transicao-lenta: 0.5s ease;
+
+    /* Z-index (camadas) */
+    --z-dropdown: 1000;
+    --z-sticky: 1020;
+    --z-fixed: 1030;
+    --z-modal-backdrop: 1040;
+    --z-modal: 1050;
+    --z-popover: 1060;
+    --z-tooltip: 1070;
+}
+
+/* ========================================
+   RESET E BASE
+   ======================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: var(--fonte-principal);
+    font-size: var(--fonte-base);
+    font-weight: var(--peso-normal);
+    line-height: 1.6;
+    color: var(--cor-cinza-escuro);
+    background-color: var(--cor-branco);
+}
+
+/* ========================================
+   TIPOGRAFIA
+   ======================================== */
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: var(--peso-bold);
+    line-height: 1.3;
+    margin-bottom: var(--espacamento-md);
+    color: var(--cor-preta);
+}
+
+h1 {
+    font-size: var(--fonte-4xl);
+}
+
+h2 {
+    font-size: var(--fonte-3xl);
+}
+
+h3 {
+    font-size: var(--fonte-2xl);
+}
+
+h4 {
+    font-size: var(--fonte-xl);
+}
+
+h5 {
+    font-size: var(--fonte-lg);
+}
+
+h6 {
+    font-size: var(--fonte-base);
+}
+
+p {
+    margin-bottom: var(--espacamento-md);
+}
+
+a {
+    color: var(--cor-dourada);
+    text-decoration: none;
+    transition: color var(--transicao-media);
+}
+
+a:hover {
+    color: var(--cor-dourada-escura);
+}
+
+/* ========================================
+   BOTÕES
+   ======================================== */
+
+.btn {
+    display: inline-block;
+    padding: var(--espacamento-sm) var(--espacamento-lg);
+    font-size: var(--fonte-base);
+    font-weight: var(--peso-medio);
+    line-height: 1.5;
+    text-align: center;
+    text-decoration: none;
+    border: 2px solid transparent;
+    border-radius: var(--borda-radius-md);
+    cursor: pointer;
+    transition: all var(--transicao-media);
+    white-space: nowrap;
+}
+
+.btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.25);
+}
+
+/* Botão Primário (Dourado) */
+.btn-primary {
+    background-color: var(--cor-dourada);
+    color: var(--cor-preta);
+    border-color: var(--cor-dourada);
+}
+
+.btn-primary:hover {
+    background-color: var(--cor-dourada-escura);
+    border-color: var(--cor-dourada-escura);
+    color: var(--cor-preta);
+    transform: translateY(-2px);
+    box-shadow: var(--sombra-dourada);
+}
+
+/* Botão Secundário */
+.btn-secondary {
+    background-color: var(--cor-cinza-escuro);
+    color: var(--cor-branco);
+    border-color: var(--cor-cinza-escuro);
+}
+
+.btn-secondary:hover {
+    background-color: var(--cor-preta);
+    border-color: var(--cor-preta);
+    color: var(--cor-branco);
+}
+
+/* Botão Sucesso */
+.btn-success {
+    background-color: var(--cor-sucesso);
+    color: var(--cor-branco);
+    border-color: var(--cor-sucesso);
+}
+
+.btn-success:hover {
+    background-color: var(--cor-sucesso-hover);
+    border-color: var(--cor-sucesso-hover);
+    color: var(--cor-branco);
+}
+
+/* Botão Outline */
+.btn-outline-primary {
+    background-color: transparent;
+    color: var(--cor-dourada);
+    border-color: var(--cor-dourada);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--cor-dourada);
+    color: var(--cor-preta);
+}
+
+/* Tamanhos de Botões */
+.btn-sm {
+    padding: var(--espacamento-xs) var(--espacamento-md);
+    font-size: var(--fonte-sm);
+}
+
+.btn-lg {
+    padding: var(--espacamento-md) var(--espacamento-2xl);
+    font-size: var(--fonte-lg);
+}
+
+/* ========================================
+   CARDS
+   ======================================== */
+
+.card {
+    background-color: var(--cor-branco);
+    border-radius: var(--borda-radius-lg);
+    box-shadow: var(--sombra-md);
+    overflow: hidden;
+    transition: all var(--transicao-media);
+}
+
+.card:hover {
+    box-shadow: var(--sombra-lg);
+    transform: translateY(-4px);
+}
+
+.card-header {
+    padding: var(--espacamento-lg);
+    background-color: var(--cor-cinza-claro);
+    border-bottom: 1px solid var(--cor-bege);
+}
+
+.card-body {
+    padding: var(--espacamento-lg);
+}
+
+.card-footer {
+    padding: var(--espacamento-md) var(--espacamento-lg);
+    background-color: var(--cor-cinza-claro);
+    border-top: 1px solid var(--cor-bege);
+}
+
+.card-title {
+    font-size: var(--fonte-xl);
+    font-weight: var(--peso-semibold);
+    margin-bottom: var(--espacamento-sm);
+    color: var(--cor-preta);
+}
+
+.card-text {
+    color: var(--cor-cinza-medio);
+    margin-bottom: var(--espacamento-md);
+}
+
+/* ========================================
+   FORMULÁRIOS
+   ======================================== */
+
+.form-group {
+    margin-bottom: var(--espacamento-lg);
+}
+
+.form-label {
+    display: block;
+    font-weight: var(--peso-medio);
+    margin-bottom: var(--espacamento-sm);
+    color: var(--cor-cinza-escuro);
+}
+
+.form-control {
+    display: block;
+    width: 100%;
+    padding: var(--espacamento-sm) var(--espacamento-md);
+    font-size: var(--fonte-base);
+    line-height: 1.5;
+    color: var(--cor-cinza-escuro);
+    background-color: var(--cor-branco);
+    border: 1px solid var(--cor-bege-escuro);
+    border-radius: var(--borda-radius-md);
+    transition: all var(--transicao-media);
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--cor-dourada);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+.form-control::placeholder {
+    color: var(--cor-cinza-claro);
+}
+
+textarea.form-control {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.form-text {
+    display: block;
+    margin-top: var(--espacamento-xs);
+    font-size: var(--fonte-sm);
+    color: var(--cor-cinza-medio);
+}
+
+/* ========================================
+   BADGES E TAGS
+   ======================================== */
+
+.badge {
+    display: inline-block;
+    padding: var(--espacamento-xs) var(--espacamento-sm);
+    font-size: var(--fonte-xs);
+    font-weight: var(--peso-semibold);
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: var(--borda-radius-sm);
+}
+
+.badge-primary {
+    background-color: var(--cor-dourada);
+    color: var(--cor-preta);
+}
+
+.badge-success {
+    background-color: var(--cor-sucesso);
+    color: var(--cor-branco);
+}
+
+.badge-info {
+    background-color: var(--cor-info);
+    color: var(--cor-branco);
+}
+
+.badge-warning {
+    background-color: var(--cor-alerta);
+    color: var(--cor-preta);
+}
+
+.badge-danger {
+    background-color: var(--cor-erro);
+    color: var(--cor-branco);
+}
+
+/* ========================================
+   ALERTAS
+   ======================================== */
+
+.alert {
+    padding: var(--espacamento-md) var(--espacamento-lg);
+    margin-bottom: var(--espacamento-lg);
+    border-radius: var(--borda-radius-md);
+    border-left: 4px solid transparent;
+}
+
+.alert-success {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: var(--cor-sucesso-hover);
+    border-left-color: var(--cor-sucesso);
+}
+
+.alert-info {
+    background-color: rgba(23, 162, 184, 0.1);
+    color: var(--cor-info-hover);
+    border-left-color: var(--cor-info);
+}
+
+.alert-warning {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: var(--cor-alerta-hover);
+    border-left-color: var(--cor-alerta);
+}
+
+.alert-danger {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: var(--cor-erro-hover);
+    border-left-color: var(--cor-erro);
+}
+
+/* ========================================
+   UTILIDADES
+   ======================================== */
+
+/* Texto */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+.text-uppercase { text-transform: uppercase; }
+.text-lowercase { text-transform: lowercase; }
+.text-capitalize { text-transform: capitalize; }
+
+/* Cores de Texto */
+.text-primary { color: var(--cor-dourada) !important; }
+.text-secondary { color: var(--cor-cinza-medio) !important; }
+.text-success { color: var(--cor-sucesso) !important; }
+.text-danger { color: var(--cor-erro) !important; }
+.text-warning { color: var(--cor-alerta) !important; }
+.text-info { color: var(--cor-info) !important; }
+.text-muted { color: var(--cor-cinza-medio) !important; }
+.text-white { color: var(--cor-branco) !important; }
+.text-dark { color: var(--cor-preta) !important; }
+
+/* Pesos de Fonte */
+.fw-light { font-weight: var(--peso-leve) !important; }
+.fw-normal { font-weight: var(--peso-normal) !important; }
+.fw-medium { font-weight: var(--peso-medio) !important; }
+.fw-semibold { font-weight: var(--peso-semibold) !important; }
+.fw-bold { font-weight: var(--peso-bold) !important; }
+
+/* Margens */
+.m-0 { margin: 0 !important; }
+.mt-0 { margin-top: 0 !important; }
+.mb-0 { margin-bottom: 0 !important; }
+.mt-1 { margin-top: var(--espacamento-xs) !important; }
+.mb-1 { margin-bottom: var(--espacamento-xs) !important; }
+.mt-2 { margin-top: var(--espacamento-sm) !important; }
+.mb-2 { margin-bottom: var(--espacamento-sm) !important; }
+.mt-3 { margin-top: var(--espacamento-md) !important; }
+.mb-3 { margin-bottom: var(--espacamento-md) !important; }
+.mt-4 { margin-top: var(--espacamento-lg) !important; }
+.mb-4 { margin-bottom: var(--espacamento-lg) !important; }
+.mt-5 { margin-top: var(--espacamento-xl) !important; }
+.mb-5 { margin-bottom: var(--espacamento-xl) !important; }
+
+/* Padding */
+.p-0 { padding: 0 !important; }
+.p-1 { padding: var(--espacamento-xs) !important; }
+.p-2 { padding: var(--espacamento-sm) !important; }
+.p-3 { padding: var(--espacamento-md) !important; }
+.p-4 { padding: var(--espacamento-lg) !important; }
+.p-5 { padding: var(--espacamento-xl) !important; }
+
+/* Display */
+.d-none { display: none !important; }
+.d-block { display: block !important; }
+.d-inline { display: inline !important; }
+.d-inline-block { display: inline-block !important; }
+.d-flex { display: flex !important; }
+
+/* Flexbox */
+.flex-row { flex-direction: row !important; }
+.flex-column { flex-direction: column !important; }
+.justify-content-start { justify-content: flex-start !important; }
+.justify-content-end { justify-content: flex-end !important; }
+.justify-content-center { justify-content: center !important; }
+.justify-content-between { justify-content: space-between !important; }
+.align-items-start { align-items: flex-start !important; }
+.align-items-end { align-items: flex-end !important; }
+.align-items-center { align-items: center !important; }
+.flex-wrap { flex-wrap: wrap !important; }
+.flex-nowrap { flex-wrap: nowrap !important; }
+
+/* Bordas */
+.rounded { border-radius: var(--borda-radius-md) !important; }
+.rounded-sm { border-radius: var(--borda-radius-sm) !important; }
+.rounded-lg { border-radius: var(--borda-radius-lg) !important; }
+.rounded-circle { border-radius: var(--borda-radius-circular) !important; }
+
+/* Sombras */
+.shadow-sm { box-shadow: var(--sombra-sm) !important; }
+.shadow { box-shadow: var(--sombra-md) !important; }
+.shadow-lg { box-shadow: var(--sombra-lg) !important; }
+
+/* ========================================
+   RESPONSIVIDADE
+   ======================================== */
+
+/* Mobile First - Breakpoints */
+@media (max-width: 576px) {
+    :root {
+        --fonte-4xl: 2rem;     /* 32px em mobile */
+        --fonte-3xl: 1.75rem;  /* 28px em mobile */
+        --fonte-2xl: 1.5rem;   /* 24px em mobile */
+    }
+
+    h1 { font-size: var(--fonte-4xl); }
+    h2 { font-size: var(--fonte-3xl); }
+    h3 { font-size: var(--fonte-2xl); }
+}
+
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: var(--espacamento-lg);
+    }
+}
+
+@media (max-width: 992px) {
+    .btn-lg {
+        padding: var(--espacamento-sm) var(--espacamento-lg);
+        font-size: var(--fonte-base);
+    }
+}
+
+/* ========================================
+   ANIMAÇÕES
+   ======================================== */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.fade-in {
+    animation: fadeIn var(--transicao-media);
+}
+
+.slide-in-up {
+    animation: slideInUp var(--transicao-media);
+}
+
+.pulse-on-hover:hover {
+    animation: pulse var(--transicao-lenta) infinite;
+}
+
+/* ========================================
+   COMPONENTES ESPECÍFICOS XODÓ DA PRETA
+   ======================================== */
+
+/* Header/Navbar */
+.navbar-xodo {
+    background: linear-gradient(135deg, var(--cor-preta) 0%, var(--cor-cinza-escuro) 100%);
+    box-shadow: var(--sombra-md);
+}
+
+.navbar-xodo .nav-link {
+    color: var(--cor-bege);
+    font-weight: var(--peso-medio);
+    transition: color var(--transicao-media);
+}
+
+.navbar-xodo .nav-link:hover {
+    color: var(--cor-dourada);
+}
+
+/* Footer */
+.footer-xodo {
+    background-color: var(--cor-preta);
+    color: var(--cor-bege);
+    padding: var(--espacamento-2xl) 0 var(--espacamento-lg);
+}
+
+.footer-xodo a {
+    color: var(--cor-bege);
+}
+
+.footer-xodo a:hover {
+    color: var(--cor-dourada);
+}
+
+/* Produto Card */
+.produto-card {
+    transition: all var(--transicao-media);
+    border: 2px solid transparent;
+}
+
+.produto-card:hover {
+    border-color: var(--cor-dourada);
+    box-shadow: var(--sombra-dourada);
+}
+
+.produto-card .preco {
+    color: var(--cor-dourada);
+    font-size: var(--fonte-xl);
+    font-weight: var(--peso-bold);
+}
+
+/* Marca de Destaque */
+.destaque-badge {
+    position: absolute;
+    top: var(--espacamento-md);
+    right: var(--espacamento-md);
+    background-color: var(--cor-dourada);
+    color: var(--cor-preta);
+    padding: var(--espacamento-xs) var(--espacamento-md);
+    border-radius: var(--borda-radius-md);
+    font-weight: var(--peso-bold);
+    font-size: var(--fonte-sm);
+    box-shadow: var(--sombra-md);
+}
