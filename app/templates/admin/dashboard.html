@@ -653,10 +653,13 @@
 
     <!-- Chart.js Configuration -->
     <script>
-        // Cores do tema
+        // Cores do tema - Paleta Dourada/Bege/Preta
         const goldColor = '#D4AF37';
-        const goldDarkColor = '#C48835';
-        const blackColor = '#000000';
+        const goldDarkColor = '#B8941E';
+        const beigeColor = '#F5E6D3';
+        const beigeDarkColor = '#E8D4B8';
+        const blackColor = '#1a1a1a';
+        const grayColor = '#4a4a4a';
 
         // ===== GRÁFICO DE PIZZA - Produtos por Categoria =====
         const categoriasCtx = document.getElementById('categoriasChart');
@@ -669,12 +672,14 @@
                         label: 'Produtos',
                         data: {{ categorias_valores|tojson }},
                         backgroundColor: [
-                            goldColor,
-                            goldDarkColor,
-                            '#B8860B',
-                            '#DAA520',
-                            '#FFD700',
-                            '#FFA500'
+                            '#D4AF37',  // Dourado principal
+                            '#B8941E',  // Dourado escuro
+                            '#8B7355',  // Marrom médio
+                            '#F5E6D3',  // Bege claro
+                            '#CD853F',  // Peru (tom terroso)
+                            '#DEB887',  // Madeira clara
+                            '#D2691E',  // Chocolate
+                            '#C19A6B'   // Camelo
                         ],
                         borderWidth: 3,
                         borderColor: '#fff'
