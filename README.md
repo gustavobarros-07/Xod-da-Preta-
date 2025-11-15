@@ -1,11 +1,11 @@
-# Xodó da Preta - E-commerce de Moda Afro
+# 🌟 Xodó da Preta - E-commerce de Moda Afro
 
-![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)
-![Flask](https://img.shields.io/badge/Flask-3.1.2-green.svg)
-![SQLite](https://img.shields.io/badge/SQLite-3-orange.svg)
-![Bootstrap](https://img.shields.io/badge/Bootstrap-5-purple.svg)
+> Plataforma de e-commerce desenvolvida para a marca **Xodó da Preta**, especializada em moda e acessórios afro autorais que celebram identidade, versatilidade e representatividade.
 
-E-commerce completo para venda de moda e acessórios afro autorais e inclusivos. Sistema desenvolvido com Flask (Python) e interface moderna com Bootstrap 5.
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-3.0+-green.svg)](https://flask.palletsprojects.com/)
+[![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-purple.svg)](https://getbootstrap.com/)
+[![SQLite](https://img.shields.io/badge/SQLite-3-lightblue.svg)](https://www.sqlite.org/)
 
 ---
 
@@ -14,321 +14,129 @@ E-commerce completo para venda de moda e acessórios afro autorais e inclusivos.
 - [Sobre o Projeto](#sobre-o-projeto)
 - [Funcionalidades](#funcionalidades)
 - [Tecnologias Utilizadas](#tecnologias-utilizadas)
-- [Instalação](#instalação)
+- [Instalação e Configuração](#instalação-e-configuração)
 - [Estrutura do Projeto](#estrutura-do-projeto)
-- [Banco de Dados](#banco-de-dados)
-- [Segurança](#segurança)
-- [Customização](#customização)
-- [Scripts Úteis](#scripts-úteis)
-- [Troubleshooting](#troubleshooting)
+- [Uso do Sistema](#uso-do-sistema)
+- [Painel Administrativo](#painel-administrativo)
+- [Deploy](#deploy)
 
 ---
 
 ## 🎯 Sobre o Projeto
 
-A **Xodó da Preta** é uma plataforma de e-commerce especializada em moda e acessórios afro, oferecendo:
+O **Xodó da Preta** é uma plataforma de e-commerce desenvolvida como projeto acadêmico para uma cliente real que vende moda afro através do Instagram e Facebook. O objetivo é profissionalizar a operação, oferecendo:
 
-- ✨ Roupas e acessórios autorais e inclusivos
-- 🎨 Design pensado para representatividade e identidade
-- ♻️ Compromisso com sustentabilidade e economia circular
-- 👥 Produtos para todos os corpos e gêneros
+- 🛍️ **Catálogo online** profissional de produtos
+- 📱 **Checkout via WhatsApp** (sem pagamento online - adequado ao modelo de negócio)
+- 🎨 **Design autêntico** que reflete a identidade da marca
+- ⚙️ **Autonomia total** para a cliente gerenciar o site
+- 📊 **Analytics** para acompanhar desempenho dos produtos
+
+### Características do Negócio
+
+- **Público-alvo:** Pessoas que apreciam moda afro autoral e inclusiva
+- **Produtos:** Colares, anéis, brincos, pulseiras e roupas
+- **Valores:** Sustentabilidade, economia circular, representatividade
+- **Canais de venda:** WhatsApp e Instagram
+- **Diferencial:** Produção consciente e design autoral
 
 ---
 
-## ⚙️ Funcionalidades
+## ✨ Funcionalidades
 
-### 🛍️ Loja Online (Cliente)
+### Para Clientes (Visitantes do Site)
 
-- Catálogo de produtos com filtros por categoria
-- Sistema de busca e navegação
-- Carrinho de compras funcional
-- Design responsivo (mobile-first)
-- Páginas institucionais (Sobre, Contato)
+- 🏠 **Home com Carrossel:** 3 slides customizáveis destacando valores da marca
+- 🎯 **Produtos em Destaque:** Seção na home com até 4 produtos selecionados
+- 🛒 **Catálogo Completo:** Navegação por categorias (Colares, Anéis, Brincos, Pulseiras, Roupas)
+- 🔍 **Busca Avançada:** Pesquisa por nome, descrição ou categoria
+- 📦 **Detalhes do Produto:** Página individual com imagens, descrição, preço e tamanhos
+- 🛒 **Carrinho de Compras:** Adicionar/remover produtos, ajustar quantidades
+- 💬 **Checkout via WhatsApp:** Finalização com mensagem formatada automática
+- 📱 **Responsivo:** Design adaptado para mobile, tablet e desktop
 
-### 🔧 Painel Administrativo
+### Para Administradores (Painel Admin)
 
-- Sistema de autenticação seguro
-- Cadastro e edição de produtos
-- Upload de imagens de produtos
-- Gerenciamento de categorias hierárquicas (3 níveis)
-- Sistema de tamanhos customizável (PP, P, M, G, GG, GG1, GG2, GG3, Único)
-- Controle de visibilidade e ordenação de produtos
-- Painel de configurações
+#### 📊 Dashboard Premium
+- **7 KPIs principais** com visualizações totais
+- **Gráficos interativos (Chart.js)**
+- **Top 10 produtos** mais visualizados
+- **Quick Actions**
 
-### 📦 Categorias Disponíveis
+#### 📦 Gestão de Produtos
+- CRUD completo
+- Upload de imagens
+- Categorias hierárquicas
+- **Marcar como Destaque**
+- Rastreamento de visualizações
 
-**Roupas**
-- **Feminino:** Vestidos, Saias, Macacões, Jaquetas
-- **Masculino:** Camisas, Batas, Conjuntos, Jaquetas
-
-**Acessórios**
-- Brincos, Colares, Anéis, Pulseiras
+#### 🎨 CMS (Sistema de Gerenciamento de Conteúdo)
+Interface visual para editar **todo o conteúdo do site** sem código
 
 ---
 
 ## 🛠️ Tecnologias Utilizadas
 
 ### Backend
-- **Python** 3.11+
-- **Flask** 3.1.2 (Framework web)
-- **Flask-SQLAlchemy** 3.1.1 (ORM)
-- **SQLite** (Banco de dados)
-- **Werkzeug** (Segurança e upload)
-- **Pillow** (Processamento de imagens)
-- **python-dotenv** (Variáveis de ambiente)
+- **Python 3.8+**
+- **Flask 3.0**
+- **SQLAlchemy**
+- **SQLite**
 
 ### Frontend
-- **Bootstrap 5** (Framework CSS)
-- **jQuery** 3.x (Manipulação DOM)
-- **Slick Carousel** (Carrosséis)
-- **Template Zay** (Design base)
+- **Bootstrap 5.3**
+- **Chart.js**
+- **Custom Design System**
 
 ---
 
-## 🚀 Instalação
-
-### Pré-requisitos
-
-- Python 3.11 ou superior
-- pip (gerenciador de pacotes Python)
+## 🚀 Instalação e Configuração
 
 ### Passo a Passo
 
-**1. Clone o repositório**
-```bash
-git clone <URL_DO_REPOSITORIO>
-cd Xodo-da-Preta
-```
-
-**2. Crie um ambiente virtual**
-```bash
-python -m venv venv
-```
-
-**3. Ative o ambiente virtual**
-
-Windows:
-```bash
-venv\Scripts\activate
-```
-
-Linux/Mac:
-```bash
-source venv/bin/activate
-```
-
-**4. Instale as dependências**
-```bash
-cd app
-pip install -r requirements.txt
-```
-
-**5. Configure as variáveis de ambiente**
-
-Crie um arquivo `.env` na pasta `app/`:
-```env
-SECRET_KEY=sua-chave-secreta-muito-segura-aqui
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD=sua-senha-forte-aqui
-```
-
-**6. Execute o setup inicial**
-```bash
-python setup_inicial.py
-```
-
-**7. Inicie o servidor**
-```bash
-python main.py
-```
-
-**8. Acesse a aplicação**
-- **Loja:** http://localhost:5000
-- **Admin:** http://localhost:5000/admin/login
+1. **Clone o repositório**
+2. **Crie ambiente virtual:** `python -m venv venv`
+3. **Ative:** `venv\Scripts\activate` (Windows)
+4. **Instale dependências:** `pip install -r requirements.txt`
+5. **Execute migrações:** `python app/migrate_db.py`
+6. **Rode servidor:** `python app/main.py`
+7. **Acesse:** http://localhost:5000
 
 ---
 
 ## 📁 Estrutura do Projeto
+
 ```
-Xodo-da-Preta/
-│
-├── .gitignore
+Xod-da-Preta/
+├── app/
+│   ├── static/css/design-system.css
+│   ├── templates/
+│   ├── models.py
+│   ├── main.py
+│   ├── admin_routes.py
+│   └── migrate_db.py
 ├── README.md
-│
-└── app/
-    ├── static/
-    │   ├── uploads/
-    │   │   └── .gitkeep
-    │   └── zay/
-    │       ├── assets/
-    │       ├── css/
-    │       ├── js/
-    │       ├── img/
-    │       └── webfonts/
-    │
-    ├── templates/
-    │   ├── admin/
-    │   │   ├── config.html
-    │   │   ├── dashboard.html
-    │   │   ├── login.html
-    │   │   ├── produto_form.html
-    │   │   ├── produtos.html
-    │   │   └── subcategoria_form.html
-    │   ├── partials/
-    │   │   ├── footer.html
-    │   │   └── topbar.html
-    │   ├── about.html
-    │   ├── base.html
-    │   ├── carrinho.html
-    │   ├── contact.html
-    │   ├── index.html
-    │   ├── shop.html
-    │   └── shop-single.html
-    │
-    ├── admin_routes.py
-    ├── config.py
-    ├── database.py
-    ├── loja.db
-    ├── main.py
-    ├── models.py
-    ├── requirements.txt
-    ├── setup_inicial.py
-    ├── populate_products.py
-    └── migrate_hierarquia.py
+└── requirements.txt
 ```
 
 ---
 
-## 🗄️ Banco de Dados
+## 🔐 Painel Administrativo
 
-### Modelos
+Acesse `/admin` com credenciais configuradas.
 
-**Produto**
-- Nome, descrição, preço
-- Categoria (3 níveis hierárquicos)
-- Tamanhos disponíveis (JSON)
-- Imagem
-- Status (ativo/inativo)
-- Ordenação customizável
-
-**Admin**
-- Usuário e senha (hash)
-- Email
-- Controle de sessão
-
-**Configuração**
-- Sistema de configurações chave-valor
-- Flexível para expansão
-
-**ItemCarrinho**
-- Gerenciamento de carrinho por sessão
-- Controle de quantidade e tamanhos
-
-**Subcategoria** (Legado)
-- Sistema de categorias (mantido por compatibilidade)
+### Funcionalidades:
+- Dashboard com métricas
+- Gerenciar Produtos
+- Gerenciar Conteúdo (CMS)
+- Configurações
 
 ---
 
-## 🔒 Segurança
+## 🌐 Deploy
 
-- ✅ Senhas com hash (Werkzeug)
-- ✅ Proteção de rotas administrativas
-- ✅ Validação de uploads de arquivos
-- ✅ Variáveis sensíveis em `.env`
-- ✅ SQLAlchemy ORM (proteção contra SQL Injection)
-- ✅ Limite de tamanho de upload (16MB)
+Opções: Heroku, PythonAnywhere, VPS
 
 ---
 
-## 🎨 Customização
-
-### Adicionar Novos Tamanhos
-
-Edite o arquivo `app/config.py`:
-```python
-SIZES = ['PP', 'P', 'M', 'G', 'GG', 'GG1', 'GG2', 'GG3', 'Único']
-```
-
-### Adicionar Novas Categorias
-
-Edite o arquivo `app/config.py`:
-```python
-CATEGORIES = ['Brincos', 'Roupas', 'Colares', 'Anéis', 'Pulseiras']
-
-CATEGORY_HIERARCHY = {
-    'Roupas': {
-        'Feminino': ['Vestido', 'Saia', 'Macacão', 'Jaqueta'],
-        'Masculino': ['Camisa', 'Bata', 'Conjunto', 'Jaqueta']
-    }
-}
-```
-
-### Alterar Foto da Autora
-
-Adicione uma imagem em:
-```
-app/static/zay/assets/img/autora.jpg
-```
-
----
-
-## 📝 Scripts Úteis
-
-**Popular Banco com Produtos de Teste**
-```bash
-python populate_products.py
-```
-
-**Criar Admin Inicial**
-```bash
-python setup_inicial.py
-```
-
----
-
-## 🔧 Troubleshooting
-
-### Erro: "No module named 'flask'"
-```bash
-pip install -r requirements.txt
-```
-
-### Erro: "Database is locked"
-- Feche todas as conexões com o banco
-- Reinicie o servidor
-
-### Imagens não aparecem
-- Verifique se a pasta `static/uploads/` existe
-- Verifique permissões de escrita na pasta
-
-### Painel admin não carrega
-- Verifique se criou um usuário admin (use `setup_inicial.py`)
-- Confirme as credenciais no `.env`
-
----
-
-## 📄 Licença
-
-Este projeto foi desenvolvido para uso privado da marca **Xodó da Preta**.
-
----
-
-## 👥 Autores
-
-- **Teresa Cristina** - Cofundadora e Estilista
-- **Equipe de Desenvolvimento** - Implementação técnica
-
----
-
-## 📞 Contato
-
-- **Website:** [Em breve]
-- **Instagram:** [@xododapreta]
-
----
-
-<div align="center">
-  
-**Desenvolvido com 💜 para representatividade e inclusão na moda brasileira**
-
-</div>
+**Desenvolvido com 💛 para celebrar a moda afro e a representatividade**
