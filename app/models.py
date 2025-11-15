@@ -71,7 +71,7 @@ class Produto(db.Model):
             'imagem': self.imagem,
             'ordem': self.ordem,
             'ativo': self.ativo,
-            'data_criacao': self.data_criacao.strftime('%d/%m/%Y') if self.data_criacao else None
+            'data_criacao': self.data_criacao.strftime('%d/%m/%Y') if isinstance(self.data_criacao, datetime) else (self.data_criacao if self.data_criacao else None)
         }
 
 
