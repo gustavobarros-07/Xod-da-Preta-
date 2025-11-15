@@ -466,3 +466,158 @@ def api_subcategorias_por_categoria(categoria):
     return {
         'subcategorias': [subcat.to_dict() for subcat in subcategorias]
     }
+
+
+# ========================================
+# ROTAS DO CMS (GERENCIAMENTO DE CONTEÚDO)
+# ========================================
+
+@admin_bp.route('/conteudo')
+@login_required
+def conteudo_listar():
+    """Lista todo o conteúdo editável do site"""
+    from models import ConteudoPagina
+
+    # Agrupar conteúdo por página
+    conteudos = ConteudoPagina.query.order_by(ConteudoPagina.pagina, ConteudoPagina.ordem).all()
+
+    # Organizar por página
+    conteudo_por_pagina = {}
+    for item in conteudos:
+        if item.pagina not in conteudo_por_pagina:
+            conteudo_por_pagina[item.pagina] = []
+        conteudo_por_pagina[item.pagina].append(item)
+
+    return render_template('admin/conteudo_lista.html', conteudo_por_pagina=conteudo_por_pagina)
+
+
+@admin_bp.route('/conteudo/editar/<pagina>')
+@login_required
+def conteudo_editar_pagina(pagina):
+    """Edita todo o conteúdo de uma página específica"""
+    from models import ConteudoPagina
+
+    # Validar página
+    paginas_validas = ['home', 'about', 'contact', 'footer']
+    if pagina not in paginas_validas:
+        flash('Página inválida', 'danger')
+        return redirect(url_for('admin.conteudo_listar'))
+
+    # Buscar conteúdo da página
+    conteudos = ConteudoPagina.query.filter_by(pagina=pagina).order_by(ConteudoPagina.ordem).all()
+
+    # Definir estrutura de campos por página
+    estruturas = {
+        'home': [
+            {'secao': 'hero_titulo_1', 'label': 'Hero - Título Principal', 'tipo': 'texto', 'placeholder': 'Autenticidade e Inclusão'},
+            {'secao': 'hero_titulo_2', 'label': 'Hero - Subtítulo', 'tipo': 'texto', 'placeholder': 'Identidade, Versatilidade e Representatividade'},
+            {'secao': 'hero_texto', 'label': 'Hero - Texto Descritivo', 'tipo': 'textarea', 'placeholder': 'Desenvolvemos moda e acessórios...'},
+            {'secao': 'hero_imagem', 'label': 'Hero - Imagem Principal', 'tipo': 'imagem'},
+            {'secao': 'slide2_titulo', 'label': 'Slide 2 - Título', 'tipo': 'texto', 'placeholder': 'Uma História de Afeto'},
+            {'secao': 'slide2_subtitulo', 'label': 'Slide 2 - Subtítulo', 'tipo': 'texto', 'placeholder': 'Xodó da Preta, criada pela minha mãe Marli'},
+            {'secao': 'slide2_texto', 'label': 'Slide 2 - Texto', 'tipo': 'textarea'},
+            {'secao': 'slide2_imagem', 'label': 'Slide 2 - Imagem', 'tipo': 'imagem'},
+            {'secao': 'slide3_titulo', 'label': 'Slide 3 - Título', 'tipo': 'texto', 'placeholder': 'Produção Consciente'},
+            {'secao': 'slide3_subtitulo', 'label': 'Slide 3 - Subtítulo', 'tipo': 'texto', 'placeholder': 'Sustentabilidade e Economia Circular'},
+            {'secao': 'slide3_texto', 'label': 'Slide 3 - Texto', 'tipo': 'textarea'},
+            {'secao': 'slide3_imagem', 'label': 'Slide 3 - Imagem', 'tipo': 'imagem'},
+            {'secao': 'categorias_titulo', 'label': 'Categorias - Título', 'tipo': 'texto', 'placeholder': 'Categorias'},
+            {'secao': 'categorias_subtitulo', 'label': 'Categorias - Subtítulo', 'tipo': 'texto', 'placeholder': 'Explore nossa coleção...'},
+        ],
+        'about': [
+            {'secao': 'header_titulo', 'label': 'Cabeçalho - Título', 'tipo': 'texto', 'placeholder': 'Sobre Mim'},
+            {'secao': 'header_texto', 'label': 'Cabeçalho - Texto', 'tipo': 'textarea', 'placeholder': 'Eu sou Teresa Cristina...'},
+            {'secao': 'header_imagem', 'label': 'Cabeçalho - Imagem', 'tipo': 'imagem'},
+            {'secao': 'servicos_titulo', 'label': 'Serviços - Título', 'tipo': 'texto', 'placeholder': 'Nossos Serviços'},
+            {'secao': 'servicos_texto', 'label': 'Serviços - Texto', 'tipo': 'textarea'},
+        ],
+        'contact': [
+            {'secao': 'header_titulo', 'label': 'Título Principal', 'tipo': 'texto', 'placeholder': 'Entre em Contato'},
+            {'secao': 'header_subtitulo', 'label': 'Subtítulo', 'tipo': 'texto', 'placeholder': 'Ficou com alguma dúvida?...'},
+            {'secao': 'telefone', 'label': 'Telefone/WhatsApp', 'tipo': 'texto', 'placeholder': '5511954375056'},
+            {'secao': 'instagram', 'label': 'Instagram (usuário)', 'tipo': 'texto', 'placeholder': '@xododapreta'},
+            {'secao': 'localizacao', 'label': 'Localização', 'tipo': 'texto', 'placeholder': 'São Paulo, SP'},
+            {'secao': 'tempo_resposta', 'label': 'Tempo de Resposta', 'tipo': 'texto', 'placeholder': 'Respondemos em até 24 horas!'},
+        ],
+        'footer': [
+            {'secao': 'sobre_texto', 'label': 'Texto "Sobre"', 'tipo': 'textarea', 'placeholder': 'Moda afro autoral...'},
+            {'secao': 'direitos', 'label': 'Direitos Autorais', 'tipo': 'texto', 'placeholder': '© 2024 Xodó da Preta'},
+        ]
+    }
+
+    estrutura_pagina = estruturas.get(pagina, [])
+
+    # Criar dicionário de conteúdos existentes
+    conteudo_dict = {item.secao: item for item in conteudos}
+
+    return render_template(
+        'admin/conteudo_editar.html',
+        pagina=pagina,
+        estrutura=estrutura_pagina,
+        conteudo_dict=conteudo_dict
+    )
+
+
+@admin_bp.route('/conteudo/salvar/<pagina>', methods=['POST'])
+@login_required
+def conteudo_salvar(pagina):
+    """Salva o conteúdo editado de uma página"""
+    from models import ConteudoPagina
+
+    try:
+        # Processar todos os campos do formulário
+        for key, value in request.form.items():
+            if key.startswith('secao_'):
+                secao = key.replace('secao_', '')
+
+                # Verificar se é campo de imagem
+                tipo = 'texto'
+                if secao.endswith('_imagem'):
+                    tipo = 'imagem'
+                elif len(value) > 200:
+                    tipo = 'textarea'
+
+                # Atualizar ou criar conteúdo
+                ConteudoPagina.set_conteudo(
+                    pagina=pagina,
+                    secao=secao,
+                    conteudo=value if value else None,
+                    tipo=tipo
+                )
+
+        # Processar upload de imagens
+        for key in request.files:
+            if key.startswith('imagem_'):
+                secao = key.replace('imagem_', '')
+                arquivo = request.files[key]
+
+                if arquivo and arquivo.filename:
+                    from werkzeug.utils import secure_filename
+                    import os
+
+                    # Salvar arquivo
+                    filename = secure_filename(arquivo.filename)
+                    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+                    filename = f"{timestamp}_{filename}"
+
+                    upload_folder = os.path.join(current_app.root_path, 'static', 'uploads')
+                    os.makedirs(upload_folder, exist_ok=True)
+
+                    filepath = os.path.join(upload_folder, filename)
+                    arquivo.save(filepath)
+
+                    # Atualizar no banco
+                    ConteudoPagina.set_conteudo(
+                        pagina=pagina,
+                        secao=secao,
+                        imagem=filename,
+                        tipo='imagem'
+                    )
+
+        flash(f'Conteúdo da página "{pagina}" atualizado com sucesso!', 'success')
+
+    except Exception as e:
+        flash(f'Erro ao salvar conteúdo: {str(e)}', 'danger')
+        db.session.rollback()
+
+    return redirect(url_for('admin.conteudo_editar_pagina', pagina=pagina))

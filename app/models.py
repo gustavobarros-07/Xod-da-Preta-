@@ -176,3 +176,71 @@ class ProdutoVisualizacao(db.Model):
 
     def __repr__(self):
         return f'<ProdutoVisualizacao produto_id={self.produto_id} em {self.data_visualizacao}>'
+
+
+class ConteudoPagina(db.Model):
+    """Modelo para conteúdo editável das páginas (CMS)"""
+    __tablename__ = 'conteudo_pagina'
+
+    id = db.Column(db.Integer, primary_key=True)
+    pagina = db.Column(db.String(50), nullable=False)  # 'home', 'about', 'contact', 'footer'
+    secao = db.Column(db.String(100), nullable=False)  # Ex: 'hero_titulo', 'sobre_texto', etc.
+    tipo = db.Column(db.String(20), default='texto')  # 'texto', 'imagem', 'html'
+    conteudo = db.Column(db.Text, nullable=True)  # Conteúdo textual
+    imagem = db.Column(db.String(200), nullable=True)  # Nome do arquivo de imagem
+    ordem = db.Column(db.Integer, default=0)  # Para ordenação
+    ativo = db.Column(db.Boolean, default=True)
+    data_atualizacao = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<ConteudoPagina {self.pagina}.{self.secao}>'
+
+    @staticmethod
+    def get_conteudo(pagina, secao, default=None):
+        """Obtém conteúdo de uma seção específica"""
+        item = ConteudoPagina.query.filter_by(
+            pagina=pagina,
+            secao=secao,
+            ativo=True
+        ).first()
+
+        if item:
+            return item.imagem if item.tipo == 'imagem' else item.conteudo
+        return default
+
+    @staticmethod
+    def set_conteudo(pagina, secao, conteudo=None, imagem=None, tipo='texto'):
+        """Define ou atualiza conteúdo de uma seção"""
+        item = ConteudoPagina.query.filter_by(pagina=pagina, secao=secao).first()
+
+        if item:
+            if conteudo is not None:
+                item.conteudo = conteudo
+            if imagem is not None:
+                item.imagem = imagem
+            item.tipo = tipo
+        else:
+            item = ConteudoPagina(
+                pagina=pagina,
+                secao=secao,
+                conteudo=conteudo,
+                imagem=imagem,
+                tipo=tipo
+            )
+            db.session.add(item)
+
+        db.session.commit()
+        return item
+
+    def to_dict(self):
+        """Converte para dicionário"""
+        return {
+            'id': self.id,
+            'pagina': self.pagina,
+            'secao': self.secao,
+            'tipo': self.tipo,
+            'conteudo': self.conteudo,
+            'imagem': self.imagem,
+            'ordem': self.ordem,
+            'ativo': self.ativo
+        }

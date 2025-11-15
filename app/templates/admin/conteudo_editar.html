@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Conteúdo - {{ pagina|title }} - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --cor-dourada: #D4AF37;
+            --cor-dourada-escura: #B8941E;
+            --cor-preta: #1a1a1a;
+            --cor-bege: #F5E6D3;
+            --cor-cinza-escuro: #2c2c2c;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 260px;
+            background: linear-gradient(180deg, var(--cor-preta) 0%, var(--cor-cinza-escuro) 100%);
+            box-shadow: 4px 0 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 3px solid var(--cor-dourada);
+            background-color: rgba(212, 175, 55, 0.1);
+        }
+
+        .sidebar-header h4 {
+            color: var(--cor-dourada);
+            margin: 0;
+            font-weight: 700;
+            font-size: 22px;
+        }
+
+        .sidebar-header small {
+            color: var(--cor-bege);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .sidebar-menu li a {
+            display: block;
+            padding: 15px 25px;
+            color: var(--cor-bege);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .sidebar-menu li a:hover {
+            background-color: rgba(212, 175, 55, 0.15);
+            padding-left: 30px;
+            color: var(--cor-dourada);
+        }
+
+        .sidebar-menu li a.active {
+            background-color: var(--cor-dourada);
+            color: var(--cor-preta);
+            border-left: 5px solid var(--cor-dourada-escura);
+        }
+
+        .sidebar-menu li a i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h4>Xodó da Preta</h4>
+            <small>Painel Admin</small>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{{ url_for('admin.dashboard') }}">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.produtos') }}">
+                    <i class="fas fa-box-open"></i> Produtos
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.subcategorias') }}">
+                    <i class="fas fa-tags"></i> Subcategorias
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.conteudo_listar') }}" class="active">
+                    <i class="fas fa-edit"></i> Gerenciar Conteúdo
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.configuracoes') }}">
+                    <i class="fas fa-cog"></i> Configurações
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('home') }}" target="_blank">
+                    <i class="fas fa-external-link-alt"></i> Ver Site
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.logout') }}">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-edit"></i> Editar Conteúdo: {{ pagina|title }}
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{{ url_for('admin.conteudo_listar') }}" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Voltar
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-10">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin.conteudo_salvar', pagina=pagina) }}" enctype="multipart/form-data">
+
+                    {% for campo in estrutura %}
+                    <div class="mb-4 pb-3 border-bottom">
+                        <label class="form-label fw-bold">
+                            <i class="fas fa-{% if campo.tipo == 'imagem' %}image{% elif campo.tipo == 'textarea' %}align-left{% else %}font{% endif %}"></i>
+                            {{ campo.label }}
+                        </label>
+
+                        {% if campo.tipo == 'imagem' %}
+                            <!-- Campo de Imagem -->
+                            {% set conteudo_atual = conteudo_dict.get(campo.secao) %}
+
+                            {% if conteudo_atual and conteudo_atual.imagem %}
+                            <div class="mb-2">
+                                <img src="{{ url_for('static', filename='uploads/' + conteudo_atual.imagem) }}"
+                                     class="img-thumbnail"
+                                     style="max-width: 300px; max-height: 200px; object-fit: cover;"
+                                     alt="Imagem atual">
+                                <p class="small text-muted mt-1">Imagem atual: {{ conteudo_atual.imagem }}</p>
+                            </div>
+                            {% endif %}
+
+                            <input type="file"
+                                   class="form-control"
+                                   id="imagem_{{ campo.secao }}"
+                                   name="imagem_{{ campo.secao }}"
+                                   accept="image/*">
+                            <small class="form-text text-muted">
+                                Formatos aceitos: JPG, PNG, GIF. Tamanho máximo: 5MB.
+                                {% if conteudo_atual and conteudo_atual.imagem %}
+                                    Deixe em branco para manter a imagem atual.
+                                {% endif %}
+                            </small>
+
+                        {% elif campo.tipo == 'textarea' %}
+                            <!-- Campo de Texto Longo -->
+                            {% set conteudo_atual = conteudo_dict.get(campo.secao) %}
+                            <textarea class="form-control"
+                                      id="secao_{{ campo.secao }}"
+                                      name="secao_{{ campo.secao }}"
+                                      rows="5"
+                                      placeholder="{{ campo.placeholder if campo.placeholder else '' }}">{{ conteudo_atual.conteudo if conteudo_atual else '' }}</textarea>
+                            <small class="form-text text-muted">
+                                Até 1000 caracteres. Use quebras de linha quando necessário.
+                            </small>
+
+                        {% else %}
+                            <!-- Campo de Texto Curto -->
+                            {% set conteudo_atual = conteudo_dict.get(campo.secao) %}
+                            <input type="text"
+                                   class="form-control"
+                                   id="secao_{{ campo.secao }}"
+                                   name="secao_{{ campo.secao }}"
+                                   value="{{ conteudo_atual.conteudo if conteudo_atual else '' }}"
+                                   placeholder="{{ campo.placeholder if campo.placeholder else '' }}">
+                            <small class="form-text text-muted">
+                                Texto curto, ideal para títulos e frases.
+                            </small>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                    <div class="mt-4 pt-3 border-top">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-save"></i> Salvar Alterações
+                        </button>
+                        <a href="{{ url_for('admin.conteudo_listar') }}"
+                           class="btn btn-secondary btn-lg">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Dicas -->
+        <div class="alert alert-info mt-4">
+            <h6><i class="fas fa-lightbulb"></i> Dicas:</h6>
+            <ul class="mb-0 small">
+                <li>As alterações são aplicadas imediatamente após salvar</li>
+                <li>Para imagens, use fotos de boa qualidade (mínimo 800x600px)</li>
+                <li>Mantenha os textos concisos e objetivos</li>
+                <li>Revise sempre o resultado no site antes de finalizar</li>
+            </ul>
+        </div>
+    </div>
+</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Preview de imagens antes do upload
+    document.querySelectorAll('input[type="file"]').forEach(input => {
+        input.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Validar tamanho (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Arquivo muito grande! Tamanho máximo: 5MB');
+                    this.value = '';
+                    return;
+                }
+
+                // Preview (opcional - pode adicionar depois se necessário)
+                console.log('Imagem selecionada:', file.name);
+            }
+        });
+    });
+
+    // Contador de caracteres para textareas
+    document.querySelectorAll('textarea').forEach(textarea => {
+        const maxLength = 1000;
+
+        function updateCounter() {
+            const current = textarea.value.length;
+            const remaining = maxLength - current;
+
+            let counter = textarea.nextElementSibling?.querySelector('.char-counter');
+            if (!counter) {
+                counter = document.createElement('span');
+                counter.className = 'char-counter text-muted float-end';
+                textarea.nextElementSibling?.appendChild(counter);
+            }
+
+            counter.textContent = `${current}/${maxLength} caracteres`;
+
+            if (remaining < 0) {
+                counter.classList.add('text-danger');
+                counter.classList.remove('text-muted');
+            } else {
+                counter.classList.remove('text-danger');
+                counter.classList.add('text-muted');
+            }
+        }
+
+        textarea.addEventListener('input', updateCounter);
+        updateCounter();
+    });
+</script>
+</body>
+</html>

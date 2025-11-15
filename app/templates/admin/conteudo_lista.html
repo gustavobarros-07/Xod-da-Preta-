@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Conteúdo - Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --cor-dourada: #D4AF37;
+            --cor-dourada-escura: #B8941E;
+            --cor-preta: #1a1a1a;
+            --cor-bege: #F5E6D3;
+            --cor-cinza-escuro: #2c2c2c;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 260px;
+            background: linear-gradient(180deg, var(--cor-preta) 0%, var(--cor-cinza-escuro) 100%);
+            box-shadow: 4px 0 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 3px solid var(--cor-dourada);
+            background-color: rgba(212, 175, 55, 0.1);
+        }
+
+        .sidebar-header h4 {
+            color: var(--cor-dourada);
+            margin: 0;
+            font-weight: 700;
+            font-size: 22px;
+        }
+
+        .sidebar-header small {
+            color: var(--cor-bege);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .sidebar-menu li a {
+            display: block;
+            padding: 15px 25px;
+            color: var(--cor-bege);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .sidebar-menu li a:hover {
+            background-color: rgba(212, 175, 55, 0.15);
+            padding-left: 30px;
+            color: var(--cor-dourada);
+        }
+
+        .sidebar-menu li a.active {
+            background-color: var(--cor-dourada);
+            color: var(--cor-preta);
+            border-left: 5px solid var(--cor-dourada-escura);
+        }
+
+        .sidebar-menu li a i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h4>Xodó da Preta</h4>
+            <small>Painel Admin</small>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{{ url_for('admin.dashboard') }}">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.produtos') }}">
+                    <i class="fas fa-box-open"></i> Produtos
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.subcategorias') }}">
+                    <i class="fas fa-tags"></i> Subcategorias
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.conteudo_listar') }}" class="active">
+                    <i class="fas fa-edit"></i> Gerenciar Conteúdo
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.configuracoes') }}">
+                    <i class="fas fa-cog"></i> Configurações
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('home') }}" target="_blank">
+                    <i class="fas fa-external-link-alt"></i> Ver Site
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.logout') }}">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="fas fa-edit"></i> Gerenciar Conteúdo do Site</h1>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            <strong>CMS (Sistema de Gerenciamento de Conteúdo)</strong><br>
+            Aqui você pode editar todos os textos e imagens do site sem precisar mexer no código.
+            Clique em "Editar" para modificar o conteúdo de cada página.
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Card: Home -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-home"></i> Página Inicial (Home)</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    Edite o conteúdo da página inicial, incluindo:
+                </p>
+                <ul class="small">
+                    <li>Carrossel de slides (3 slides)</li>
+                    <li>Títulos, subtítulos e textos</li>
+                    <li>Imagens dos slides</li>
+                    <li>Seção de categorias</li>
+                </ul>
+                <p class="text-muted small mb-0">
+                    <i class="fas fa-file-alt"></i>
+                    {% if conteudo_por_pagina.get('home') %}
+                        {{ conteudo_por_pagina['home']|length }} itens configurados
+                    {% else %}
+                        Nenhum conteúdo configurado ainda
+                    {% endif %}
+                </p>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('admin.conteudo_editar_pagina', pagina='home') }}"
+                   class="btn btn-primary btn-sm">
+                    <i class="fas fa-edit"></i> Editar Home
+                </a>
+                <a href="{{ url_for('home') }}"
+                   class="btn btn-outline-secondary btn-sm"
+                   target="_blank">
+                    <i class="fas fa-external-link-alt"></i> Ver Página
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card: Sobre -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-user"></i> Página Sobre (About)</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    Edite o conteúdo da página "Sobre", incluindo:
+                </p>
+                <ul class="small">
+                    <li>Título e texto do cabeçalho</li>
+                    <li>Imagem da fundadora</li>
+                    <li>Seção de serviços</li>
+                    <li>História da marca</li>
+                </ul>
+                <p class="text-muted small mb-0">
+                    <i class="fas fa-file-alt"></i>
+                    {% if conteudo_por_pagina.get('about') %}
+                        {{ conteudo_por_pagina['about']|length }} itens configurados
+                    {% else %}
+                        Nenhum conteúdo configurado ainda
+                    {% endif %}
+                </p>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('admin.conteudo_editar_pagina', pagina='about') }}"
+                   class="btn btn-success btn-sm">
+                    <i class="fas fa-edit"></i> Editar Sobre
+                </a>
+                <a href="{{ url_for('about') }}"
+                   class="btn btn-outline-secondary btn-sm"
+                   target="_blank">
+                    <i class="fas fa-external-link-alt"></i> Ver Página
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card: Contato -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-envelope"></i> Página Contato</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    Edite as informações de contato, incluindo:
+                </p>
+                <ul class="small">
+                    <li>Título e subtítulo</li>
+                    <li>Telefone/WhatsApp</li>
+                    <li>Instagram</li>
+                    <li>Localização</li>
+                    <li>Tempo de resposta</li>
+                </ul>
+                <p class="text-muted small mb-0">
+                    <i class="fas fa-file-alt"></i>
+                    {% if conteudo_por_pagina.get('contact') %}
+                        {{ conteudo_por_pagina['contact']|length }} itens configurados
+                    {% else %}
+                        Nenhum conteúdo configurado ainda
+                    {% endif %}
+                </p>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('admin.conteudo_editar_pagina', pagina='contact') }}"
+                   class="btn btn-info btn-sm text-white">
+                    <i class="fas fa-edit"></i> Editar Contato
+                </a>
+                <a href="{{ url_for('contact') }}"
+                   class="btn btn-outline-secondary btn-sm"
+                   target="_blank">
+                    <i class="fas fa-external-link-alt"></i> Ver Página
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card: Rodapé -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="fas fa-align-justify"></i> Rodapé (Footer)</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    Edite o conteúdo do rodapé, incluindo:
+                </p>
+                <ul class="small">
+                    <li>Texto "Sobre" no footer</li>
+                    <li>Direitos autorais</li>
+                    <li>Ano atual</li>
+                </ul>
+                <p class="text-muted small mb-0">
+                    <i class="fas fa-file-alt"></i>
+                    {% if conteudo_por_pagina.get('footer') %}
+                        {{ conteudo_por_pagina['footer']|length }} itens configurados
+                    {% else %}
+                        Nenhum conteúdo configurado ainda
+                    {% endif %}
+                </p>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('admin.conteudo_editar_pagina', pagina='footer') }}"
+                   class="btn btn-dark btn-sm">
+                    <i class="fas fa-edit"></i> Editar Rodapé
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>Importante:</strong> As alterações feitas aqui são aplicadas imediatamente no site.
+            Certifique-se de revisar o conteúdo antes de salvar.
+        </div>
+    </div>
+</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

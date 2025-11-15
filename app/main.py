@@ -25,7 +25,7 @@ db.init_app(app)
 # Criar tabelas se não existirem
 with app.app_context():
     # Importar modelos para garantir que sejam registrados
-    from models import Produto, Admin, Configuracao, Subcategoria
+    from models import Produto, Admin, Configuracao, Subcategoria, ConteudoPagina
     db.create_all()
 
 # Registrar Blueprint do Admin
