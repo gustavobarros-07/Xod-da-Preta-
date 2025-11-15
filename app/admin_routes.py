@@ -2,7 +2,7 @@
 Rotas do painel administrativo
 """
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app
 from werkzeug.utils import secure_filename
 from functools import wraps
 import os
@@ -662,3 +662,198 @@ def conteudo_salvar(pagina):
         db.session.rollback()
 
     return redirect(url_for('admin.conteudo_editar_pagina', pagina=pagina))
+
+
+# ==========================================
+# BIBLIOTECA DE MÍDIA
+# ==========================================
+
+@admin_bp.route('/media')
+@login_required
+def media_biblioteca():
+    """Biblioteca de mídia - todas as imagens do sistema"""
+    from pathlib import Path
+    import os
+
+    upload_folder = Config.UPLOAD_FOLDER
+    imagens = []
+
+    if upload_folder.exists():
+        # Listar todos os arquivos de imagem
+        extensoes_permitidas = {'.jpg', '.jpeg', '.png', '.gif', '.webp'}
+
+        for arquivo in upload_folder.iterdir():
+            if arquivo.is_file() and arquivo.suffix.lower() in extensoes_permitidas:
+                # Obter informações do arquivo
+                stat = arquivo.stat()
+                tamanho_kb = stat.st_size / 1024  # Converter para KB
+
+                # Verificar se a imagem está sendo usada em algum produto
+                usado_em = []
+                produtos_usando = Produto.query.filter(
+                    (Produto.imagem == arquivo.name) |
+                    (Produto.imagens_adicionais.like(f'%{arquivo.name}%'))
+                ).all()
+
+                for p in produtos_usando:
+                    usado_em.append({
+                        'tipo': 'produto',
+                        'nome': p.nome,
+                        'id': p.id
+                    })
+
+                imagens.append({
+                    'nome': arquivo.name,
+                    'tamanho_kb': round(tamanho_kb, 2),
+                    'data_modificacao': datetime.fromtimestamp(stat.st_mtime),
+                    'usado_em': usado_em,
+                    'em_uso': len(usado_em) > 0
+                })
+
+        # Ordenar por data (mais recentes primeiro)
+        imagens.sort(key=lambda x: x['data_modificacao'], reverse=True)
+
+    return render_template('admin/media_biblioteca.html', imagens=imagens)
+
+
+@admin_bp.route('/media/deletar/<filename>', methods=['POST'])
+@login_required
+def media_deletar(filename):
+    """Deletar imagem da biblioteca"""
+    from pathlib import Path
+
+    # Verificar se a imagem está sendo usada
+    produtos_usando = Produto.query.filter(
+        (Produto.imagem == filename) |
+        (Produto.imagens_adicionais.like(f'%{filename}%'))
+    ).all()
+
+    if produtos_usando:
+        nomes = ', '.join([p.nome for p in produtos_usando[:3]])
+        if len(produtos_usando) > 3:
+            nomes += f' e mais {len(produtos_usando) - 3}'
+        flash(f'Não é possível deletar. Imagem em uso em: {nomes}', 'danger')
+        return redirect(url_for('admin.media_biblioteca'))
+
+    # Deletar arquivo
+    try:
+        arquivo = Config.UPLOAD_FOLDER / filename
+        if arquivo.exists():
+            arquivo.unlink()
+            flash(f'Imagem "{filename}" deletada com sucesso!', 'success')
+        else:
+            flash('Arquivo não encontrado.', 'warning')
+    except Exception as e:
+        flash(f'Erro ao deletar arquivo: {str(e)}', 'danger')
+
+    return redirect(url_for('admin.media_biblioteca'))
+
+
+# ==========================================
+# SISTEMA DE BACKUP
+# ==========================================
+
+@admin_bp.route('/backup')
+@login_required
+def backup_painel():
+    """Painel de backup e restore"""
+    from pathlib import Path
+    import os
+
+    # Listar backups existentes
+    backup_folder = Path(current_app.root_path).parent / 'backups'
+    backups = []
+
+    if backup_folder.exists():
+        for arquivo in backup_folder.iterdir():
+            if arquivo.is_file() and arquivo.suffix == '.zip':
+                stat = arquivo.stat()
+                backups.append({
+                    'nome': arquivo.name,
+                    'tamanho_mb': round(stat.st_size / (1024 * 1024), 2),
+                    'data': datetime.fromtimestamp(stat.st_mtime)
+                })
+
+        backups.sort(key=lambda x: x['data'], reverse=True)
+
+    return render_template('admin/backup.html', backups=backups)
+
+
+@admin_bp.route('/backup/criar', methods=['POST'])
+@login_required
+def backup_criar():
+    """Criar backup do banco de dados e uploads"""
+    from pathlib import Path
+    import shutil
+    import zipfile
+
+    try:
+        # Criar pasta de backups se não existir
+        backup_folder = Path(current_app.root_path).parent / 'backups'
+        backup_folder.mkdir(exist_ok=True)
+
+        # Nome do backup com timestamp
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        backup_name = f'backup_{timestamp}.zip'
+        backup_path = backup_folder / backup_name
+
+        # Criar arquivo ZIP
+        with zipfile.ZipFile(backup_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            # Adicionar banco de dados
+            db_path = Path(current_app.root_path) / 'loja.db'
+            if db_path.exists():
+                zipf.write(db_path, arcname='loja.db')
+
+            # Adicionar pasta uploads
+            uploads_folder = Config.UPLOAD_FOLDER
+            if uploads_folder.exists():
+                for arquivo in uploads_folder.rglob('*'):
+                    if arquivo.is_file():
+                        arcname = f'uploads/{arquivo.relative_to(uploads_folder)}'
+                        zipf.write(arquivo, arcname=arcname)
+
+        flash(f'Backup criado com sucesso: {backup_name}', 'success')
+
+    except Exception as e:
+        flash(f'Erro ao criar backup: {str(e)}', 'danger')
+
+    return redirect(url_for('admin.backup_painel'))
+
+
+@admin_bp.route('/backup/download/<filename>')
+@login_required
+def backup_download(filename):
+    """Download de arquivo de backup"""
+    from flask import send_file
+    from pathlib import Path
+
+    backup_folder = Path(current_app.root_path).parent / 'backups'
+    backup_path = backup_folder / filename
+
+    if not backup_path.exists():
+        flash('Arquivo de backup não encontrado.', 'danger')
+        return redirect(url_for('admin.backup_painel'))
+
+    return send_file(backup_path, as_attachment=True)
+
+
+@admin_bp.route('/backup/deletar/<filename>', methods=['POST'])
+@login_required
+def backup_deletar(filename):
+    """Deletar arquivo de backup"""
+    from pathlib import Path
+
+    try:
+        backup_folder = Path(current_app.root_path).parent / 'backups'
+        backup_path = backup_folder / filename
+
+        if backup_path.exists():
+            backup_path.unlink()
+            flash(f'Backup "{filename}" deletado com sucesso!', 'success')
+        else:
+            flash('Arquivo não encontrado.', 'warning')
+
+    except Exception as e:
+        flash(f'Erro ao deletar backup: {str(e)}', 'danger')
+
+    return redirect(url_for('admin.backup_painel'))

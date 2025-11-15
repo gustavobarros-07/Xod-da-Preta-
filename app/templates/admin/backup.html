@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subcategorias - Admin | Xodó da Preta</title>
+    <title>Sistema de Backup - Admin | Xodó da Preta</title>
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
@@ -94,57 +94,65 @@
             align-items: center;
         }
 
-        .btn-add {
+        .btn-create-backup {
             background-color: var(--cor-dourada);
             color: var(--cor-preta);
             border: none;
             font-weight: 600;
         }
 
-        .btn-add:hover {
+        .btn-create-backup:hover {
             background-color: #C48835;
             color: var(--cor-preta);
         }
 
-        .subcategorias-container {
+        .backup-container {
             background: white;
             border-radius: 10px;
             padding: 25px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
         }
 
-        .categoria-header {
-            background-color: var(--cor-preta);
-            color: var(--cor-dourada);
-            padding: 15px 20px;
+        .backup-info-box {
+            background: #f8f9fa;
+            border-left: 4px solid var(--cor-dourada);
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+        }
+
+        .backup-info-box h5 {
+            color: var(--cor-preta);
+            margin-bottom: 10px;
+        }
+
+        .backup-info-box p {
+            margin: 5px 0;
+            color: #666;
+        }
+
+        .table img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
             border-radius: 8px;
-            margin-bottom: 15px;
-            font-weight: 600;
-            font-size: 18px;
-        }
-
-        .badge-status {
-            padding: 5px 12px;
-            border-radius: 5px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .badge-ativo {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .badge-inativo {
-            background-color: #dc3545;
-            color: white;
         }
 
         .btn-action {
             padding: 5px 10px;
             margin: 0 2px;
             font-size: 14px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #ccc;
+            margin-bottom: 20px;
         }
     </style>
 </head>
@@ -168,7 +176,7 @@
                 </a>
             </li>
             <li>
-                <a href="{{ url_for('admin.subcategorias') }}" class="active">
+                <a href="{{ url_for('admin.subcategorias') }}">
                     <i class="fas fa-tags"></i> Subcategorias
                 </a>
             </li>
@@ -188,7 +196,7 @@
                 </a>
             </li>
             <li>
-                <a href="{{ url_for('admin.backup_painel') }}">
+                <a href="{{ url_for('admin.backup_painel') }}" class="active">
                     <i class="fas fa-hdd"></i> Backup
                 </a>
             </li>
@@ -209,10 +217,12 @@
     <div class="main-content">
         <!-- Header -->
         <div class="admin-header">
-            <h1><i class="fas fa-tags"></i> Gerenciar Subcategorias</h1>
-            <a href="{{ url_for('admin.subcategoria_nova') }}" class="btn btn-add">
-                <i class="fas fa-plus"></i> Adicionar Subcategoria
-            </a>
+            <h1><i class="fas fa-hdd"></i> Sistema de Backup</h1>
+            <form method="POST" action="{{ url_for('admin.backup_criar') }}" style="display: inline;">
+                <button type="submit" class="btn btn-create-backup">
+                    <i class="fas fa-plus"></i> Criar Novo Backup
+                </button>
+            </form>
         </div>
 
         <!-- Mensagens Flash -->
@@ -227,62 +237,71 @@
             {% endif %}
         {% endwith %}
 
-        <!-- Lista de Subcategorias por Categoria -->
-        {% if subcategorias_por_categoria %}
-            {% for categoria in categorias %}
-                {% if categoria in subcategorias_por_categoria %}
-                    <div class="subcategorias-container">
-                        <div class="categoria-header">
-                            <i class="fas fa-folder"></i> {{ categoria }}
-                        </div>
+        <!-- Info Box -->
+        <div class="backup-info-box">
+            <h5><i class="fas fa-info-circle"></i> Sobre os Backups</h5>
+            <p><strong>O que é incluído no backup:</strong></p>
+            <ul>
+                <li>Banco de dados completo (produtos, subcategorias, conteúdo)</li>
+                <li>Todas as imagens da pasta uploads</li>
+            </ul>
+            <p class="text-muted mb-0">
+                <i class="fas fa-exclamation-triangle"></i>
+                Recomendamos criar backups regularmente (semanal ou mensalmente)
+            </p>
+        </div>
 
-                        <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th style="width: 50px;">Ordem</th>
-                                    <th>Nome</th>
-                                    <th style="width: 100px;">Status</th>
-                                    <th style="width: 150px;" class="text-end">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for subcat in subcategorias_por_categoria[categoria] %}
-                                    <tr>
-                                        <td>{{ subcat.ordem }}</td>
-                                        <td><strong>{{ subcat.nome }}</strong></td>
-                                        <td>
-                                            {% if subcat.ativo %}
-                                                <span class="badge-status badge-ativo">Ativo</span>
-                                            {% else %}
-                                                <span class="badge-status badge-inativo">Inativo</span>
-                                            {% endif %}
-                                        </td>
-                                        <td class="text-end">
-                                            <a href="{{ url_for('admin.subcategoria_editar', subcategoria_id=subcat.id) }}"
-                                               class="btn btn-sm btn-primary btn-action">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <button type="button" class="btn btn-sm btn-danger btn-action"
-                                                    onclick="confirmarDelecao({{ subcat.id }}, '{{ subcat.nome }}')">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                {% endif %}
-            {% endfor %}
-        {% else %}
-            <div class="alert alert-info">
-                <i class="fas fa-info-circle"></i> Nenhuma subcategoria cadastrada ainda.
-                <a href="{{ url_for('admin.subcategoria_nova') }}">Adicionar a primeira subcategoria</a>
+        <!-- Lista de Backups -->
+        <div class="backup-container">
+            {% if backups %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nome do Arquivo</th>
+                            <th>Tamanho</th>
+                            <th>Data de Criação</th>
+                            <th width="180">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for backup in backups %}
+                        <tr>
+                            <td>
+                                <i class="fas fa-file-archive text-warning"></i>
+                                <strong>{{ backup.nome }}</strong>
+                            </td>
+                            <td>{{ backup.tamanho_mb }} MB</td>
+                            <td>{{ backup.data_criacao.strftime('%d/%m/%Y às %H:%M') }}</td>
+                            <td>
+                                <a href="{{ url_for('admin.backup_download', filename=backup.nome) }}"
+                                   class="btn btn-sm btn-success btn-action"
+                                   title="Download">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                                <button type="button"
+                                        class="btn btn-sm btn-danger btn-action"
+                                        onclick="confirmarDelete('{{ backup.nome }}')"
+                                        title="Deletar">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-        {% endif %}
+            {% else %}
+            <div class="empty-state">
+                <i class="fas fa-hdd"></i>
+                <h4 class="text-muted">Nenhum backup criado ainda</h4>
+                <p class="text-muted">Clique em "Criar Novo Backup" para fazer o primeiro backup do sistema</p>
+            </div>
+            {% endif %}
+        </div>
     </div>
 
-    <!-- Modal de Confirmação de Deleção -->
+    <!-- Modal de Confirmação de Delete -->
     <div class="modal fade" id="deleteModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -291,13 +310,15 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Tem certeza que deseja deletar a subcategoria <strong id="subcategoriaNome"></strong>?</p>
-                    <p class="text-danger"><small>Esta ação não pode ser desfeita.</small></p>
+                    <p>Tem certeza que deseja deletar o backup <strong id="backupNome"></strong>?</p>
+                    <p class="text-danger"><i class="fas fa-exclamation-triangle"></i> Esta ação não pode ser desfeita!</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <form id="deleteForm" method="POST" style="display: inline;">
-                        <button type="submit" class="btn btn-danger">Deletar</button>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Deletar
+                        </button>
                     </form>
                 </div>
             </div>
@@ -308,9 +329,9 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        function confirmarDelecao(id, nome) {
-            document.getElementById('subcategoriaNome').textContent = nome;
-            document.getElementById('deleteForm').action = `/admin/subcategorias/${id}/deletar`;
+        function confirmarDelete(backupNome) {
+            document.getElementById('backupNome').textContent = backupNome;
+            document.getElementById('deleteForm').action = `/admin/backup/deletar/${backupNome}`;
 
             var modal = new bootstrap.Modal(document.getElementById('deleteModal'));
             modal.show();
