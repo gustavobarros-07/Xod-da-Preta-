@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 from database import db
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -77,20 +78,18 @@ class Produto(db.Model):
 
     def get_todas_imagens(self):
         """Retorna lista com todas as imagens (principal + adicionais)"""
-        import json
         imagens = []
         if self.imagem:
             imagens.append(self.imagem)
         if self.imagens_adicionais:
             try:
                 imagens.extend(json.loads(self.imagens_adicionais))
-            except:
+            except json.JSONDecodeError:
                 pass
         return imagens
 
     def set_imagens_adicionais(self, lista_imagens):
         """Define imagens adicionais a partir de uma lista"""
-        import json
         self.imagens_adicionais = json.dumps(lista_imagens) if lista_imagens else None
 
 

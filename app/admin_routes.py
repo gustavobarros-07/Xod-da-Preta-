@@ -5,12 +5,14 @@ Rotas do painel administrativo
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, current_app
 from werkzeug.utils import secure_filename
 from functools import wraps
+from datetime import datetime, timedelta
 import os
+import json
+import zipfile
 from pathlib import Path
 from database import db
 from models import Produto, Admin, Configuracao, Subcategoria
 from config import Config
-import json
 
 # Criar Blueprint para rotas do admin
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
@@ -36,7 +38,6 @@ def save_product_image(file):
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         # Adicionar timestamp para evitar conflitos
-        from datetime import datetime
         timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
         name, ext = os.path.splitext(filename)
         filename = f"{name}_{timestamp}{ext}"
@@ -69,9 +70,8 @@ def login():
             session['admin_logged_in'] = True
             session['admin_id'] = admin.id
             session['admin_username'] = admin.username
-            
+
             # Atualizar último login
-            from datetime import datetime
             admin.ultimo_login = datetime.utcnow()
             db.session.commit()
             
@@ -98,7 +98,6 @@ def logout():
 @login_required
 def dashboard():
     """Dashboard principal do admin com métricas avançadas"""
-    from datetime import datetime, timedelta
     from models import ProdutoVisualizacao
 
     # ===== ESTATÍSTICAS BÁSICAS =====
@@ -290,14 +289,13 @@ def produto_editar(produto_id):
         if imagens_adicionais_files and any(f.filename for f in imagens_adicionais_files):
             # Deletar imagens adicionais antigas se existir
             if produto.imagens_adicionais:
-                import json as json_module
                 try:
-                    old_images = json_module.loads(produto.imagens_adicionais)
+                    old_images = json.loads(produto.imagens_adicionais)
                     for old_img in old_images:
                         old_img_path = Config.UPLOAD_FOLDER / old_img
                         if old_img_path.exists():
                             old_img_path.unlink()
-                except:
+                except (json.JSONDecodeError, TypeError, OSError):
                     pass
 
             # Salvar novas imagens
@@ -679,6 +677,29 @@ def media_biblioteca():
     imagens = []
 
     if upload_folder.exists():
+        # Carregar todos os produtos de uma vez (otimização N+1)
+        todos_produtos = Produto.query.all()
+
+        # Criar mapa de imagens para produtos
+        imagem_para_produtos = {}
+        for p in todos_produtos:
+            # Verificar imagem principal
+            if p.imagem:
+                if p.imagem not in imagem_para_produtos:
+                    imagem_para_produtos[p.imagem] = []
+                imagem_para_produtos[p.imagem].append({'tipo': 'produto', 'nome': p.nome, 'id': p.id})
+
+            # Verificar imagens adicionais
+            if p.imagens_adicionais:
+                try:
+                    imgs_adicionais = json.loads(p.imagens_adicionais)
+                    for img in imgs_adicionais:
+                        if img not in imagem_para_produtos:
+                            imagem_para_produtos[img] = []
+                        imagem_para_produtos[img].append({'tipo': 'produto', 'nome': p.nome, 'id': p.id})
+                except json.JSONDecodeError:
+                    pass
+
         # Listar todos os arquivos de imagem
         extensoes_permitidas = {'.jpg', '.jpeg', '.png', '.gif', '.webp'}
 
@@ -688,19 +709,8 @@ def media_biblioteca():
                 stat = arquivo.stat()
                 tamanho_kb = stat.st_size / 1024  # Converter para KB
 
-                # Verificar se a imagem está sendo usada em algum produto
-                usado_em = []
-                produtos_usando = Produto.query.filter(
-                    (Produto.imagem == arquivo.name) |
-                    (Produto.imagens_adicionais.like(f'%{arquivo.name}%'))
-                ).all()
-
-                for p in produtos_usando:
-                    usado_em.append({
-                        'tipo': 'produto',
-                        'nome': p.nome,
-                        'id': p.id
-                    })
+                # Buscar no mapa (sem query adicional)
+                usado_em = imagem_para_produtos.get(arquivo.name, [])
 
                 imagens.append({
                     'nome': arquivo.name,
@@ -785,7 +795,6 @@ def backup_criar():
     """Criar backup do banco de dados e uploads"""
     from pathlib import Path
     import shutil
-    import zipfile
 
     try:
         # Criar pasta de backups se não existir
