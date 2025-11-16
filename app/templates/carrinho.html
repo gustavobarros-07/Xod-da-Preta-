@@ -146,6 +146,31 @@
                     <span class="fw-bold" id="cart-subtotal">{{ total | currency }}</span>
                 </div>
 
+                <!-- Campo de Cupom -->
+                <div class="mb-3 pb-3 border-bottom">
+                    <label for="cupom-input" class="form-label small mb-2">Cupom de Desconto:</label>
+                    <div class="input-group">
+                        <input type="text"
+                               class="form-control"
+                               id="cupom-input"
+                               placeholder="Digite o código">
+                        <button class="btn btn-outline-success"
+                                type="button"
+                                id="aplicar-cupom">
+                            Aplicar
+                        </button>
+                    </div>
+                    <div id="cupom-feedback" class="small mt-2"></div>
+                </div>
+
+                <!-- Desconto aplicado -->
+                <div id="desconto-container" class="d-none">
+                    <div class="d-flex justify-content-between mb-2 text-success">
+                        <span>Desconto (<span id="cupom-codigo"></span>):</span>
+                        <span class="fw-bold" id="desconto-valor">- R$ 0,00</span>
+                    </div>
+                </div>
+
                 <div class="d-flex justify-content-between mb-3 pb-3 border-bottom">
                     <span class="text-muted small">Frete calculado no WhatsApp</span>
                 </div>
@@ -294,28 +319,168 @@ function atualizarTotalGeral() {
     document.getElementById('cart-total').textContent = totalFormatado;
 }
 
+// Variáveis globais para cupom
+let cupomAplicado = null;
+let valorDesconto = 0;
+
+// Aplicar/Remover cupom
+document.getElementById('aplicar-cupom')?.addEventListener('click', function() {
+    const feedbackElement = document.getElementById('cupom-feedback');
+
+    // Se já tem cupom aplicado, remover
+    if (cupomAplicado) {
+        removerCupom();
+        feedbackElement.innerHTML = '<span class="text-info"><i class="fas fa-info-circle"></i> Cupom removido</span>';
+        setTimeout(() => {
+            feedbackElement.innerHTML = '';
+        }, 3000);
+        return;
+    }
+
+    // Caso contrário, aplicar cupom
+    const codigoCupom = document.getElementById('cupom-input').value.trim().toUpperCase();
+
+    if (!codigoCupom) {
+        feedbackElement.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle"></i> Digite um código de cupom</span>';
+        return;
+    }
+
+    // Buscar cupom na API
+    fetch(`/api/cupom/validar`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            codigo: codigoCupom,
+            valor_carrinho: getSubtotalValue()
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            cupomAplicado = data.cupom;
+            valorDesconto = data.valor_desconto;
+
+            // Mostrar feedback de sucesso
+            feedbackElement.innerHTML = `<span class="text-success"><i class="fas fa-check-circle"></i> Cupom aplicado com sucesso!</span>`;
+            document.getElementById('cupom-input').disabled = true;
+            document.getElementById('aplicar-cupom').textContent = 'Remover';
+            document.getElementById('aplicar-cupom').classList.remove('btn-outline-success');
+            document.getElementById('aplicar-cupom').classList.add('btn-outline-danger');
+
+            // Mostrar desconto
+            document.getElementById('desconto-container').classList.remove('d-none');
+            document.getElementById('cupom-codigo').textContent = cupomAplicado.codigo;
+
+            const descontoFormatado = new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(valorDesconto);
+            document.getElementById('desconto-valor').textContent = '- ' + descontoFormatado;
+
+            // Recalcular total
+            atualizarTotalComDesconto();
+
+        } else {
+            feedbackElement.innerHTML = `<span class="text-danger"><i class="fas fa-times-circle"></i> ${data.message}</span>`;
+            removerCupom();
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        feedbackElement.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle"></i> Erro ao validar cupom</span>';
+    });
+});
+
+// Remover cupom
+function removerCupom() {
+    cupomAplicado = null;
+    valorDesconto = 0;
+    document.getElementById('cupom-input').disabled = false;
+    document.getElementById('cupom-input').value = '';
+    document.getElementById('aplicar-cupom').textContent = 'Aplicar';
+    document.getElementById('aplicar-cupom').classList.remove('btn-outline-danger');
+    document.getElementById('aplicar-cupom').classList.add('btn-outline-success');
+    document.getElementById('desconto-container').classList.add('d-none');
+    document.getElementById('cupom-feedback').innerHTML = '';
+    atualizarTotalComDesconto();
+}
+
+// Obter subtotal como número
+function getSubtotalValue() {
+    const subtotalText = document.getElementById('cart-subtotal').textContent;
+    return parseFloat(subtotalText.replace('R$', '').replace(/\./g, '').replace(',', '.'));
+}
+
+// Atualizar total com desconto
+function atualizarTotalComDesconto() {
+    const subtotal = getSubtotalValue();
+    const total = subtotal - valorDesconto;
+
+    const totalFormatado = new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    }).format(total);
+
+    document.getElementById('cart-total').textContent = totalFormatado;
+}
+
 // Finalizar pedido via WhatsApp
 document.getElementById('checkout-btn')?.addEventListener('click', function() {
-    let mensagem = '*Novo Pedido - Xodó da Preta*\n\n';
+    // Cabeçalho da mensagem
+    let mensagem = '🛍️ *NOVO PEDIDO - XODÓ DA PRETA*\n';
+    mensagem += '━━━━━━━━━━━━━━━━━━━━━━━\n\n';
 
+    // Itens do pedido
+    mensagem += '📦 *PRODUTOS:*\n\n';
     document.querySelectorAll('.cart-item').forEach((item, index) => {
-        const nome = item.querySelector('h5').textContent;
+        const nome = item.querySelector('h5').textContent.trim();
+        const categoria = item.querySelector('.text-muted.small:nth-of-type(1)').textContent.trim();
         const quantidade = item.querySelector('.quantity-input').value;
-        const preco = item.querySelector('.item-subtotal').textContent;
-        const tamanhoElement = item.querySelector('.text-muted.small:nth-of-type(2)');
-        const tamanho = tamanhoElement ? tamanhoElement.textContent : '';
+        const subtotal = item.querySelector('.item-subtotal').textContent.trim();
 
-        mensagem += `${index + 1}. ${nome}\n`;
-        if (tamanho) mensagem += `   ${tamanho}\n`;
-        mensagem += `   Quantidade: ${quantidade}\n`;
-        mensagem += `   Subtotal: ${preco}\n\n`;
+        // Verificar se tem tamanho
+        const tamanhoElements = item.querySelectorAll('.text-muted.small');
+        let tamanho = null;
+        if (tamanhoElements.length > 1) {
+            const tamanhoText = tamanhoElements[1].textContent.trim();
+            if (tamanhoText.startsWith('Tamanho:')) {
+                tamanho = tamanhoText.replace('Tamanho:', '').trim();
+            }
+        }
+
+        mensagem += `*${index + 1}. ${nome}*\n`;
+        mensagem += `   📁 ${categoria}\n`;
+        if (tamanho) {
+            mensagem += `   📏 Tamanho: ${tamanho}\n`;
+        }
+        mensagem += `   🔢 Quantidade: ${quantidade}\n`;
+        mensagem += `   💰 Subtotal: ${subtotal}\n\n`;
     });
 
-    const total = document.getElementById('cart-total').textContent;
-    mensagem += `*Total: ${total}*\n\n`;
-    mensagem += 'Aguardo informações sobre o frete!';
+    // Resumo financeiro
+    mensagem += '━━━━━━━━━━━━━━━━━━━━━━━\n';
+    mensagem += '💵 *RESUMO FINANCEIRO:*\n\n';
 
-    const phoneNumber = '5511954375056';
+    const subtotal = document.getElementById('cart-subtotal').textContent.trim();
+    mensagem += `Subtotal: ${subtotal}\n`;
+
+    // Se houver cupom aplicado
+    if (cupomAplicado && valorDesconto > 0) {
+        const desconto = document.getElementById('desconto-valor').textContent.trim();
+        mensagem += `Desconto (${cupomAplicado.codigo}): ${desconto}\n`;
+    }
+
+    const total = document.getElementById('cart-total').textContent.trim();
+    mensagem += `\n*TOTAL: ${total}*\n\n`;
+
+    mensagem += '🚚 _Frete a combinar_\n\n';
+    mensagem += '━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+    mensagem += 'Aguardo retorno para confirmar o pedido e combinarmos a forma de entrega! 😊';
+
+    // Número do WhatsApp da configuração
+    const phoneNumber = '{{ config_loja_telefone|replace(" ", "")|replace("-", "") }}';
     const whatsappURL = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(mensagem)}`;
 
     window.open(whatsappURL, '_blank');

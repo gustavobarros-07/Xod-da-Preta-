@@ -346,6 +346,60 @@ def carrinho_total():
     return jsonify({'total_itens': total_itens})
 
 # ========================================
+# CUPONS
+# ========================================
+
+@app.route("/api/cupom/validar", methods=['POST'])
+def validar_cupom():
+    """Valida um cupom de desconto"""
+    from models import Cupom
+
+    try:
+        data = request.get_json()
+        codigo = data.get('codigo', '').upper().strip()
+        valor_carrinho = float(data.get('valor_carrinho', 0))
+
+        if not codigo:
+            return jsonify({'success': False, 'message': 'Código do cupom não informado'}), 400
+
+        # Buscar cupom
+        cupom = Cupom.query.filter_by(codigo=codigo).first()
+
+        if not cupom:
+            return jsonify({'success': False, 'message': 'Cupom não encontrado'}), 404
+
+        # Validar cupom
+        valido, mensagem = cupom.is_valido()
+        if not valido:
+            return jsonify({'success': False, 'message': mensagem}), 400
+
+        # Verificar valor mínimo
+        if cupom.valor_minimo and valor_carrinho < cupom.valor_minimo:
+            return jsonify({
+                'success': False,
+                'message': f'Valor mínimo do carrinho: R$ {cupom.valor_minimo:.2f}'
+            }), 400
+
+        # Calcular desconto
+        valor_desconto = cupom.calcular_desconto(valor_carrinho)
+
+        return jsonify({
+            'success': True,
+            'cupom': {
+                'id': cupom.id,
+                'codigo': cupom.codigo,
+                'tipo_desconto': cupom.tipo_desconto,
+                'valor_desconto': cupom.valor_desconto
+            },
+            'valor_desconto': valor_desconto,
+            'message': 'Cupom aplicado com sucesso!'
+        })
+
+    except Exception as e:
+        print(f"Erro ao validar cupom: {e}")
+        return jsonify({'success': False, 'message': 'Erro ao validar cupom'}), 500
+
+# ========================================
 # BUSCA
 # ========================================
 
