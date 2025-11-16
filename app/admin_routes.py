@@ -1164,3 +1164,57 @@ def cupom_deletar(cupom_id):
 
     flash(f'Cupom "{codigo}" deletado com sucesso!', 'success')
     return redirect(url_for('admin.cupons'))
+
+
+# ==========================================
+# DEBUG - TEMPORÁRIO
+# ==========================================
+
+@admin_bp.route('/debug/config')
+@login_required
+def debug_config():
+    """Debug de configurações - TEMPORÁRIO"""
+    from flask import Response
+
+    output = []
+    output.append("=== DEBUG DE CONFIGURAÇÕES ===\n\n")
+
+    # Todas as configs
+    output.append("TODAS AS CONFIGURAÇÕES NO BANCO:\n")
+    all_configs = Configuracao.query.all()
+    for c in all_configs:
+        output.append(f"  {c.chave:25} = '{c.valor}' (type: {type(c.valor).__name__})\n")
+
+    output.append("\n" + "="*50 + "\n\n")
+
+    # Teste específico do topbar
+    output.append("TESTE TOPBAR_ATIVO:\n")
+    topbar_valor = Configuracao.get_valor('topbar_ativo', '1')
+    output.append(f"  get_valor('topbar_ativo', '1') = '{topbar_valor}'\n")
+    output.append(f"  type = {type(topbar_valor).__name__}\n")
+    output.append(f"  '{topbar_valor}' == '1' ? {topbar_valor == '1'}\n")
+    output.append(f"  bool('{topbar_valor}') = {bool(topbar_valor)}\n")
+
+    output.append("\n" + "="*50 + "\n\n")
+
+    # Context processor
+    output.append("CONTEXT PROCESSOR:\n")
+    result = topbar_valor == '1'
+    output.append(f"  config_topbar_ativo = {result}\n")
+
+    if result:
+        output.append("\n✓ Top Bar DEVERIA APARECER\n")
+    else:
+        output.append("\n✗ Top Bar NÃO VAI APARECER\n")
+        output.append("  Solução: Marcar checkbox em /admin/configuracoes\n")
+
+    return Response(''.join(output), mimetype='text/plain')
+
+
+@admin_bp.route('/debug/fix-topbar')
+@login_required
+def debug_fix_topbar():
+    """Força topbar_ativo = 1"""
+    Configuracao.set_valor('topbar_ativo', '1', 'Controla exibição do top bar')
+    flash('topbar_ativo forçado para "1" (ativo)', 'success')
+    return redirect(url_for('admin.debug_config'))
