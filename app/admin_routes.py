@@ -172,11 +172,14 @@ def dashboard():
             total_descontos_valor += (preco_medio * (cupom.valor_desconto / 100)) * cupom.quantidade_usada
 
     # ===== RANKING DE CATEGORIAS (por quantidade de produtos) =====
-    categorias_ranking = db.session.query(
+    categorias_ranking_raw = db.session.query(
         Produto.categoria,
         db.func.count(Produto.id).label('total'),
         db.func.sum(Produto.visualizacoes).label('views_total')
     ).group_by(Produto.categoria).order_by(db.text('total DESC')).all()
+
+    # Converter Row objects para listas simples (JSON serializable)
+    categorias_ranking = [[cat, total, views or 0] for cat, total, views in categorias_ranking_raw]
 
     return render_template('admin/dashboard.html',
                          # Estatísticas básicas
