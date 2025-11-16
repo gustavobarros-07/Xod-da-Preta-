@@ -11,7 +11,7 @@ import json
 import zipfile
 from pathlib import Path
 from database import db
-from models import Produto, Admin, Configuracao, Subcategoria
+from models import Produto, Admin, Configuracao, Subcategoria, Cupom
 from config import Config
 
 # Criar Blueprint para rotas do admin
@@ -928,3 +928,196 @@ def backup_deletar(filename):
         flash(f'Erro ao deletar backup: {str(e)}', 'danger')
 
     return redirect(url_for('admin.backup_painel'))
+
+
+# ==========================================
+# CUPONS DE DESCONTO
+# ==========================================
+
+@admin_bp.route('/cupons')
+@login_required
+def cupons():
+    """Lista todos os cupons"""
+    cupons_lista = Cupom.query.order_by(Cupom.data_criacao.desc()).all()
+    return render_template('admin/cupons.html', cupons=cupons_lista)
+
+
+@admin_bp.route('/cupons/novo', methods=['GET', 'POST'])
+@login_required
+def cupom_novo():
+    """Criar novo cupom"""
+    if request.method == 'POST':
+        # Obter e validar dados
+        codigo = request.form.get('codigo', '').strip().upper()
+        descricao = request.form.get('descricao', '').strip()
+        tipo_desconto = request.form.get('tipo_desconto', 'percentual')
+        valor_desconto_str = request.form.get('valor_desconto', '0')
+        valor_minimo_str = request.form.get('valor_minimo', '0')
+        quantidade_maxima_str = request.form.get('quantidade_maxima', '')
+        data_inicio_str = request.form.get('data_inicio', '')
+        data_fim_str = request.form.get('data_fim', '')
+        ativo = request.form.get('ativo') == 'on'
+
+        # VALIDAÇÕES
+        if not codigo:
+            flash('Código do cupom é obrigatório', 'danger')
+            return redirect(url_for('admin.cupom_novo'))
+
+        # Verificar se código já existe
+        cupom_existente = Cupom.query.filter_by(codigo=codigo).first()
+        if cupom_existente:
+            flash(f'Cupom "{codigo}" já existe', 'danger')
+            return redirect(url_for('admin.cupom_novo'))
+
+        try:
+            valor_desconto = float(valor_desconto_str)
+            if valor_desconto <= 0:
+                flash('Valor do desconto deve ser maior que zero', 'danger')
+                return redirect(url_for('admin.cupom_novo'))
+        except (ValueError, TypeError):
+            flash('Valor do desconto inválido', 'danger')
+            return redirect(url_for('admin.cupom_novo'))
+
+        try:
+            valor_minimo = float(valor_minimo_str) if valor_minimo_str else 0
+        except (ValueError, TypeError):
+            valor_minimo = 0
+
+        try:
+            quantidade_maxima = int(quantidade_maxima_str) if quantidade_maxima_str else None
+        except (ValueError, TypeError):
+            quantidade_maxima = None
+
+        # Converter datas
+        data_inicio = None
+        data_fim = None
+
+        if data_inicio_str:
+            try:
+                data_inicio = datetime.strptime(data_inicio_str, '%Y-%m-%dT%H:%M')
+            except ValueError:
+                data_inicio = datetime.utcnow()
+
+        if data_fim_str:
+            try:
+                data_fim = datetime.strptime(data_fim_str, '%Y-%m-%dT%H:%M')
+            except ValueError:
+                data_fim = None
+
+        # Criar cupom
+        cupom = Cupom(
+            codigo=codigo,
+            descricao=descricao,
+            tipo_desconto=tipo_desconto,
+            valor_desconto=valor_desconto,
+            valor_minimo=valor_minimo,
+            quantidade_maxima=quantidade_maxima,
+            data_inicio=data_inicio or datetime.utcnow(),
+            data_fim=data_fim,
+            ativo=ativo
+        )
+
+        db.session.add(cupom)
+        db.session.commit()
+
+        flash(f'Cupom "{codigo}" criado com sucesso!', 'success')
+        return redirect(url_for('admin.cupons'))
+
+    return render_template('admin/cupom_form.html', cupom=None)
+
+
+@admin_bp.route('/cupons/<int:cupom_id>/editar', methods=['GET', 'POST'])
+@login_required
+def cupom_editar(cupom_id):
+    """Editar cupom existente"""
+    cupom = Cupom.query.get_or_404(cupom_id)
+
+    if request.method == 'POST':
+        # Obter e validar dados
+        codigo = request.form.get('codigo', '').strip().upper()
+        descricao = request.form.get('descricao', '').strip()
+        tipo_desconto = request.form.get('tipo_desconto', 'percentual')
+        valor_desconto_str = request.form.get('valor_desconto', '0')
+        valor_minimo_str = request.form.get('valor_minimo', '0')
+        quantidade_maxima_str = request.form.get('quantidade_maxima', '')
+        data_inicio_str = request.form.get('data_inicio', '')
+        data_fim_str = request.form.get('data_fim', '')
+        ativo = request.form.get('ativo') == 'on'
+
+        # VALIDAÇÕES
+        if not codigo:
+            flash('Código do cupom é obrigatório', 'danger')
+            return redirect(url_for('admin.cupom_editar', cupom_id=cupom_id))
+
+        # Verificar se código já existe em outro cupom
+        cupom_existente = Cupom.query.filter(Cupom.codigo == codigo, Cupom.id != cupom_id).first()
+        if cupom_existente:
+            flash(f'Cupom "{codigo}" já existe', 'danger')
+            return redirect(url_for('admin.cupom_editar', cupom_id=cupom_id))
+
+        try:
+            valor_desconto = float(valor_desconto_str)
+            if valor_desconto <= 0:
+                flash('Valor do desconto deve ser maior que zero', 'danger')
+                return redirect(url_for('admin.cupom_editar', cupom_id=cupom_id))
+        except (ValueError, TypeError):
+            flash('Valor do desconto inválido', 'danger')
+            return redirect(url_for('admin.cupom_editar', cupom_id=cupom_id))
+
+        try:
+            valor_minimo = float(valor_minimo_str) if valor_minimo_str else 0
+        except (ValueError, TypeError):
+            valor_minimo = 0
+
+        try:
+            quantidade_maxima = int(quantidade_maxima_str) if quantidade_maxima_str else None
+        except (ValueError, TypeError):
+            quantidade_maxima = None
+
+        # Converter datas
+        data_inicio = cupom.data_inicio
+        data_fim = None
+
+        if data_inicio_str:
+            try:
+                data_inicio = datetime.strptime(data_inicio_str, '%Y-%m-%dT%H:%M')
+            except ValueError:
+                pass
+
+        if data_fim_str:
+            try:
+                data_fim = datetime.strptime(data_fim_str, '%Y-%m-%dT%H:%M')
+            except ValueError:
+                data_fim = None
+
+        # Atualizar cupom
+        cupom.codigo = codigo
+        cupom.descricao = descricao
+        cupom.tipo_desconto = tipo_desconto
+        cupom.valor_desconto = valor_desconto
+        cupom.valor_minimo = valor_minimo
+        cupom.quantidade_maxima = quantidade_maxima
+        cupom.data_inicio = data_inicio
+        cupom.data_fim = data_fim
+        cupom.ativo = ativo
+
+        db.session.commit()
+
+        flash(f'Cupom "{codigo}" atualizado com sucesso!', 'success')
+        return redirect(url_for('admin.cupons'))
+
+    return render_template('admin/cupom_form.html', cupom=cupom)
+
+
+@admin_bp.route('/cupons/<int:cupom_id>/deletar', methods=['POST'])
+@login_required
+def cupom_deletar(cupom_id):
+    """Deletar cupom"""
+    cupom = Cupom.query.get_or_404(cupom_id)
+    codigo = cupom.codigo
+
+    db.session.delete(cupom)
+    db.session.commit()
+
+    flash(f'Cupom "{codigo}" deletado com sucesso!', 'success')
+    return redirect(url_for('admin.cupons'))

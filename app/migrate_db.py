@@ -1,11 +1,11 @@
 """
 Script para migrar o banco de dados
 Adiciona campos 'destaque', 'visualizacoes' e 'imagens_adicionais' a tabela Produto
-Cria tabelas ProdutoVisualizacao e ConteudoPagina
+Cria tabelas ProdutoVisualizacao, ConteudoPagina e Cupom
 """
 
 from main import app, db
-from models import Produto, ProdutoVisualizacao, ConteudoPagina
+from models import Produto, ProdutoVisualizacao, ConteudoPagina, Cupom
 from sqlalchemy import inspect
 
 def migrate_database():
@@ -60,6 +60,14 @@ def migrate_database():
             print("[OK] Tabela 'conteudo_pagina' criada (CMS)")
         else:
             print("[OK] Tabela 'conteudo_pagina' ja existe")
+
+        # Criar tabela cupons se nao existir
+        if 'cupons' not in inspector.get_table_names():
+            print("Criando tabela 'cupons'...")
+            db.create_all()
+            print("[OK] Tabela 'cupons' criada (Sistema de Cupons)")
+        else:
+            print("[OK] Tabela 'cupons' ja existe")
 
         print("\n[SUCESSO] Migracao concluida!")
 

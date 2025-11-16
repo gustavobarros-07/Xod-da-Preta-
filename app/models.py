@@ -196,6 +196,98 @@ class ProdutoVisualizacao(db.Model):
         return f'<ProdutoVisualizacao produto_id={self.produto_id} em {self.data_visualizacao}>'
 
 
+class Cupom(db.Model):
+    """Modelo para cupons de desconto"""
+    __tablename__ = 'cupons'
+
+    id = db.Column(db.Integer, primary_key=True)
+    codigo = db.Column(db.String(50), unique=True, nullable=False)  # Ex: PRIMEIRACOMPRA10
+    descricao = db.Column(db.String(200), nullable=True)  # Descrição do cupom
+
+    # Tipo de desconto
+    tipo_desconto = db.Column(db.String(20), nullable=False, default='percentual')  # 'percentual' ou 'fixo'
+    valor_desconto = db.Column(db.Float, nullable=False)  # 10 (para 10%) ou 50 (para R$ 50)
+
+    # Condições
+    valor_minimo = db.Column(db.Float, default=0)  # Valor mínimo do carrinho para usar
+    quantidade_maxima = db.Column(db.Integer, nullable=True)  # Máximo de usos (None = ilimitado)
+    quantidade_usada = db.Column(db.Integer, default=0)  # Quantas vezes foi usado
+
+    # Validade
+    data_inicio = db.Column(db.DateTime, default=datetime.utcnow)
+    data_fim = db.Column(db.DateTime, nullable=True)  # None = sem data de expiração
+
+    # Status
+    ativo = db.Column(db.Boolean, default=True)
+
+    # Auditoria
+    data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
+    data_atualizacao = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<Cupom {self.codigo}>'
+
+    def is_valido(self):
+        """Verifica se o cupom está válido para uso"""
+        if not self.ativo:
+            return False, "Cupom inativo"
+
+        # Verificar data de início
+        if self.data_inicio and datetime.utcnow() < self.data_inicio:
+            return False, "Cupom ainda não está disponível"
+
+        # Verificar data de expiração
+        if self.data_fim and datetime.utcnow() > self.data_fim:
+            return False, "Cupom expirado"
+
+        # Verificar quantidade máxima
+        if self.quantidade_maxima and self.quantidade_usada >= self.quantidade_maxima:
+            return False, "Cupom esgotado"
+
+        return True, "Cupom válido"
+
+    def calcular_desconto(self, valor_carrinho):
+        """Calcula o valor do desconto para um determinado valor de carrinho"""
+        valido, mensagem = self.is_valido()
+        if not valido:
+            return 0, mensagem
+
+        # Verificar valor mínimo
+        if valor_carrinho < self.valor_minimo:
+            return 0, f"Valor mínimo do carrinho deve ser R$ {self.valor_minimo:.2f}"
+
+        # Calcular desconto
+        if self.tipo_desconto == 'percentual':
+            desconto = valor_carrinho * (self.valor_desconto / 100)
+        else:  # fixo
+            desconto = self.valor_desconto
+
+        # Desconto não pode ser maior que o valor do carrinho
+        desconto = min(desconto, valor_carrinho)
+
+        return desconto, "Desconto aplicado com sucesso!"
+
+    def usar(self):
+        """Incrementa o contador de uso do cupom"""
+        self.quantidade_usada += 1
+        db.session.commit()
+
+    def to_dict(self):
+        """Converte o cupom para dicionário"""
+        return {
+            'id': self.id,
+            'codigo': self.codigo,
+            'descricao': self.descricao,
+            'tipo_desconto': self.tipo_desconto,
+            'valor_desconto': self.valor_desconto,
+            'valor_minimo': self.valor_minimo,
+            'quantidade_maxima': self.quantidade_maxima,
+            'quantidade_usada': self.quantidade_usada,
+            'ativo': self.ativo,
+            'valido': self.is_valido()[0]
+        }
+
+
 class ConteudoPagina(db.Model):
     """Modelo para conteúdo editável das páginas (CMS)"""
     __tablename__ = 'conteudo_pagina'
