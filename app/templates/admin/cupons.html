@@ -323,6 +323,11 @@
                                     <span class="badge-tipo badge-expirado">{{ msg }}</span>
                                 {% else %}
                                     <span class="badge-tipo badge-ativo">Ativo</span>
+                                    {% if cupom.quantidade_maxima and cupom.quantidade_usada >= cupom.quantidade_maxima * 0.8 %}
+                                        <small class="text-muted ms-2">({{ cupom.quantidade_usada }}/{{ cupom.quantidade_maxima }} usos)</small>
+                                    {% elif cupom.data_fim %}
+                                        <small class="text-muted ms-2">(expira em {{ cupom.data_fim.strftime('%d/%m/%Y') }})</small>
+                                    {% endif %}
                                 {% endif %}
                             </td>
                             <td>
