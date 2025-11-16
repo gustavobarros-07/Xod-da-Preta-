@@ -1,18 +1,28 @@
 <!-- Start Top Nav -->
-<nav class="navbar navbar-expand-lg bg-dark navbar-light d-none d-lg-block" id="templatemo_nav_top">
+<nav class="navbar navbar-expand-lg bg-dark navbar-light d-none d-md-block" id="templatemo_nav_top">
     <div class="container text-light">
         <div class="w-100 d-flex justify-content-between">
             <div>
+                {% if config_loja_telefone %}
                 <i class="fab fa-whatsapp mx-2"></i>
-                <a class="navbar-sm-brand text-light text-decoration-none" 
-                   href="https://wa.me/5511954375056" 
+                <a class="navbar-sm-brand text-light text-decoration-none"
+                   href="https://wa.me/{{ config_loja_telefone|replace(' ', '')|replace('-', '') }}"
                    target="_blank">
-                    +55 11 95437-5056
+                    {{ config_loja_telefone }}
                 </a>
+                {% endif %}
             </div>
             <div>
-                <a class="text-light" href="https://www.facebook.com/xododapreta" target="_blank"><i class="fab fa-facebook-f fa-sm fa-fw me-2"></i></a>
-                <a class="text-light" href="https://www.instagram.com/xododapreta" target="_blank"><i class="fab fa-instagram fa-sm fa-fw me-2"></i></a>
+                {% if config_loja_facebook %}
+                <a class="text-light" href="{{ config_loja_facebook }}" target="_blank" title="Facebook">
+                    <i class="fab fa-facebook-f fa-sm fa-fw me-2"></i>
+                </a>
+                {% endif %}
+                {% if config_loja_instagram %}
+                <a class="text-light" href="https://www.instagram.com/{{ config_loja_instagram|replace('@', '') }}" target="_blank" title="Instagram">
+                    <i class="fab fa-instagram fa-sm fa-fw me-2"></i>
+                </a>
+                {% endif %}
             </div>
         </div>
     </div>

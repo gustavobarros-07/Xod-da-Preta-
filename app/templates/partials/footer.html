@@ -39,11 +39,13 @@
             </div>
             <div class="col-auto me-auto">
                 <ul class="list-inline text-left footer-icons">
+                    {% if config_loja_facebook %}
                     <li class="list-inline-item border border-light rounded-circle text-center">
-                        <a class="text-light text-decoration-none" target="_blank" href="http://facebook.com/">
+                        <a class="text-light text-decoration-none" target="_blank" href="{{ config_loja_facebook }}">
                             <i class="fab fa-facebook-f fa-lg fa-fw"></i>
                         </a>
                     </li>
+                    {% endif %}
                     {% if config_loja_instagram %}
                     <li class="list-inline-item border border-light rounded-circle text-center">
                         <a class="text-light text-decoration-none" target="_blank" href="https://www.instagram.com/{{ config_loja_instagram|replace('@', '') }}">

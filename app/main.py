@@ -45,6 +45,7 @@ def inject_configuracoes():
         'config_loja_telefone': Configuracao.get_valor('loja_telefone', '55 11 95437-5056'),
         'config_loja_email': Configuracao.get_valor('loja_email', ''),
         'config_loja_instagram': Configuracao.get_valor('loja_instagram', '@xododapreta'),
+        'config_loja_facebook': Configuracao.get_valor('loja_facebook', ''),
         'config_loja_endereco': Configuracao.get_valor('loja_endereco', 'São Paulo, SP'),
     }
 
