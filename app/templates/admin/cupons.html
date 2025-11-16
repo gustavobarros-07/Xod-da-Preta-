@@ -294,7 +294,9 @@
                             <td>
                                 <small>
                                     {% if cupom.valor_minimo > 0 %}
-                                        Mín: R$ {{ "%.2f"|format(cupom.valor_minimo) }}<br>
+                                        Mín: R$ {{ "%.2f"|format(cupom.valor_minimo) }}
+                                    {% else %}
+                                        <span class="text-muted">Sem condições</span>
                                     {% endif %}
                                 </small>
                             </td>
