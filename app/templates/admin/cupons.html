@@ -317,13 +317,12 @@
                             </td>
                             <td>
                                 {% set valido, msg = cupom.is_valido() %}
-                                {% if cupom.ativo %}
-                                    <span class="badge-tipo badge-ativo">Ativo</span>
-                                {% else %}
+                                {% if not cupom.ativo %}
                                     <span class="badge-tipo badge-inativo">Inativo</span>
-                                {% endif %}
-                                {% if not valido %}
-                                    <br><span class="badge-tipo badge-expirado">{{ msg }}</span>
+                                {% elif not valido %}
+                                    <span class="badge-tipo badge-expirado">{{ msg }}</span>
+                                {% else %}
+                                    <span class="badge-tipo badge-ativo">Ativo</span>
                                 {% endif %}
                             </td>
                             <td>
@@ -348,9 +347,9 @@
             <div class="empty-state">
                 <i class="fas fa-ticket-alt"></i>
                 <h4 class="text-muted">Nenhum cupom cadastrado</h4>
-                <p class="text-muted">Crie cupons de desconto para seus clientes</p>
-                <a href="{{ url_for('admin.cupom_novo') }}" class="btn btn-add mt-3">
-                    <i class="fas fa-plus"></i> Criar Primeiro Cupom
+                <p class="text-muted">Crie cupons de desconto para incentivar as vendas</p>
+                <a href="{{ url_for('admin.cupom_novo') }}" class="btn btn-lg btn-add mt-3" style="padding: 15px 40px; font-size: 16px; border-radius: 8px;">
+                    <i class="fas fa-plus-circle"></i> Criar Primeiro Cupom
                 </a>
             </div>
             {% endif %}
