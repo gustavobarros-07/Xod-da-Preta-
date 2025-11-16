@@ -47,6 +47,7 @@ def inject_configuracoes():
         'config_loja_instagram': Configuracao.get_valor('loja_instagram', '@xododapreta'),
         'config_loja_facebook': Configuracao.get_valor('loja_facebook', ''),
         'config_loja_endereco': Configuracao.get_valor('loja_endereco', 'São Paulo, SP'),
+        'config_topbar_ativo': Configuracao.get_valor('topbar_ativo', '1') == '1',
     }
 
 # ========================================

@@ -461,26 +461,33 @@ def configuracoes():
             'loja_telefone',
             'loja_email',
             'loja_instagram',
+            'loja_facebook',
             'loja_endereco'
         ]
-        
+
         for config_key in configs:
-            valor = request.form.get(config_key)
-            if valor:
-                Configuracao.set_valor(config_key, valor)
-        
+            valor = request.form.get(config_key, '').strip()
+            # Salvar mesmo se vazio (permite remover valores)
+            Configuracao.set_valor(config_key, valor)
+
+        # Configuração do Top Bar (checkbox)
+        topbar_ativo = request.form.get('topbar_ativo') == 'on'
+        Configuracao.set_valor('topbar_ativo', '1' if topbar_ativo else '0')
+
         flash('Configurações atualizadas com sucesso!', 'success')
         return redirect(url_for('admin.configuracoes'))
-    
+
     # Buscar configurações atuais
     configs = {
         'loja_nome': Configuracao.get_valor('loja_nome', 'Xodó da Preta'),
         'loja_telefone': Configuracao.get_valor('loja_telefone', ''),
         'loja_email': Configuracao.get_valor('loja_email', ''),
         'loja_instagram': Configuracao.get_valor('loja_instagram', ''),
-        'loja_endereco': Configuracao.get_valor('loja_endereco', '')
+        'loja_facebook': Configuracao.get_valor('loja_facebook', ''),
+        'loja_endereco': Configuracao.get_valor('loja_endereco', ''),
+        'topbar_ativo': Configuracao.get_valor('topbar_ativo', '1') == '1'
     }
-    
+
     return render_template('admin/config.html', configs=configs)
 
 # ========================================

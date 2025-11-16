@@ -277,15 +277,34 @@
                         <label for="loja_endereco" class="form-label">
                             <i class="fas fa-map-marker-alt"></i> Endereço / Cidade
                         </label>
-                        <input type="text" 
-                               class="form-control" 
-                               id="loja_endereco" 
-                               name="loja_endereco" 
+                        <input type="text"
+                               class="form-control"
+                               id="loja_endereco"
+                               name="loja_endereco"
                                value="{{ configs.loja_endereco }}"
                                placeholder="São Paulo, SP">
                     </div>
                 </div>
-                
+
+                <hr class="my-4">
+
+                <h5 class="mb-3"><i class="fas fa-sliders-h"></i> Configurações de Exibição</h5>
+
+                <div class="mb-4">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input"
+                               type="checkbox"
+                               id="topbar_ativo"
+                               name="topbar_ativo"
+                               {% if configs.topbar_ativo %}checked{% endif %}>
+                        <label class="form-check-label" for="topbar_ativo">
+                            <i class="fas fa-bars"></i> <strong>Exibir Top Bar</strong>
+                            <br>
+                            <small class="text-muted">Barra superior com telefone e redes sociais (visível em tablets e desktops)</small>
+                        </label>
+                    </div>
+                </div>
+
                 <div class="d-flex justify-content-end mt-4">
                     <button type="submit" class="btn btn-save">
                         <i class="fas fa-save"></i> Salvar Configurações
@@ -297,24 +316,49 @@
         <!-- Preview -->
         <div class="config-container mt-4">
             <h4 class="mb-3"><i class="fas fa-eye"></i> Pré-visualização</h4>
-            <p class="text-muted">Estas informações aparecerão assim no site:</p>
-            
+            <p class="text-muted">Estas informações aparecerão assim no site (atualiza em tempo real):</p>
+
+            <!-- Preview Top Bar -->
+            <div id="preview-topbar" class="mb-4" style="{% if not configs.topbar_ativo %}display: none;{% endif %}">
+                <h6 class="mb-2"><i class="fas fa-bars"></i> Top Bar</h6>
+                <div style="background-color: #343a40; color: #f8f9fa; padding: 10px 20px; border-radius: 5px; font-size: 14px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div id="preview-topbar-phone">
+                            <i class="fab fa-whatsapp"></i> <span>{{ configs.loja_telefone }}</span>
+                        </div>
+                        <div>
+                            <span id="preview-topbar-facebook" {% if not configs.loja_facebook %}style="display: none;"{% endif %}>
+                                <i class="fab fa-facebook-f"></i>
+                            </span>
+                            <span id="preview-topbar-instagram" {% if not configs.loja_instagram %}style="display: none;"{% endif %} class="ms-2">
+                                <i class="fab fa-instagram"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview Footer -->
+            <h6 class="mb-2"><i class="fas fa-shoe-prints"></i> Rodapé</h6>
             <div class="row">
                 <div class="col-md-6">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title" style="color: var(--cor-dourada);">{{ configs.loja_nome }}</h5>
-                            <p class="card-text mb-2">
-                                <i class="fas fa-phone"></i> {{ configs.loja_telefone }}
+                            <h5 class="card-title" style="color: var(--cor-dourada);" id="preview-nome">{{ configs.loja_nome }}</h5>
+                            <p class="card-text mb-2" id="preview-telefone-container" {% if not configs.loja_telefone %}style="display: none;"{% endif %}>
+                                <i class="fab fa-whatsapp"></i> <span id="preview-telefone">{{ configs.loja_telefone }}</span>
                             </p>
-                            <p class="card-text mb-2">
-                                <i class="fas fa-envelope"></i> {{ configs.loja_email }}
+                            <p class="card-text mb-2" id="preview-email-container" {% if not configs.loja_email %}style="display: none;"{% endif %}>
+                                <i class="fas fa-envelope"></i> <span id="preview-email">{{ configs.loja_email }}</span>
                             </p>
-                            <p class="card-text mb-2">
-                                <i class="fab fa-instagram"></i> {{ configs.loja_instagram }}
+                            <p class="card-text mb-2" id="preview-instagram-container" {% if not configs.loja_instagram %}style="display: none;"{% endif %}>
+                                <i class="fab fa-instagram"></i> <span id="preview-instagram">{{ configs.loja_instagram }}</span>
                             </p>
-                            <p class="card-text mb-0">
-                                <i class="fas fa-map-marker-alt"></i> {{ configs.loja_endereco }}
+                            <p class="card-text mb-2" id="preview-facebook-container" {% if not configs.loja_facebook %}style="display: none;"{% endif %}>
+                                <i class="fab fa-facebook-f"></i> <span id="preview-facebook-text">{{ configs.loja_facebook }}</span>
+                            </p>
+                            <p class="card-text mb-0" id="preview-endereco-container" {% if not configs.loja_endereco %}style="display: none;"{% endif %}>
+                                <i class="fas fa-map-marker-alt"></i> <span id="preview-endereco">{{ configs.loja_endereco }}</span>
                             </p>
                         </div>
                     </div>
@@ -322,8 +366,94 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript para atualizar preview em tempo real -->
+    <script>
+    // Atualizar preview em tempo real
+    function atualizarPreview() {
+        // Nome da loja
+        const nome = document.getElementById('loja_nome').value || 'Xodó da Preta';
+        document.getElementById('preview-nome').textContent = nome;
+
+        // Telefone
+        const telefone = document.getElementById('loja_telefone').value;
+        const telefoneContainer = document.getElementById('preview-telefone-container');
+        const telefoneTopbar = document.getElementById('preview-topbar-phone').querySelector('span');
+        if (telefone) {
+            document.getElementById('preview-telefone').textContent = telefone;
+            telefoneTopbar.textContent = telefone;
+            telefoneContainer.style.display = 'block';
+        } else {
+            telefoneContainer.style.display = 'none';
+        }
+
+        // Email
+        const email = document.getElementById('loja_email').value;
+        const emailContainer = document.getElementById('preview-email-container');
+        if (email) {
+            document.getElementById('preview-email').textContent = email;
+            emailContainer.style.display = 'block';
+        } else {
+            emailContainer.style.display = 'none';
+        }
+
+        // Instagram
+        const instagram = document.getElementById('loja_instagram').value;
+        const instagramContainer = document.getElementById('preview-instagram-container');
+        const instagramTopbar = document.getElementById('preview-topbar-instagram');
+        if (instagram) {
+            document.getElementById('preview-instagram').textContent = instagram;
+            instagramContainer.style.display = 'block';
+            instagramTopbar.style.display = 'inline';
+        } else {
+            instagramContainer.style.display = 'none';
+            instagramTopbar.style.display = 'none';
+        }
+
+        // Facebook
+        const facebook = document.getElementById('loja_facebook').value;
+        const facebookContainer = document.getElementById('preview-facebook-container');
+        const facebookTopbar = document.getElementById('preview-topbar-facebook');
+        if (facebook) {
+            document.getElementById('preview-facebook-text').textContent = facebook;
+            facebookContainer.style.display = 'block';
+            facebookTopbar.style.display = 'inline';
+        } else {
+            facebookContainer.style.display = 'none';
+            facebookTopbar.style.display = 'none';
+        }
+
+        // Endereço
+        const endereco = document.getElementById('loja_endereco').value;
+        const enderecoContainer = document.getElementById('preview-endereco-container');
+        if (endereco) {
+            document.getElementById('preview-endereco').textContent = endereco;
+            enderecoContainer.style.display = 'block';
+        } else {
+            enderecoContainer.style.display = 'none';
+        }
+
+        // Top Bar ativo/inativo
+        const topbarAtivo = document.getElementById('topbar_ativo').checked;
+        const previewTopbar = document.getElementById('preview-topbar');
+        if (topbarAtivo) {
+            previewTopbar.style.display = 'block';
+        } else {
+            previewTopbar.style.display = 'none';
+        }
+    }
+
+    // Adicionar listeners para todos os campos
+    document.getElementById('loja_nome').addEventListener('input', atualizarPreview);
+    document.getElementById('loja_telefone').addEventListener('input', atualizarPreview);
+    document.getElementById('loja_email').addEventListener('input', atualizarPreview);
+    document.getElementById('loja_instagram').addEventListener('input', atualizarPreview);
+    document.getElementById('loja_facebook').addEventListener('input', atualizarPreview);
+    document.getElementById('loja_endereco').addEventListener('input', atualizarPreview);
+    document.getElementById('topbar_ativo').addEventListener('change', atualizarPreview);
+    </script>
 </body>
 </html>
