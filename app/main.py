@@ -381,7 +381,13 @@ def validar_cupom():
             }), 400
 
         # Calcular desconto
-        valor_desconto = cupom.calcular_desconto(valor_carrinho)
+        valor_desconto, mensagem_desconto = cupom.calcular_desconto(valor_carrinho)
+
+        if valor_desconto == 0:
+            return jsonify({
+                'success': False,
+                'message': mensagem_desconto
+            }), 400
 
         return jsonify({
             'success': True,

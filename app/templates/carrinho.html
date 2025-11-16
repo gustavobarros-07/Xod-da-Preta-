@@ -326,6 +326,7 @@ let valorDesconto = 0;
 // Aplicar/Remover cupom
 document.getElementById('aplicar-cupom')?.addEventListener('click', function() {
     const feedbackElement = document.getElementById('cupom-feedback');
+    console.log('Botão aplicar cupom clicado');
 
     // Se já tem cupom aplicado, remover
     if (cupomAplicado) {
@@ -339,13 +340,18 @@ document.getElementById('aplicar-cupom')?.addEventListener('click', function() {
 
     // Caso contrário, aplicar cupom
     const codigoCupom = document.getElementById('cupom-input').value.trim().toUpperCase();
+    console.log('Código do cupom:', codigoCupom);
 
     if (!codigoCupom) {
         feedbackElement.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle"></i> Digite um código de cupom</span>';
         return;
     }
 
+    // Mostrar loading
+    feedbackElement.innerHTML = '<span class="text-info"><i class="fas fa-spinner fa-spin"></i> Validando cupom...</span>';
+
     // Buscar cupom na API
+    console.log('Fazendo requisição para /api/cupom/validar');
     fetch(`/api/cupom/validar`, {
         method: 'POST',
         headers: {
@@ -356,8 +362,12 @@ document.getElementById('aplicar-cupom')?.addEventListener('click', function() {
             valor_carrinho: getSubtotalValue()
         })
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Resposta recebida:', response);
+        return response.json();
+    })
     .then(data => {
+        console.log('Dados do cupom:', data);
         if (data.success) {
             cupomAplicado = data.cupom;
             valorDesconto = data.valor_desconto;
@@ -383,13 +393,14 @@ document.getElementById('aplicar-cupom')?.addEventListener('click', function() {
             atualizarTotalComDesconto();
 
         } else {
+            console.log('Cupom inválido:', data.message);
             feedbackElement.innerHTML = `<span class="text-danger"><i class="fas fa-times-circle"></i> ${data.message}</span>`;
             removerCupom();
         }
     })
     .catch(error => {
-        console.error('Erro:', error);
-        feedbackElement.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle"></i> Erro ao validar cupom</span>';
+        console.error('Erro ao validar cupom:', error);
+        feedbackElement.innerHTML = '<span class="text-danger"><i class="fas fa-times-circle"></i> Erro ao validar cupom. Verifique sua conexão.</span>';
     });
 });
 

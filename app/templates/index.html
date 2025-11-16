@@ -19,7 +19,7 @@
                     </div>
                     <div class="col-lg-6 mb-0 d-flex align-items-center">
                         <div class="text-align-left align-self-center">
-                            <h1 class="h1 text-success"><b> </b> Autenticidade e Inclusão </h1>
+                            <h1 class="h1 text-warning"><b> </b> Autenticidade e Inclusão </h1>
                             <h3 class="h2"> Identidade, Versatilidade e Representatividade </h3>
                             <p>
                                 Desenvolvemos moda e acessórios afro autorais que celebram suas raízes. Nossas estampas são cheias de alegria, com peças pensadas para vestir com conforto e versatilidade todos os corpos e todos os gêneros.
@@ -37,7 +37,7 @@
                     </div>
                     <div class="col-lg-6 mb-0 d-flex align-items-center">
                         <div class="text-align-left">
-                            <h1 class="h1 text-success"> Uma História de Afeto </h1>
+                            <h1 class="h1 text-warning"> Uma História de Afeto </h1>
                             <h3 class="h2"> Xodó da Preta, criada pela minha mãe Marli </h3>
                             <p>
                                 Mais que uma marca, somos um sonho de família que se tornou realidade. Cada peça é idealizada pela minha mãe, Marli, e carrega o propósito de transmitir identidade, afeto e representatividade
@@ -55,7 +55,7 @@
                     </div>
                     <div class="col-lg-6 mb-0 d-flex align-items-center">
                         <div class="text-align-left">
-                            <h1 class="h1 text-success"> Produção Consciente </h1>
+                            <h1 class="h1 text-warning"> Produção Consciente </h1>
                             <h3 class="h2"> Sustentabilidade e Economia Circular </h3>
                             <p>
                                 Nosso compromisso com o planeta é real. Prezamos por uma produção que respeita o meio ambiente e reforça a economia circular. Isso significa menos desperdício e mais impacto positivo, criando
@@ -113,9 +113,9 @@
                         {% endif %}
                         <div class="mt-auto">
                             <div class="d-flex justify-content-between align-items-center">
-                                <h5 class="text-success mb-0">{{ produto.preco|currency }}</h5>
+                                <h5 class="text-warning mb-0">{{ produto.preco|currency }}</h5>
                                 <a href="{{ url_for('shop_single', produto_id=produto.id) }}"
-                                   class="btn btn-success btn-sm">
+                                   class="btn btn-warning btn-sm">
                                     Ver Detalhes
                                 </a>
                             </div>
