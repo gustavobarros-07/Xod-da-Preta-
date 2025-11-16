@@ -154,7 +154,7 @@
                                class="form-control"
                                id="cupom-input"
                                placeholder="Digite o código">
-                        <button class="btn btn-outline-success"
+                        <button class="btn btn-outline-warning"
                                 type="button"
                                 id="aplicar-cupom">
                             Aplicar
@@ -165,7 +165,7 @@
 
                 <!-- Desconto aplicado -->
                 <div id="desconto-container" class="d-none">
-                    <div class="d-flex justify-content-between mb-2 text-success">
+                    <div class="d-flex justify-content-between mb-2 text-warning">
                         <span>Desconto (<span id="cupom-codigo"></span>):</span>
                         <span class="fw-bold" id="desconto-valor">- R$ 0,00</span>
                     </div>
@@ -177,7 +177,7 @@
 
                 <div class="d-flex justify-content-between mb-4">
                     <span class="h5 mb-0">Total:</span>
-                    <span class="h5 mb-0 text-success" id="cart-total">{{ total | currency }}</span>
+                    <span class="h5 mb-0 text-warning" id="cart-total">{{ total | currency }}</span>
                 </div>
 
                 <button class="btn whatsapp-checkout w-100 mb-3" id="checkout-btn">
@@ -197,7 +197,7 @@
         <i class="fas fa-shopping-cart"></i>
         <h3 class="mb-3">Seu carrinho está vazio</h3>
         <p class="text-muted mb-4">Adicione produtos incríveis ao seu carrinho!</p>
-        <a href="{{ url_for('shop') }}" class="btn btn-success btn-lg">
+        <a href="{{ url_for('shop') }}" class="btn btn-warning btn-lg">
             Ir à loja
         </a>
     </div>
@@ -363,10 +363,10 @@ document.getElementById('aplicar-cupom')?.addEventListener('click', function() {
             valorDesconto = data.valor_desconto;
 
             // Mostrar feedback de sucesso
-            feedbackElement.innerHTML = `<span class="text-success"><i class="fas fa-check-circle"></i> Cupom aplicado com sucesso!</span>`;
+            feedbackElement.innerHTML = `<span class="text-warning"><i class="fas fa-check-circle"></i> Cupom aplicado com sucesso!</span>`;
             document.getElementById('cupom-input').disabled = true;
             document.getElementById('aplicar-cupom').textContent = 'Remover';
-            document.getElementById('aplicar-cupom').classList.remove('btn-outline-success');
+            document.getElementById('aplicar-cupom').classList.remove('btn-outline-warning');
             document.getElementById('aplicar-cupom').classList.add('btn-outline-danger');
 
             // Mostrar desconto
@@ -401,7 +401,7 @@ function removerCupom() {
     document.getElementById('cupom-input').value = '';
     document.getElementById('aplicar-cupom').textContent = 'Aplicar';
     document.getElementById('aplicar-cupom').classList.remove('btn-outline-danger');
-    document.getElementById('aplicar-cupom').classList.add('btn-outline-success');
+    document.getElementById('aplicar-cupom').classList.add('btn-outline-warning');
     document.getElementById('desconto-container').classList.add('d-none');
     document.getElementById('cupom-feedback').innerHTML = '';
     atualizarTotalComDesconto();
