@@ -191,17 +191,42 @@ def produto_novo():
     """Adicionar novo produto"""
     if request.method == 'POST':
         # Obter dados do formulário
-        nome = request.form.get('nome')
-        descricao = request.form.get('descricao')
-        preco = float(request.form.get('preco'))
-        categoria = request.form.get('categoria')
+        nome = request.form.get('nome', '').strip()
+        descricao = request.form.get('descricao', '').strip()
+        preco_str = request.form.get('preco', '0')
+        categoria = request.form.get('categoria', '').strip()
         subcategoria = request.form.get('subcategoria')  # Feminino/Masculino
         tipo = request.form.get('tipo')  # Vestido, Camisa, etc.
         subcategoria_id = request.form.get('subcategoria_id')  # Legado
         tamanhos = request.form.getlist('tamanhos')
         ativo = request.form.get('ativo') == 'on'
         destaque = request.form.get('destaque') == 'on'
-        ordem = int(request.form.get('ordem', 0))
+        ordem_str = request.form.get('ordem', '0')
+
+        # VALIDAÇÃO DE CAMPOS OBRIGATÓRIOS
+        if not nome:
+            flash('Nome do produto é obrigatório', 'danger')
+            return redirect(url_for('admin.produto_novo'))
+
+        if not categoria:
+            flash('Categoria é obrigatória', 'danger')
+            return redirect(url_for('admin.produto_novo'))
+
+        # VALIDAÇÃO DE PREÇO
+        try:
+            preco = float(preco_str)
+            if preco < 0:
+                flash('Preço não pode ser negativo', 'danger')
+                return redirect(url_for('admin.produto_novo'))
+        except (ValueError, TypeError):
+            flash('Preço inválido. Use apenas números (ex: 49.90)', 'danger')
+            return redirect(url_for('admin.produto_novo'))
+
+        # VALIDAÇÃO DE ORDEM
+        try:
+            ordem = int(ordem_str)
+        except (ValueError, TypeError):
+            ordem = 0
 
         # Upload de imagem principal
         imagem_file = request.files.get('imagem')
@@ -258,19 +283,56 @@ def produto_editar(produto_id):
     produto = Produto.query.get_or_404(produto_id)
     
     if request.method == 'POST':
-        # Atualizar dados
-        produto.nome = request.form.get('nome')
-        produto.descricao = request.form.get('descricao')
-        produto.preco = float(request.form.get('preco'))
-        produto.categoria = request.form.get('categoria')
-        produto.subcategoria = request.form.get('subcategoria') or None
-        produto.tipo = request.form.get('tipo') or None
+        # Obter e validar dados
+        nome = request.form.get('nome', '').strip()
+        descricao = request.form.get('descricao', '').strip()
+        preco_str = request.form.get('preco', '0')
+        categoria = request.form.get('categoria', '').strip()
+        subcategoria = request.form.get('subcategoria') or None
+        tipo = request.form.get('tipo') or None
         subcategoria_id = request.form.get('subcategoria_id')
+        tamanhos = request.form.getlist('tamanhos')
+        ativo = request.form.get('ativo') == 'on'
+        destaque = request.form.get('destaque') == 'on'
+        ordem_str = request.form.get('ordem', '0')
+
+        # VALIDAÇÃO DE CAMPOS OBRIGATÓRIOS
+        if not nome:
+            flash('Nome do produto é obrigatório', 'danger')
+            return redirect(url_for('admin.produto_editar', produto_id=produto_id))
+
+        if not categoria:
+            flash('Categoria é obrigatória', 'danger')
+            return redirect(url_for('admin.produto_editar', produto_id=produto_id))
+
+        # VALIDAÇÃO DE PREÇO
+        try:
+            preco = float(preco_str)
+            if preco < 0:
+                flash('Preço não pode ser negativo', 'danger')
+                return redirect(url_for('admin.produto_editar', produto_id=produto_id))
+        except (ValueError, TypeError):
+            flash('Preço inválido. Use apenas números (ex: 49.90)', 'danger')
+            return redirect(url_for('admin.produto_editar', produto_id=produto_id))
+
+        # VALIDAÇÃO DE ORDEM
+        try:
+            ordem = int(ordem_str)
+        except (ValueError, TypeError):
+            ordem = 0
+
+        # Atualizar dados do produto
+        produto.nome = nome
+        produto.descricao = descricao
+        produto.preco = preco
+        produto.categoria = categoria
+        produto.subcategoria = subcategoria
+        produto.tipo = tipo
         produto.subcategoria_id = int(subcategoria_id) if subcategoria_id else None
-        produto.tamanhos = json.dumps(request.form.getlist('tamanhos'))
-        produto.ativo = request.form.get('ativo') == 'on'
-        produto.destaque = request.form.get('destaque') == 'on'
-        produto.ordem = int(request.form.get('ordem', 0))
+        produto.tamanhos = json.dumps(tamanhos)
+        produto.ativo = ativo
+        produto.destaque = destaque
+        produto.ordem = ordem
 
         # Upload de nova imagem principal (opcional)
         imagem_file = request.files.get('imagem')
