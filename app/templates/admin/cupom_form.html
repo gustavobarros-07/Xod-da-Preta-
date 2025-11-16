@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if cupom %}Editar{% else %}Novo{% endif %} Cupom - Admin | Xodó da Preta</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --cor-preta: #000000;
+            --cor-dourada: #D4AF37;
+            --cor-bege: #F5F5F5;
+            --cor-cinza-escuro: #333333;
+        }
+
+        body {
+            background-color: var(--cor-bege);
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 250px;
+            background-color: var(--cor-preta);
+            padding: 20px 0;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid var(--cor-dourada);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-header h4 {
+            color: var(--cor-dourada);
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .sidebar-header small {
+            color: var(--cor-bege);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li a {
+            display: block;
+            padding: 15px 25px;
+            color: var(--cor-bege);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .sidebar-menu li a:hover,
+        .sidebar-menu li a.active {
+            background-color: var(--cor-dourada);
+            color: var(--cor-preta);
+            padding-left: 35px;
+        }
+
+        .sidebar-menu li a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+        }
+
+        .admin-header {
+            background-color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .form-container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-save {
+            background-color: var(--cor-dourada);
+            color: var(--cor-preta);
+            font-weight: 600;
+            padding: 12px 30px;
+        }
+
+        .btn-save:hover {
+            background-color: #C48835;
+            color: var(--cor-preta);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--cor-cinza-escuro);
+        }
+
+        .form-switch .form-check-input:checked {
+            background-color: var(--cor-dourada);
+            border-color: var(--cor-dourada);
+        }
+
+        .info-box {
+            background-color: #fff3cd;
+            border-left: 4px solid var(--cor-dourada);
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h4>Xodó da Preta</h4>
+            <small>Admin Panel</small>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{{ url_for('admin.dashboard') }}">
+                    <i class="fas fa-th-large"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.produtos') }}">
+                    <i class="fas fa-box"></i> Produtos
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.subcategorias') }}">
+                    <i class="fas fa-tags"></i> Subcategorias
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.conteudo_listar') }}">
+                    <i class="fas fa-edit"></i> Gerenciar Conteúdo
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.configuracoes') }}">
+                    <i class="fas fa-cog"></i> Configurações
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.cupons') }}" class="active">
+                    <i class="fas fa-ticket-alt"></i> Cupons
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.media_biblioteca') }}">
+                    <i class="fas fa-images"></i> Biblioteca de Mídia
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.backup_painel') }}">
+                    <i class="fas fa-hdd"></i> Backup
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('home') }}" target="_blank">
+                    <i class="fas fa-external-link-alt"></i> Ver Site
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin.logout') }}">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="admin-header">
+            <h1>
+                <i class="fas fa-ticket-alt"></i>
+                {% if cupom %}Editar Cupom{% else %}Novo Cupom{% endif %}
+            </h1>
+            <a href="{{ url_for('admin.cupons') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </a>
+        </div>
+
+        <!-- Mensagens Flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Formulário -->
+        <div class="form-container">
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                <strong>Dica:</strong> Crie cupons como PRIMEIRACOMPRA10 (10% de desconto na primeira compra) ou NATAL50 (R$ 50 de desconto no Natal)
+            </div>
+
+            <form method="POST">
+                <div class="row">
+                    <!-- Código do Cupom -->
+                    <div class="col-md-6 mb-3">
+                        <label for="codigo" class="form-label">
+                            <i class="fas fa-tag"></i> Código do Cupom *
+                        </label>
+                        <input type="text"
+                               class="form-control"
+                               id="codigo"
+                               name="codigo"
+                               value="{{ cupom.codigo if cupom else '' }}"
+                               placeholder="Ex: PRIMEIRACOMPRA10"
+                               style="text-transform: uppercase;"
+                               required>
+                        <small class="text-muted">Será convertido para maiúsculas automaticamente</small>
+                    </div>
+
+                    <!-- Descrição -->
+                    <div class="col-md-6 mb-3">
+                        <label for="descricao" class="form-label">
+                            <i class="fas fa-align-left"></i> Descrição
+                        </label>
+                        <input type="text"
+                               class="form-control"
+                               id="descricao"
+                               name="descricao"
+                               value="{{ cupom.descricao if cupom else '' }}"
+                               placeholder="Ex: 10% na primeira compra">
+                    </div>
+
+                    <!-- Tipo de Desconto -->
+                    <div class="col-md-6 mb-3">
+                        <label for="tipo_desconto" class="form-label">
+                            <i class="fas fa-percent"></i> Tipo de Desconto *
+                        </label>
+                        <select class="form-select" id="tipo_desconto" name="tipo_desconto" required>
+                            <option value="percentual" {% if cupom and cupom.tipo_desconto == 'percentual' %}selected{% endif %}>
+                                Percentual (%)
+                            </option>
+                            <option value="fixo" {% if cupom and cupom.tipo_desconto == 'fixo' %}selected{% endif %}>
+                                Valor Fixo (R$)
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- Valor do Desconto -->
+                    <div class="col-md-6 mb-3">
+                        <label for="valor_desconto" class="form-label">
+                            <i class="fas fa-dollar-sign"></i> Valor do Desconto *
+                        </label>
+                        <input type="number"
+                               class="form-control"
+                               id="valor_desconto"
+                               name="valor_desconto"
+                               value="{{ cupom.valor_desconto if cupom else '' }}"
+                               step="0.01"
+                               min="0.01"
+                               placeholder="Ex: 10 (para 10%) ou 50 (para R$ 50)"
+                               required>
+                        <small class="text-muted">Para percentual: 10 = 10% | Para fixo: 50 = R$ 50,00</small>
+                    </div>
+
+                    <!-- Valor Mínimo do Carrinho -->
+                    <div class="col-md-6 mb-3">
+                        <label for="valor_minimo" class="form-label">
+                            <i class="fas fa-shopping-cart"></i> Valor Mínimo do Carrinho
+                        </label>
+                        <input type="number"
+                               class="form-control"
+                               id="valor_minimo"
+                               name="valor_minimo"
+                               value="{{ cupom.valor_minimo if cupom else '0' }}"
+                               step="0.01"
+                               min="0"
+                               placeholder="0 = sem mínimo">
+                        <small class="text-muted">Deixe 0 para permitir uso sem valor mínimo</small>
+                    </div>
+
+                    <!-- Quantidade Máxima de Usos -->
+                    <div class="col-md-6 mb-3">
+                        <label for="quantidade_maxima" class="form-label">
+                            <i class="fas fa-users"></i> Quantidade Máxima de Usos
+                        </label>
+                        <input type="number"
+                               class="form-control"
+                               id="quantidade_maxima"
+                               name="quantidade_maxima"
+                               value="{{ cupom.quantidade_maxima if cupom and cupom.quantidade_maxima else '' }}"
+                               min="1"
+                               placeholder="Deixe vazio para ilimitado">
+                        <small class="text-muted">Vazio = uso ilimitado</small>
+                    </div>
+
+                    <!-- Data de Início -->
+                    <div class="col-md-6 mb-3">
+                        <label for="data_inicio" class="form-label">
+                            <i class="fas fa-calendar-alt"></i> Data de Início
+                        </label>
+                        <input type="datetime-local"
+                               class="form-control"
+                               id="data_inicio"
+                               name="data_inicio"
+                               value="{% if cupom and cupom.data_inicio %}{{ cupom.data_inicio.strftime('%Y-%m-%dT%H:%M') }}{% endif %}">
+                        <small class="text-muted">Deixe vazio para iniciar imediatamente</small>
+                    </div>
+
+                    <!-- Data de Fim -->
+                    <div class="col-md-6 mb-3">
+                        <label for="data_fim" class="form-label">
+                            <i class="fas fa-calendar-times"></i> Data de Expiração
+                        </label>
+                        <input type="datetime-local"
+                               class="form-control"
+                               id="data_fim"
+                               name="data_fim"
+                               value="{% if cupom and cupom.data_fim %}{{ cupom.data_fim.strftime('%Y-%m-%dT%H:%M') }}{% endif %}">
+                        <small class="text-muted">Deixe vazio para nunca expirar</small>
+                    </div>
+
+                    <!-- Status Ativo -->
+                    <div class="col-12 mb-3">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   id="ativo"
+                                   name="ativo"
+                                   {% if not cupom or cupom.ativo %}checked{% endif %}>
+                            <label class="form-check-label" for="ativo">
+                                Cupom ativo (disponível para uso)
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Informação de Usos (apenas ao editar) -->
+                    {% if cupom %}
+                    <div class="col-12 mb-3">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Estatísticas:</strong>
+                            Este cupom já foi usado <strong>{{ cupom.quantidade_usada }} vez(es)</strong>
+                            {% if cupom.quantidade_maxima %}
+                                de {{ cupom.quantidade_maxima }} permitidas
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Botões -->
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{{ url_for('admin.cupons') }}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-save">
+                        <i class="fas fa-save"></i>
+                        {% if cupom %}Atualizar{% else %}Criar{% endif %} Cupom
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
