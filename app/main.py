@@ -366,7 +366,7 @@ def validar_cupom():
         cupom = Cupom.query.filter_by(codigo=codigo).first()
 
         if not cupom:
-            return jsonify({'success': False, 'message': 'Cupom não encontrado'}), 404
+            return jsonify({'success': False, 'message': f'Cupom "{codigo}" não encontrado. Verifique o código e tente novamente.'}), 404
 
         # Validar cupom
         valido, mensagem = cupom.is_valido()

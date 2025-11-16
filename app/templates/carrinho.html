@@ -302,21 +302,46 @@ document.querySelectorAll('.btn-remove').forEach(btn => {
 
 // Atualizar total geral
 function atualizarTotalGeral() {
-    let total = 0;
+    let subtotal = 0;
 
     document.querySelectorAll('.cart-item').forEach(item => {
         const subtotalText = item.querySelector('.item-subtotal').textContent;
         const subtotalValue = parseFloat(subtotalText.replace('R$', '').replace(/\./g, '').replace(',', '.'));
-        total += subtotalValue;
+        subtotal += subtotalValue;
     });
 
-    const totalFormatado = new Intl.NumberFormat('pt-BR', {
+    const subtotalFormatado = new Intl.NumberFormat('pt-BR', {
         style: 'currency',
         currency: 'BRL'
-    }).format(total);
+    }).format(subtotal);
 
-    document.getElementById('cart-subtotal').textContent = totalFormatado;
-    document.getElementById('cart-total').textContent = totalFormatado;
+    document.getElementById('cart-subtotal').textContent = subtotalFormatado;
+
+    // Se tem cupom aplicado, recalcular desconto baseado no novo subtotal
+    if (cupomAplicado && valorDesconto > 0) {
+        // Recalcular o desconto baseado no novo valor do carrinho
+        const novoSubtotal = getSubtotalValue();
+
+        // Verificar se ainda atende o valor mínimo (se houver)
+        // Nota: valor_minimo pode não estar disponível no objeto simplificado
+        // então vamos apenas recalcular o desconto
+
+        if (cupomAplicado.tipo_desconto === 'percentual') {
+            // Recalcular desconto percentual
+            valorDesconto = novoSubtotal * (cupomAplicado.valor_desconto / 100);
+
+            const descontoFormatado = new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(valorDesconto);
+            document.getElementById('desconto-valor').textContent = '- ' + descontoFormatado;
+        }
+        // Para desconto fixo, mantém o mesmo valor
+
+        atualizarTotalComDesconto();
+    } else {
+        document.getElementById('cart-total').textContent = subtotalFormatado;
+    }
 }
 
 // Variáveis globais para cupom
