@@ -203,9 +203,11 @@
         <div class="config-container">
             <div class="info-box">
                 <i class="fas fa-info-circle"></i>
-                <strong>Informação:</strong> Estas configurações aparecem no site (rodapé, contato, etc).
+                <strong>Informação:</strong> Estas configurações aparecem no rodapé do site.
+                <br>
+                <small><i class="fas fa-lightbulb"></i> <strong>Dica:</strong> Campos deixados em branco não aparecerão no rodapé. Se não quiser exibir o email, por exemplo, basta deixá-lo vazio.</small>
             </div>
-            
+
             <form method="POST">
                 <div class="mb-4">
                     <label for="loja_nome" class="form-label">
@@ -235,14 +237,15 @@
                     
                     <div class="col-md-6 mb-4">
                         <label for="loja_email" class="form-label">
-                            <i class="fas fa-envelope"></i> Email de Contato
+                            <i class="fas fa-envelope"></i> Email de Contato <span class="badge bg-secondary">Opcional</span>
                         </label>
-                        <input type="email" 
-                               class="form-control" 
-                               id="loja_email" 
-                               name="loja_email" 
+                        <input type="email"
+                               class="form-control"
+                               id="loja_email"
+                               name="loja_email"
                                value="{{ configs.loja_email }}"
                                placeholder="contato@exemplo.com">
+                        <small class="text-muted">Deixe vazio se não quiser exibir no rodapé</small>
                     </div>
                 </div>
                 
