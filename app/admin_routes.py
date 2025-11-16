@@ -152,6 +152,32 @@ def dashboard():
         ProdutoVisualizacao.data_visualizacao >= trinta_dias_atras
     ).scalar() or 0
 
+    # ===== ANALYTICS DE CUPONS =====
+    total_cupons = Cupom.query.count()
+    cupons_ativos = Cupom.query.filter_by(ativo=True).count()
+
+    # Cupons mais usados (top 5)
+    cupons_mais_usados = Cupom.query.filter(
+        Cupom.quantidade_usada > 0
+    ).order_by(Cupom.quantidade_usada.desc()).limit(5).all()
+
+    # Total de descontos dados (estimativa)
+    total_descontos_valor = 0
+    for cupom in Cupom.query.filter(Cupom.quantidade_usada > 0).all():
+        # Estimativa simples: quantidade_usada * valor médio de desconto
+        if cupom.tipo_desconto == 'fixo':
+            total_descontos_valor += cupom.valor_desconto * cupom.quantidade_usada
+        else:
+            # Para percentuais, usar preço médio como base de cálculo
+            total_descontos_valor += (preco_medio * (cupom.valor_desconto / 100)) * cupom.quantidade_usada
+
+    # ===== RANKING DE CATEGORIAS (por quantidade de produtos) =====
+    categorias_ranking = db.session.query(
+        Produto.categoria,
+        db.func.count(Produto.id).label('total'),
+        db.func.sum(Produto.visualizacoes).label('views_total')
+    ).group_by(Produto.categoria).order_by(db.text('total DESC')).all()
+
     return render_template('admin/dashboard.html',
                          # Estatísticas básicas
                          total_produtos=total_produtos,
@@ -172,7 +198,14 @@ def dashboard():
                          produtos_mais_vistos=produtos_mais_vistos,
                          ultimos_produtos=ultimos_produtos,
                          # Analytics
-                         total_visualizacoes=total_visualizacoes)
+                         total_visualizacoes=total_visualizacoes,
+                         # Analytics de cupons
+                         total_cupons=total_cupons,
+                         cupons_ativos=cupons_ativos,
+                         cupons_mais_usados=cupons_mais_usados,
+                         total_descontos_valor=total_descontos_valor,
+                         # Rankings
+                         categorias_ranking=categorias_ranking)
 
 # ========================================
 # GERENCIAR PRODUTOS
