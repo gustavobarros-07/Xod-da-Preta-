@@ -32,6 +32,23 @@ with app.app_context():
 app.register_blueprint(admin_bp)
 
 # ========================================
+# CONTEXT PROCESSOR - Configurações globais
+# ========================================
+
+@app.context_processor
+def inject_configuracoes():
+    """Injeta configurações da loja em todos os templates"""
+    from models import Configuracao
+
+    return {
+        'config_loja_nome': Configuracao.get_valor('loja_nome', 'Xodó da Preta'),
+        'config_loja_telefone': Configuracao.get_valor('loja_telefone', '55 11 95437-5056'),
+        'config_loja_email': Configuracao.get_valor('loja_email', ''),
+        'config_loja_instagram': Configuracao.get_valor('loja_instagram', '@xododapreta'),
+        'config_loja_endereco': Configuracao.get_valor('loja_endereco', 'São Paulo, SP'),
+    }
+
+# ========================================
 # ROTAS DO SITE
 # ========================================
 

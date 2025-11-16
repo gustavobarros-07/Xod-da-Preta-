@@ -3,20 +3,32 @@
     <div class="container">
         <div class="row">
             <div class="col-md-4 pt-5">
-                <h2 class="h2 text-success border-bottom pb-3 border-light logo">Xodó da Preta</h2>
+                <h2 class="h2 text-success border-bottom pb-3 border-light logo">{{ config_loja_nome }}</h2>
                 <ul class="list-unstyled text-light footer-link-list">
+                    {% if config_loja_endereco %}
                     <li>
                         <i class="fas fa-map-marker-alt fa-fw"></i>
-                        São Paulo, SP
+                        {{ config_loja_endereco }}
                     </li>
+                    {% endif %}
+                    {% if config_loja_telefone %}
                     <li>
                         <i class="fab fa-whatsapp fa-fw"></i>
-                        <a class="text-decoration-none" 
-                           href="https://wa.me/5511954375056" 
+                        <a class="text-decoration-none"
+                           href="https://wa.me/{{ config_loja_telefone|replace(' ', '')|replace('-', '') }}"
                            target="_blank">
-                            +55 11 95437-5056
+                            {{ config_loja_telefone }}
                         </a>
                     </li>
+                    {% endif %}
+                    {% if config_loja_email %}
+                    <li>
+                        <i class="fas fa-envelope fa-fw"></i>
+                        <a class="text-decoration-none" href="mailto:{{ config_loja_email }}">
+                            {{ config_loja_email }}
+                        </a>
+                    </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
@@ -27,16 +39,13 @@
             </div>
             <div class="col-auto me-auto">
                 <ul class="list-inline text-left footer-icons">
+                    {% if config_loja_instagram %}
                     <li class="list-inline-item border border-light rounded-circle text-center">
-                        <a class="text-light text-decoration-none" target="_blank" href="https://www.facebook.com/xododapreta">
-                            <i class="fab fa-facebook-f fa-lg fa-fw"></i>
-                        </a>
-                    </li>
-                    <li class="list-inline-item border border-light rounded-circle text-center">
-                        <a class="text-light text-decoration-none" target="_blank" href="https://www.instagram.com/xododapreta">
+                        <a class="text-light text-decoration-none" target="_blank" href="https://www.instagram.com/{{ config_loja_instagram|replace('@', '') }}">
                             <i class="fab fa-instagram fa-lg fa-fw"></i>
                         </a>
                     </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
@@ -47,7 +56,7 @@
             <div class="row pt-2">
                 <div class="col-12">
                     <p class="text-left text-light">
-                        &copy; 2025 Xodó da Preta - Todos os direitos reservados
+                        &copy; 2025 {{ config_loja_nome }} - Todos os direitos reservados
                     </p>
                 </div>
             </div>

@@ -132,7 +132,7 @@
             </li>
             <li>
                 <a href="{{ url_for('admin.configuracoes') }}">
-                    <i class="fas fa-cog"></i> Configurações
+                    <i class="fas fa-cog"></i> Dados da Loja
                 </a>
             </li>
             <li>
@@ -294,38 +294,6 @@
         </div>
     </div>
 
-    <!-- Card: Rodapé -->
-    <div class="col-md-6 mb-4">
-        <div class="card h-100 shadow-sm">
-            <div class="card-header bg-dark text-white">
-                <h5 class="mb-0"><i class="fas fa-align-justify"></i> Rodapé (Footer)</h5>
-            </div>
-            <div class="card-body">
-                <p class="card-text">
-                    Edite o conteúdo do rodapé, incluindo:
-                </p>
-                <ul class="small">
-                    <li>Texto "Sobre" no footer</li>
-                    <li>Direitos autorais</li>
-                    <li>Ano atual</li>
-                </ul>
-                <p class="text-muted small mb-0">
-                    <i class="fas fa-file-alt"></i>
-                    {% if conteudo_por_pagina.get('footer') %}
-                        {{ conteudo_por_pagina['footer']|length }} itens configurados
-                    {% else %}
-                        Nenhum conteúdo configurado ainda
-                    {% endif %}
-                </p>
-            </div>
-            <div class="card-footer">
-                <a href="{{ url_for('admin.conteudo_editar_pagina', pagina='footer') }}"
-                   class="btn btn-dark btn-sm">
-                    <i class="fas fa-edit"></i> Editar Rodapé
-                </a>
-            </div>
-        </div>
-    </div>
 </div>
 
 <div class="row mt-4">
