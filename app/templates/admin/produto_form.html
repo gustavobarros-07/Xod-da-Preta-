@@ -136,6 +136,17 @@
         .size-checkbox input[type="checkbox"] {
             margin-right: 5px;
         }
+    
+        .sidebar-menu li a.btn-logout {
+            background-color: #C44835;
+            color: white;
+            font-weight: 600;
+        }
+
+        .sidebar-menu li a.btn-logout:hover {
+            background-color: #a53a2a;
+            padding-left: 35px;
+        }
     </style>
 </head>
 <body>
@@ -188,7 +199,7 @@
                 </a>
             </li>
             <li>
-                <a href="{{ url_for('admin.logout') }}">
+                <a href="{{ url_for(\'admin.logout\') }}" class="btn-logout" onclick="return confirm(\'Tem certeza que deseja sair do painel administrativo?\');">
                     <i class="fas fa-sign-out-alt"></i> Sair
                 </a>
             </li>
