@@ -12,7 +12,7 @@
     <style>
         :root {
             --cor-preta: #000000;
-            --cor-dourada: #D4AF37;
+            --cor-dourada: #ffc107;
             --cor-bege: #F5F5F5;
             --cor-cinza-escuro: #333333;
         }
@@ -109,7 +109,7 @@
         }
         
         .btn-save:hover {
-            background-color: #C48835;
+            background-color: var(--cor-dourada-escura);
             color: var(--cor-preta);
         }
         
@@ -288,6 +288,78 @@
 
                 <hr class="my-4">
 
+                <h5 class="mb-3"><i class="fas fa-palette"></i> Personalização de Cores</h5>
+                <p class="text-muted small mb-3">
+                    <i class="fas fa-info-circle"></i> Personalize as cores do site. As cores padrão são baseadas na identidade visual da marca.
+                </p>
+
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <label for="cor_primaria" class="form-label">
+                            <i class="fas fa-circle" id="icon-primaria"></i> Cor Primária (Dourado)
+                        </label>
+                        <input type="color"
+                               class="form-control form-control-color"
+                               id="cor_primaria"
+                               name="cor_primaria"
+                               value="{{ configs.cor_primaria }}"
+                               title="Escolha a cor primária">
+                        <small class="text-muted">Usada em botões, links e destaques</small>
+                    </div>
+
+                    <div class="col-md-4 mb-4">
+                        <label for="cor_secundaria" class="form-label">
+                            <i class="fas fa-circle" id="icon-secundaria"></i> Cor Secundária (Preto)
+                        </label>
+                        <input type="color"
+                               class="form-control form-control-color"
+                               id="cor_secundaria"
+                               name="cor_secundaria"
+                               value="{{ configs.cor_secundaria }}"
+                               title="Escolha a cor secundária">
+                        <small class="text-muted">Usada em textos e fundos escuros</small>
+                    </div>
+
+                    <div class="col-md-4 mb-4">
+                        <label for="cor_destaque" class="form-label">
+                            <i class="fas fa-circle" id="icon-destaque"></i> Cor de Destaque (Laranja)
+                        </label>
+                        <input type="color"
+                               class="form-control form-control-color"
+                               id="cor_destaque"
+                               name="cor_destaque"
+                               value="{{ configs.cor_destaque }}"
+                               title="Escolha a cor de destaque">
+                        <small class="text-muted">Usada em hover e elementos interativos</small>
+                    </div>
+                </div>
+
+                <!-- Pré-visualização das Cores -->
+                <div class="alert alert-info mb-3">
+                    <h6><i class="fas fa-eye"></i> Pré-visualização</h6>
+                    <p class="mb-2 small">Veja como as cores ficam em diferentes elementos:</p>
+
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            <button type="button" class="btn w-100" id="preview-btn-primary" style="background-color: {{ configs.cor_primaria }}; border-color: {{ configs.cor_primaria }}; color: #000;">
+                                <i class="fas fa-check"></i> Botão Primário
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-2 text-center rounded" id="preview-bg-secondary" style="background-color: {{ configs.cor_secundaria }}; color: #fff;">
+                                <small>Fundo Secundário</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-2 text-center border rounded" id="preview-hover-state">
+                                <small>Hover: <span id="preview-text-destaque" style="color: {{ configs.cor_destaque }}; font-weight: bold;">Destaque</span></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
                 <h5 class="mb-3"><i class="fas fa-sliders-h"></i> Configurações de Exibição</h5>
 
                 <div class="mb-4">
@@ -300,12 +372,15 @@
                         <label class="form-check-label" for="topbar_ativo">
                             <i class="fas fa-bars"></i> <strong>Exibir Top Bar</strong>
                             <br>
-                            <small class="text-muted">Barra superior com telefone e redes sociais (visível em tablets e desktops)</small>
+                            <small class="text-muted">Barra preta fina no topo com telefone e redes sociais. Aparece apenas em telas ≥768px (tablets e desktops). IMPORTANTE: Certifique-se de que o navegador está maximizado para visualizar.</small>
                         </label>
                     </div>
                 </div>
 
-                <div class="d-flex justify-content-end mt-4">
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <button type="button" class="btn btn-secondary" onclick="window.location.reload();">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
                     <button type="submit" class="btn btn-save">
                         <i class="fas fa-save"></i> Salvar Configurações
                     </button>
@@ -454,6 +529,45 @@
     document.getElementById('loja_facebook').addEventListener('input', atualizarPreview);
     document.getElementById('loja_endereco').addEventListener('input', atualizarPreview);
     document.getElementById('topbar_ativo').addEventListener('change', atualizarPreview);
+
+    // ===== PRÉ-VISUALIZAÇÃO DINÂMICA DE CORES =====
+    function atualizarPreviewCores() {
+        const corPrimaria = document.getElementById('cor_primaria').value;
+        const corSecundaria = document.getElementById('cor_secundaria').value;
+        const corDestaque = document.getElementById('cor_destaque').value;
+
+        // Atualizar ícones ao lado dos labels
+        document.getElementById('icon-primaria').style.color = corPrimaria;
+        document.getElementById('icon-secundaria').style.color = corSecundaria;
+        document.getElementById('icon-destaque').style.color = corDestaque;
+
+        // Atualizar preview do botão primário
+        const btnPrimary = document.getElementById('preview-btn-primary');
+        btnPrimary.style.backgroundColor = corPrimaria;
+        btnPrimary.style.borderColor = corPrimaria;
+
+        // Atualizar preview do fundo secundário
+        const bgSecondary = document.getElementById('preview-bg-secondary');
+        bgSecondary.style.backgroundColor = corSecundaria;
+
+        // Atualizar preview do texto de destaque
+        const textDestaque = document.getElementById('preview-text-destaque');
+        textDestaque.style.color = corDestaque;
+
+        // Atualizar preview do hover state
+        const hoverState = document.getElementById('preview-hover-state');
+        hoverState.style.borderColor = corDestaque;
+    }
+
+    // Adicionar listeners para os color pickers
+    document.getElementById('cor_primaria').addEventListener('input', atualizarPreviewCores);
+    document.getElementById('cor_secundaria').addEventListener('input', atualizarPreviewCores);
+    document.getElementById('cor_destaque').addEventListener('input', atualizarPreviewCores);
+
+    // Inicializar cores dos ícones ao carregar a página
+    window.addEventListener('DOMContentLoaded', function() {
+        atualizarPreviewCores();
+    });
     </script>
 </body>
 </html>

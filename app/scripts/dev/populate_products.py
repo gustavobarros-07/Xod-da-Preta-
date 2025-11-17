@@ -1,7 +1,19 @@
 """
-Script para popular o banco de dados com produtos de exemplo
-Execute: python populate_products.py
+Script para Popular Produtos de Exemplo
+========================================
+Adiciona produtos de exemplo ao banco de dados para testes e demonstração.
+
+Execute: python scripts/dev/populate_products.py
+
+⚠️ IMPORTANTE: Este script adiciona produtos, não substitui os existentes.
+Se quiser limpar tudo antes, use scripts/dev/DANGER_reset_database.py
 """
+
+import sys
+import os
+
+# Adicionar diretório pai ao path para importar módulos
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 from main import app
 from database import db

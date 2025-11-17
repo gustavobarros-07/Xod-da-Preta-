@@ -9,14 +9,15 @@
 :root {
     /* Cores principais */
     --cor-preta: #000000;
-    --cor-dourada: #D4AF37;
+    --cor-dourada: #ffc107;
+    --cor-dourada-escura: #B8941E;
     --cor-bege: #F5F5F5;
     --cor-cinza-escuro: #333333;
-    --cor-laranja: #C48835;
-    
+    --cor-laranja: #ff9800;
+
     /* Cores de estado */
-    --cor-hover: #E5C158;
-    --cor-sucesso: #D4AF37;
+    --cor-hover: #ffcd38;
+    --cor-sucesso: #ffc107;
     --cor-erro: #C44835;
 }
 
@@ -82,7 +83,7 @@ body {
     background-color: var(--cor-laranja) !important;
     border-color: var(--cor-laranja) !important;
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+    box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
 }
 
 /* ========================================
@@ -97,7 +98,7 @@ body {
 
 .product-wap:hover {
     transform: translateY(-10px);
-    box-shadow: 0 10px 25px rgba(212, 175, 55, 0.3);
+    box-shadow: 0 10px 25px rgba(255, 193, 7, 0.3);
 }
 
 .product-wap .card-body {
@@ -319,7 +320,7 @@ a {
 /* Inputs com estilo */
 .form-control:focus {
     border-color: var(--cor-dourada);
-    box-shadow: 0 0 0 0.2rem rgba(212, 175, 55, 0.25);
+    box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
 }
 
 /* Alertas personalizados */
@@ -406,4 +407,74 @@ input:focus {
 
 .text-dark {
     color: var(--cor-cinza-escuro) !important;
+}
+
+/* ========================================
+   PRODUTOS - DESTAQUE NO NOME
+   ======================================== */
+.card-title,
+.product-name,
+.product-title,
+h5.card-title {
+    font-weight: 700 !important;
+}
+
+/* ========================================
+   CATEGORIAS - IMAGENS CIRCULARES (DISCRETAS)
+   ======================================== */
+.category-img {
+    width: 120px !important;
+    height: 120px !important;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto;
+    aspect-ratio: 1 / 1;
+}
+
+/* Desktop: imagens moderadas */
+@media (min-width: 768px) {
+    .category-img {
+        width: 150px !important;
+        height: 150px !important;
+    }
+}
+
+@media (min-width: 992px) {
+    .category-img {
+        width: 180px !important;
+        height: 180px !important;
+    }
+}
+
+/* ========================================
+   CARROSSEL - PADRONIZAÇÃO DE IMAGENS
+   ======================================== */
+.carousel-img {
+    width: 100%;
+    height: 300px;
+    object-fit: contain;
+    object-position: center;
+}
+
+@media (min-width: 768px) {
+    .carousel-img {
+        height: 400px;
+    }
+}
+
+@media (min-width: 992px) {
+    .carousel-img {
+        height: 450px;
+    }
+}
+
+/* Altura fixa do carrossel para evitar "pulos" */
+#template-mo-zay-hero-carousel .carousel-inner {
+    min-height: 400px;
+}
+
+@media (min-width: 768px) {
+    #template-mo-zay-hero-carousel .carousel-inner {
+        min-height: 500px;
+    }
 }

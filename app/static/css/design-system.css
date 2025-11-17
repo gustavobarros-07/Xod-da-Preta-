@@ -10,9 +10,9 @@
 
 :root {
     /* Cores Principais */
-    --cor-dourada: #D4AF37;
-    --cor-dourada-escura: #B8941E;
-    --cor-dourada-clara: #E8D499;
+    --cor-dourada: #ffc107;
+    --cor-dourada-escura: #ff9800;
+    --cor-dourada-clara: #ffcd38;
     --cor-preta: #1a1a1a;
     --cor-cinza-escuro: #2c2c2c;
     --cor-cinza-medio: #4a4a4a;
@@ -484,6 +484,43 @@ textarea.form-control {
 .d-inline { display: inline !important; }
 .d-inline-block { display: inline-block !important; }
 .d-flex { display: flex !important; }
+
+/* Display Responsivo - Bootstrap Breakpoints */
+/* sm: ≥576px */
+@media (min-width: 576px) {
+    .d-sm-none { display: none !important; }
+    .d-sm-block { display: block !important; }
+    .d-sm-inline { display: inline !important; }
+    .d-sm-inline-block { display: inline-block !important; }
+    .d-sm-flex { display: flex !important; }
+}
+
+/* md: ≥768px */
+@media (min-width: 768px) {
+    .d-md-none { display: none !important; }
+    .d-md-block { display: block !important; }
+    .d-md-inline { display: inline !important; }
+    .d-md-inline-block { display: inline-block !important; }
+    .d-md-flex { display: flex !important; }
+}
+
+/* lg: ≥992px */
+@media (min-width: 992px) {
+    .d-lg-none { display: none !important; }
+    .d-lg-block { display: block !important; }
+    .d-lg-inline { display: inline !important; }
+    .d-lg-inline-block { display: inline-block !important; }
+    .d-lg-flex { display: flex !important; }
+}
+
+/* xl: ≥1200px */
+@media (min-width: 1200px) {
+    .d-xl-none { display: none !important; }
+    .d-xl-block { display: block !important; }
+    .d-xl-inline { display: inline !important; }
+    .d-xl-inline-block { display: inline-block !important; }
+    .d-xl-flex { display: flex !important; }
+}
 
 /* Flexbox */
 .flex-row { flex-direction: row !important; }

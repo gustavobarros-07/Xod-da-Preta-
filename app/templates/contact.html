@@ -35,7 +35,7 @@
     }
     
     .contact-info-card h5 {
-        color: #D4AF37;
+        color: #ffc107;
         margin-bottom: 20px;
     }
     
@@ -44,7 +44,7 @@
     }
     
     .contact-info-card i {
-        color: #D4AF37;
+        color: #ffc107;
         margin-right: 10px;
         width: 20px;
     }
@@ -119,14 +119,22 @@
                     
                     <div class="mb-3">
                         <label for="message" class="form-label">Sua Mensagem *</label>
-                        <textarea class="form-control" 
-                                  id="message" 
-                                  rows="6" 
-                                  placeholder="Digite sua mensagem..."
+                        <textarea class="form-control"
+                                  id="message"
+                                  rows="4"
+                                  maxlength="200"
+                                  placeholder="Digite sua mensagem curta e objetiva..."
                                   required></textarea>
+                        <div class="form-text text-end">
+                            <span id="char-count">0</span>/200 caracteres
+                        </div>
                         <div class="invalid-feedback">
                             Por favor, digite sua mensagem.
                         </div>
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle"></i>
+                            Mantenha sua mensagem breve para garantir que será carregada corretamente no WhatsApp.
+                        </small>
                     </div>
                     
                     <div class="text-center">
@@ -150,24 +158,65 @@
 {% block extra_js %}
 <!-- WhatsApp Integration Script -->
 <script>
+    // Contador de caracteres
+    const messageField = document.getElementById('message');
+    const charCount = document.getElementById('char-count');
+
+    messageField.addEventListener('input', function() {
+        charCount.textContent = this.value.length;
+    });
+
+    // Envio do formulário
     document.getElementById('contactForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        
+
         const name = document.getElementById('name').value.trim();
         const message = document.getElementById('message').value.trim();
-        
+
         if (!name || !message) {
             alert('Por favor, preencha todos os campos!');
             return;
         }
-        
+
+        // Mensagem compacta
         const whatsappMessage = `Olá! Meu nome é ${name}.\n\n${message}`;
-        const phoneNumber = '5511954375056';
+
+        // Copiar para área de transferência como fallback
+        navigator.clipboard.writeText(whatsappMessage).catch(err => {
+            console.warn('Não foi possível copiar automaticamente');
+        });
+
+        const phoneNumber = '{{ config_loja_telefone|replace(" ", "")|replace("-", "") }}';
         const whatsappURL = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(whatsappMessage)}`;
-        
-        window.open(whatsappURL, '_blank');
-        document.getElementById('contactForm').reset();
-        alert('Redirecionando para o WhatsApp...');
+
+        // Detectar se é mobile ou desktop
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+        if (isMobile) {
+            // Mobile: Abrir direto (mensagem geralmente preenche automaticamente)
+            window.open(whatsappURL, '_blank');
+            document.getElementById('contactForm').reset();
+            charCount.textContent = '0';
+
+            // Feedback sutil
+            setTimeout(() => {
+                alert('💬 Abrindo WhatsApp...\n\nSe a mensagem não aparecer, ela foi copiada para você colar!');
+            }, 500);
+        } else {
+            // Desktop: Avisar sobre a cópia
+            const confirmacao = confirm(
+                '📋 Mensagem copiada para área de transferência!\n\n' +
+                'O WhatsApp Desktop geralmente não preenche automaticamente.\n\n' +
+                'Quando abrir o WhatsApp, cole a mensagem com Ctrl+V (ou Cmd+V no Mac).\n\n' +
+                'Clique OK para continuar.'
+            );
+
+            if (confirmacao) {
+                window.open(whatsappURL, '_blank');
+                document.getElementById('contactForm').reset();
+                charCount.textContent = '0';
+            }
+        }
     });
 </script>
 {% endblock %}

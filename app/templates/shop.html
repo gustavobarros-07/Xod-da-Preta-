@@ -4,22 +4,26 @@
 
 {% block extra_css %}
 <style>
-    /* Estilos Profissionais */
+    /* Estilos Minimalistas e Discretos */
     .shop-header {
-        background: linear-gradient(135deg, #000 0%, #333 100%);
-        padding: 60px 0;
+        background: #f8f9fa;
+        border-bottom: 1px solid #e0e0e0;
+        padding: 30px 0;
         margin-bottom: 40px;
     }
-    
+
     .shop-header h1 {
-        color: #D4AF37;
-        font-weight: 700;
+        color: #333;
+        font-weight: 600;
+        font-size: 1.75rem;
         margin: 0;
+        letter-spacing: 0.5px;
     }
-    
+
     .shop-header p {
-        color: #fff;
-        margin: 10px 0 0;
+        color: #666;
+        margin: 5px 0 0;
+        font-size: 0.95rem;
     }
     
     /* Sidebar de Filtros */
@@ -57,7 +61,7 @@
     }
 
     .clear-all-filters {
-        color: #D4AF37;
+        color: #ffc107;
         font-size: 13px;
         text-decoration: none;
         font-weight: 600;
@@ -65,7 +69,7 @@
     }
 
     .clear-all-filters:hover {
-        color: #C48835;
+        color: #ff9800;
         text-decoration: underline;
     }
 
@@ -96,7 +100,7 @@
 
     .filter-accordion .accordion-button:not(.collapsed) {
         background: transparent;
-        color: #D4AF37;
+        color: #ffc107;
     }
 
     .filter-accordion .accordion-button:focus {
@@ -135,7 +139,7 @@
     }
 
     .filter-link.active {
-        background: #D4AF37;
+        background: #ffc107;
         color: #000;
         font-weight: 600;
     }
@@ -165,7 +169,7 @@
     }
 
     .sub-filter-link.active {
-        background: #C48835;
+        background: #ff9800;
         color: #000;
         font-weight: 600;
     }
@@ -174,6 +178,210 @@
     .products-content {
         flex: 1;
         min-width: 0;
+    }
+
+    /* FILTROS HORIZONTAIS MOBILE (3 botões compactos) */
+    .mobile-filters-bar {
+        display: none;
+        background: #fff;
+        border-bottom: 1px solid #e0e0e0;
+        padding: 10px 15px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .mobile-filter-buttons {
+        display: flex;
+        gap: 8px;
+        justify-content: space-between;
+    }
+
+    .mobile-filter-btn {
+        flex: 1;
+        padding: 10px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background: #fff;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: #333;
+    }
+
+    .mobile-filter-btn:hover {
+        background: #f8f9fa;
+        border-color: #999;
+    }
+
+    .mobile-filter-btn i {
+        font-size: 12px;
+        margin-right: 4px;
+    }
+
+    /* Contador de Produtos Mobile */
+    .mobile-product-count {
+        display: none;
+        padding: 12px 15px;
+        font-size: 14px;
+        color: #333;
+    }
+
+    /* Esconder results-info no mobile */
+    @media (max-width: 768px) {
+        .results-info {
+            display: none !important;
+        }
+    }
+
+    /* MODAIS MOBILE */
+    .mobile-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        animation: fadeIn 0.2s;
+    }
+
+    .mobile-modal.active {
+        display: block;
+    }
+
+    .mobile-modal-content {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        max-height: 80vh;
+        background: white;
+        border-radius: 20px 20px 0 0;
+        animation: slideUp 0.3s;
+        overflow-y: auto;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+        from { transform: translateY(100%); }
+        to { transform: translateY(0); }
+    }
+
+    .mobile-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        border-bottom: 1px solid #e0e0e0;
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 10;
+    }
+
+    .mobile-modal-header h5 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .mobile-modal-close {
+        background: none;
+        border: none;
+        font-size: 24px;
+        color: #999;
+        cursor: pointer;
+        padding: 0;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .mobile-modal-body {
+        padding: 10px 0 20px;
+    }
+
+    .mobile-modal-option {
+        display: flex;
+        align-items: center;
+        padding: 15px 20px;
+        color: #333;
+        text-decoration: none;
+        border-bottom: 1px solid #f5f5f5;
+        transition: all 0.2s;
+    }
+
+    .mobile-modal-option i {
+        margin-right: 12px;
+        width: 20px;
+        color: #666;
+    }
+
+    .mobile-modal-option:hover {
+        background: #f8f9fa;
+    }
+
+    .mobile-modal-option.active {
+        background: #fff8e1;
+        color: #f57c00;
+        font-weight: 600;
+    }
+
+    .mobile-modal-option.active i {
+        color: #f57c00;
+    }
+
+    .mobile-filter-section {
+        padding: 15px 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .mobile-filter-section h6 {
+        padding: 0 20px 10px;
+        margin: 0;
+        font-size: 14px;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .mobile-filter-section:last-child {
+        border-bottom: none;
+        padding: 15px 20px;
+    }
+
+    /* Categoria Expansível */
+    .mobile-category-toggle {
+        width: 100%;
+        text-align: left;
+        justify-content: space-between;
+        position: relative;
+    }
+
+    .toggle-icon {
+        margin-left: auto;
+        transition: transform 0.3s;
+    }
+
+    .mobile-category-toggle.expanded .toggle-icon {
+        transform: rotate(180deg);
+    }
+
+    .mobile-subcategories {
+        background: #f8f9fa;
+    }
+
+    .mobile-modal-option.subcategory {
+        padding-left: 52px;
+        font-size: 14px;
     }
 
     /* Responsividade */
@@ -185,6 +393,20 @@
         .filters-sidebar {
             width: 100%;
             position: static;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .filters-sidebar {
+            display: none !important;
+        }
+
+        .mobile-filters-bar {
+            display: block;
+        }
+
+        .mobile-product-count {
+            display: block;
         }
     }
     
@@ -226,7 +448,7 @@
         position: absolute;
         top: 15px;
         left: 15px;
-        background: #D4AF37;
+        background: #ffc107;
         color: #000;
         padding: 5px 15px;
         border-radius: 20px;
@@ -239,7 +461,7 @@
         position: absolute;
         top: 50px;
         left: 15px;
-        background: #C48835;
+        background: #ff9800;
         color: #000;
         padding: 4px 12px;
         border-radius: 15px;
@@ -280,7 +502,7 @@
     }
     
     .action-btn:hover {
-        background: #D4AF37;
+        background: #ffc107;
         transform: scale(1.1);
     }
     
@@ -293,7 +515,7 @@
     
     .product-title {
         font-size: 18px;
-        font-weight: 600;
+        font-weight: 700;
         color: #000;
         text-decoration: none;
         display: block;
@@ -302,7 +524,7 @@
     }
     
     .product-title:hover {
-        color: #D4AF37;
+        color: #ffc107;
     }
     
     .product-description {
@@ -321,7 +543,7 @@
     .product-price {
         font-size: 24px;
         font-weight: 700;
-        color: #D4AF37;
+        color: #ffc107;
     }
     
     .btn-add-cart {
@@ -336,7 +558,7 @@
     }
     
     .btn-add-cart:hover {
-        background: #D4AF37;
+        background: #ffc107;
         color: #000;
     }
     
@@ -354,7 +576,7 @@
     }
     
     .clear-filters {
-        color: #D4AF37;
+        color: #ffc107;
         text-decoration: none;
         font-weight: 500;
         font-size: 14px;
@@ -399,7 +621,7 @@
         appearance: none;
         width: 18px;
         height: 18px;
-        background: #D4AF37;
+        background: #ffc107;
         cursor: pointer;
         border-radius: 50%;
         pointer-events: all;
@@ -410,7 +632,7 @@
     .price-slider::-moz-range-thumb {
         width: 18px;
         height: 18px;
-        background: #D4AF37;
+        background: #ffc107;
         cursor: pointer;
         border-radius: 50%;
         pointer-events: all;
@@ -452,7 +674,7 @@
 
     .filter-link-sm:hover,
     .filter-link-sm.active {
-        background: #D4AF37;
+        background: #ffc107;
         color: #1a1a1a;
     }
 
@@ -467,7 +689,7 @@
     }
 
     .sort-dropdown:hover {
-        border-color: #D4AF37;
+        border-color: #ffc107;
     }
 </style>
 {% endblock %}
@@ -478,6 +700,153 @@
     <div class="container">
         <h1>Nossa Coleção</h1>
         <p>Descubra peças únicas de moda afro</p>
+    </div>
+</div>
+
+<!-- Mobile Filters Bar (3 botões) -->
+<div class="mobile-filters-bar">
+    <div class="mobile-filter-buttons">
+        <button class="mobile-filter-btn" id="sortBtn">
+            <i class="fas fa-sort-amount-down"></i> Ordenar
+        </button>
+        <button class="mobile-filter-btn" id="filterBtn">
+            <i class="fas fa-sliders-h"></i> Filtros
+        </button>
+        <button class="mobile-filter-btn" id="categoryBtn">
+            <i class="fas fa-th-large"></i> Categorias
+        </button>
+    </div>
+</div>
+
+<!-- Contador de Produtos (Mobile) -->
+<div class="mobile-product-count">
+    <strong>{{ produtos|length }}</strong> produto{% if produtos|length != 1 %}s{% endif %}
+</div>
+
+<!-- Modal de Ordenação (Mobile) -->
+<div class="mobile-modal" id="sortModal">
+    <div class="mobile-modal-content">
+        <div class="mobile-modal-header">
+            <h5>Ordenar por</h5>
+            <button class="mobile-modal-close" onclick="closeMobileModal('sortModal')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="mobile-modal-body">
+            <a href="javascript:void(0)" onclick="applySortMobile('padrao')" class="mobile-modal-option {% if request.args.get('ordenar') == 'padrao' or not request.args.get('ordenar') %}active{% endif %}">
+                <i class="fas fa-star"></i> Padrão
+            </a>
+            <a href="javascript:void(0)" onclick="applySortMobile('recentes')" class="mobile-modal-option {% if request.args.get('ordenar') == 'recentes' %}active{% endif %}">
+                <i class="fas fa-clock"></i> Mais Recentes
+            </a>
+            <a href="javascript:void(0)" onclick="applySortMobile('preco_asc')" class="mobile-modal-option {% if request.args.get('ordenar') == 'preco_asc' %}active{% endif %}">
+                <i class="fas fa-arrow-down"></i> Menor Preço
+            </a>
+            <a href="javascript:void(0)" onclick="applySortMobile('preco_desc')" class="mobile-modal-option {% if request.args.get('ordenar') == 'preco_desc' %}active{% endif %}">
+                <i class="fas fa-arrow-up"></i> Maior Preço
+            </a>
+            <a href="javascript:void(0)" onclick="applySortMobile('nome')" class="mobile-modal-option {% if request.args.get('ordenar') == 'nome' %}active{% endif %}">
+                <i class="fas fa-font"></i> Nome (A-Z)
+            </a>
+            <a href="javascript:void(0)" onclick="applySortMobile('visualizacoes')" class="mobile-modal-option {% if request.args.get('ordenar') == 'visualizacoes' %}active{% endif %}">
+                <i class="fas fa-eye"></i> Mais Vistos
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Filtros (Mobile) -->
+<div class="mobile-modal" id="filterModal">
+    <div class="mobile-modal-content">
+        <div class="mobile-modal-header">
+            <h5>Filtros</h5>
+            <button class="mobile-modal-close" onclick="closeMobileModal('filterModal')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="mobile-modal-body">
+            <div class="mobile-filter-section">
+                <h6>Preço</h6>
+                <a href="?preco=0-50" class="mobile-modal-option {% if request.args.get('preco') == '0-50' %}active{% endif %}">
+                    Até R$ 50
+                </a>
+                <a href="?preco=50-100" class="mobile-modal-option {% if request.args.get('preco') == '50-100' %}active{% endif %}">
+                    R$ 50 - R$ 100
+                </a>
+                <a href="?preco=100+" class="mobile-modal-option {% if request.args.get('preco') == '100+' %}active{% endif %}">
+                    R$ 100+
+                </a>
+            </div>
+            {% if request.args.get('categoria') or request.args.get('preco') or request.args.get('subcategoria') %}
+            <div class="mobile-filter-section">
+                <a href="{{ url_for('shop') }}" class="btn btn-outline-danger btn-sm w-100">
+                    <i class="fas fa-times"></i> Limpar Filtros
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Categorias (Mobile) -->
+<div class="mobile-modal" id="categoryModal">
+    <div class="mobile-modal-content">
+        <div class="mobile-modal-header">
+            <h5>Categorias</h5>
+            <button class="mobile-modal-close" onclick="closeMobileModal('categoryModal')">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="mobile-modal-body">
+            <a href="{{ url_for('shop') }}" class="mobile-modal-option {% if not request.args.get('categoria') %}active{% endif %}">
+                <i class="fas fa-th"></i> Todos os Produtos
+            </a>
+            <a href="?categoria=Brincos" class="mobile-modal-option {% if categoria_filtro == 'Brincos' %}active{% endif %}">
+                <i class="fas fa-gem"></i> Brincos
+            </a>
+            <a href="?categoria=Colares" class="mobile-modal-option {% if categoria_filtro == 'Colares' %}active{% endif %}">
+                <i class="fas fa-circle"></i> Colares
+            </a>
+            <a href="?categoria=Anéis" class="mobile-modal-option {% if categoria_filtro == 'Anéis' %}active{% endif %}">
+                <i class="fas fa-ring"></i> Anéis
+            </a>
+            <a href="?categoria=Pulseiras" class="mobile-modal-option {% if categoria_filtro == 'Pulseiras' %}active{% endif %}">
+                <i class="fas fa-circle-notch"></i> Pulseiras
+            </a>
+
+            <!-- Roupas com Subcategorias -->
+            <div class="mobile-category-expandable">
+                <button class="mobile-modal-option mobile-category-toggle {% if categoria_filtro == 'Roupas' %}active{% endif %}" onclick="toggleSubcategories(event)">
+                    <i class="fas fa-tshirt"></i> Roupas
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </button>
+                <div class="mobile-subcategories" style="display: {% if categoria_filtro == 'Roupas' %}block{% else %}none{% endif %};">
+                    <a href="?categoria=Roupas" class="mobile-modal-option subcategory {% if categoria_filtro == 'Roupas' and not request.args.get('subcategoria') %}active{% endif %}">
+                        Todas as Roupas
+                    </a>
+                    <a href="?categoria=Roupas&subcategoria=Feminino" class="mobile-modal-option subcategory {% if request.args.get('subcategoria') == 'Feminino' %}active{% endif %}">
+                        <i class="fas fa-female"></i> Feminino
+                    </a>
+                    <a href="?categoria=Roupas&subcategoria=Masculino" class="mobile-modal-option subcategory {% if request.args.get('subcategoria') == 'Masculino' %}active{% endif %}">
+                        <i class="fas fa-male"></i> Masculino
+                    </a>
+                    <a href="?categoria=Roupas&subcategoria=Unissex" class="mobile-modal-option subcategory {% if request.args.get('subcategoria') == 'Unissex' %}active{% endif %}">
+                        <i class="fas fa-users"></i> Unissex
+                    </a>
+
+                    <!-- Subcategorias Dinâmicas (criadas no admin) -->
+                    {% if subcategorias %}
+                        {% for subcat in subcategorias %}
+                            {% if subcat.categoria == 'Roupas' and subcat.nome not in ['Feminino', 'Masculino', 'Unissex'] %}
+                            <a href="?categoria=Roupas&subcategoria={{ subcat.nome }}" class="mobile-modal-option subcategory {% if request.args.get('subcategoria') == subcat.nome %}active{% endif %}">
+                                <i class="fas fa-tag"></i> {{ subcat.nome }}
+                            </a>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -551,22 +920,28 @@
                                 <i class="fas fa-th"></i> Todas as Roupas
                             </a>
 
-                            {% if hierarchy and 'Roupas' in hierarchy %}
-                                {% for subcategoria, tipos in hierarchy['Roupas'].items() %}
-                                    <!-- Subcategoria (Nível 2: Feminino/Masculino) -->
-                                    <a href="{{ url_for('shop', categoria='Roupas', subcategoria=subcategoria) }}"
-                                       class="filter-link {% if subcategoria_filtro == subcategoria and not tipo_filtro %}active{% endif %}">
-                                        <i class="fas fa-{% if subcategoria == 'Feminino' %}venus{% else %}mars{% endif %}"></i> {{ subcategoria }}
-                                    </a>
+                            <!-- Subcategorias Padrão (Hardcoded) -->
+                            <a href="{{ url_for('shop', categoria='Roupas', subcategoria='Feminino') }}"
+                               class="filter-link {% if subcategoria_filtro == 'Feminino' %}active{% endif %}">
+                                <i class="fas fa-female"></i> Feminino
+                            </a>
+                            <a href="{{ url_for('shop', categoria='Roupas', subcategoria='Masculino') }}"
+                               class="filter-link {% if subcategoria_filtro == 'Masculino' %}active{% endif %}">
+                                <i class="fas fa-male"></i> Masculino
+                            </a>
+                            <a href="{{ url_for('shop', categoria='Roupas', subcategoria='Unissex') }}"
+                               class="filter-link {% if subcategoria_filtro == 'Unissex' %}active{% endif %}">
+                                <i class="fas fa-users"></i> Unissex
+                            </a>
 
-                                    <!-- Tipos (Nível 3: Vestido, Camisa, etc.) -->
-                                    {% if subcategoria_filtro == subcategoria %}
-                                        {% for tipo in tipos %}
-                                            <a href="{{ url_for('shop', categoria='Roupas', subcategoria=subcategoria, tipo=tipo) }}"
-                                               class="sub-filter-link {% if tipo_filtro == tipo %}active{% endif %}">
-                                                {{ tipo }}
-                                            </a>
-                                        {% endfor %}
+                            <!-- Subcategorias Dinâmicas (criadas no admin) -->
+                            {% if subcategorias %}
+                                {% for subcat in subcategorias %}
+                                    {% if subcat.categoria == 'Roupas' and subcat.nome not in ['Feminino', 'Masculino', 'Unissex'] %}
+                                    <a href="{{ url_for('shop', categoria='Roupas', subcategoria=subcat.nome) }}"
+                                       class="filter-link {% if subcategoria_filtro == subcat.nome %}active{% endif %}">
+                                        <i class="fas fa-tag"></i> {{ subcat.nome }}
+                                    </a>
                                     {% endif %}
                                 {% endfor %}
                             {% endif %}
@@ -600,7 +975,7 @@
 
                                 <div class="price-filter-container">
                                     <div class="price-range-display mb-3">
-                                        <span id="priceRangeText" style="color: #D4AF37; font-weight: 600; font-size: 14px;">
+                                        <span id="priceRangeText" style="color: #ffc107; font-weight: 600; font-size: 14px;">
                                             R$ <span id="minPriceDisplay">0</span> - R$ <span id="maxPriceDisplay">500</span>
                                         </span>
                                     </div>
@@ -612,7 +987,7 @@
                                         <input type="hidden" name="preco_max" id="preco_max" value="500">
                                     </div>
 
-                                    <button type="submit" class="btn btn-sm w-100" style="background: #D4AF37; color: #1a1a1a; font-weight: 600;">
+                                    <button type="submit" class="btn btn-sm w-100" style="background: #ffc107; color: #1a1a1a; font-weight: 600;">
                                         <i class="fas fa-filter"></i> Aplicar Filtro
                                     </button>
                                 </div>
@@ -764,8 +1139,15 @@ function addToCart(produtoId) {
     window.location.href = `/shop/${produtoId}`;
 }
 
-// Função de ordenação
+// Função de ordenação (desktop)
 function applySort(sortValue) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('ordenar', sortValue);
+    window.location.href = url.toString();
+}
+
+// Função de ordenação (mobile)
+function applySortMobile(sortValue) {
     const url = new URL(window.location.href);
     url.searchParams.set('ordenar', sortValue);
     window.location.href = url.toString();
@@ -823,6 +1205,64 @@ document.addEventListener('DOMContentLoaded', function() {
             maxDisplay.textContent = precoMax;
         }
     }
+
+    // MOBILE MODALS - Controle de abertura/fechamento
+    const sortBtn = document.getElementById('sortBtn');
+    const filterBtn = document.getElementById('filterBtn');
+    const categoryBtn = document.getElementById('categoryBtn');
+
+    if (sortBtn) {
+        sortBtn.addEventListener('click', () => openMobileModal('sortModal'));
+    }
+    if (filterBtn) {
+        filterBtn.addEventListener('click', () => openMobileModal('filterModal'));
+    }
+    if (categoryBtn) {
+        categoryBtn.addEventListener('click', () => openMobileModal('categoryModal'));
+    }
+
+    // Fechar modal ao clicar no fundo escuro
+    document.querySelectorAll('.mobile-modal').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeMobileModal(modal.id);
+            }
+        });
+    });
 });
+
+// Funções globais para modais
+function openMobileModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeMobileModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
+// Toggle de subcategorias
+function toggleSubcategories(event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const button = event.currentTarget;
+    const subcategories = button.nextElementSibling;
+
+    button.classList.toggle('expanded');
+
+    if (subcategories.style.display === 'none' || subcategories.style.display === '') {
+        subcategories.style.display = 'block';
+    } else {
+        subcategories.style.display = 'none';
+    }
+}
 </script>
 {% endblock %}

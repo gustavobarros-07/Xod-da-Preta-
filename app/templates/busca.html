@@ -4,22 +4,22 @@
 
 {% block content %}
 <!-- Header -->
-<div class="container-fluid bg-light py-5">
+<div class="container-fluid bg-light py-4">
     <div class="col-md-8 m-auto text-center">
-        <h1 class="h1">
-            <i class="fas fa-search"></i>
+        <h2 class="h3 mb-2">
+            <i class="fas fa-search" style="font-size: 1.2rem;"></i>
             {% if termo %}
                 Resultados para "{{ termo }}"
             {% else %}
                 Buscar Produtos
             {% endif %}
-        </h1>
+        </h2>
         {% if termo %}
-        <p class="text-muted">
+        <p class="text-muted small mb-0">
             {% if produtos %}
-                Encontramos {{ produtos|length }} produto(s) para sua busca
+                {{ produtos|length }} produto(s) encontrado(s)
             {% else %}
-                Nenhum produto encontrado para sua busca
+                Nenhum produto encontrado
             {% endif %}
         </p>
         {% endif %}
@@ -86,9 +86,9 @@
 
                     <div class="mt-auto">
                         <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="text-success mb-0 preco">{{ produto.preco|currency }}</h5>
+                            <h5 class="text-warning mb-0 preco">{{ produto.preco|currency }}</h5>
                             <a href="{{ url_for('shop_single', produto_id=produto.id) }}"
-                               class="btn btn-success btn-sm">
+                               class="btn btn-warning btn-sm">
                                 Ver Detalhes
                             </a>
                         </div>

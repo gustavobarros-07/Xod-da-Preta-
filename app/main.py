@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, session, jsonify
 from pathlib import Path
 from config import Config
-from database import db, init_db
+from database import db
 from admin_routes import admin_bp
 import uuid
 
@@ -470,6 +470,106 @@ def inject_global_vars():
         'loja_email': Configuracao.get_valor('loja_email', 'contato@xododapreta.com'),
         'loja_instagram': Configuracao.get_valor('loja_instagram', '@xododapreta'),
     }
+
+# ========================================
+# ROTA DE CSS DINÂMICO (CORES PERSONALIZÁVEIS)
+# ========================================
+
+@app.route('/static/css/custom-colors.css')
+def custom_colors_css():
+    """Gera CSS dinâmico com cores personalizadas do painel admin"""
+    from models import Configuracao
+    from flask import Response
+
+    # Buscar cores do banco
+    cor_primaria = Configuracao.get_valor('cor_primaria', '#ffc107')
+    cor_secundaria = Configuracao.get_valor('cor_secundaria', '#000000')
+    cor_destaque = Configuracao.get_valor('cor_destaque', '#ff9800')
+
+    # Gerar CSS dinâmico
+    css_content = f"""
+/* ========================================
+   CORES PERSONALIZADAS - XODÓ DA PRETA
+   Gerado automaticamente pelo painel admin
+   ======================================== */
+
+:root {{
+    --cor-dourada: {cor_primaria};
+    --cor-preta: {cor_secundaria};
+    --cor-laranja: {cor_destaque};
+    --cor-hover: {cor_destaque};
+    --cor-sucesso: {cor_primaria};
+}}
+
+/* Aplicar cores personalizadas */
+.btn-success {{
+    background-color: {cor_primaria} !important;
+    border-color: {cor_primaria} !important;
+}}
+
+.btn-success:hover {{
+    background-color: {cor_destaque} !important;
+    border-color: {cor_destaque} !important;
+}}
+
+.text-success,
+.text-warning {{
+    color: {cor_primaria} !important;
+}}
+
+.bg-success,
+.bg-warning {{
+    background-color: {cor_primaria} !important;
+}}
+
+#templatemo_nav_top {{
+    background-color: {cor_secundaria} !important;
+}}
+
+#templatemo_nav_top a {{
+    color: {cor_primaria} !important;
+}}
+
+#templatemo_main_nav a:hover {{
+    color: {cor_primaria} !important;
+}}
+
+.navbar-brand {{
+    color: {cor_secundaria} !important;
+}}
+
+.product-price {{
+    color: {cor_primaria} !important;
+}}
+
+.badge.bg-warning {{
+    background-color: {cor_destaque} !important;
+}}
+
+.input-group-text.bg-warning {{
+    background-color: {cor_primaria} !important;
+}}
+
+#tempaltemo_footer {{
+    background-color: {cor_secundaria} !important;
+}}
+
+#tempaltemo_footer h2 {{
+    color: {cor_primaria} !important;
+    border-bottom-color: {cor_primaria} !important;
+}}
+
+#tempaltemo_footer a:hover {{
+    color: {cor_primaria} !important;
+}}
+
+.form-control:focus {{
+    border-color: {cor_primaria};
+    box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+}}
+"""
+
+    return Response(css_content, mimetype='text/css')
 
 # ========================================
 # EXECUTAR APLICAÇÃO

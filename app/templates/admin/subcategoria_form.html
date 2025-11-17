@@ -12,7 +12,7 @@
     <style>
         :root {
             --cor-preta: #000000;
-            --cor-dourada: #D4AF37;
+            --cor-dourada: #ffc107;
             --cor-bege: #F5F5F5;
             --cor-cinza-escuro: #333333;
         }
@@ -109,8 +109,8 @@
         }
 
         .btn-primary:hover {
-            background-color: #C48835;
-            border-color: #C48835;
+            background-color: var(--cor-dourada-escura);
+            border-color: var(--cor-dourada-escura);
             color: var(--cor-preta);
         }
 
@@ -234,6 +234,26 @@
                         </select>
                     </div>
 
+                    <!-- Subcategoria Pai (hierarquia) -->
+                    <div class="col-md-6 mb-3">
+                        <label for="parent_id" class="form-label">Subcategoria Pai (opcional)</label>
+                        <select class="form-select" id="parent_id" name="parent_id">
+                            <option value="">Nenhuma (nível 1)</option>
+                            {% if subcategorias_disponiveis %}
+                                {% for subcat in subcategorias_disponiveis %}
+                                    <option value="{{ subcat.id }}"
+                                            data-categoria="{{ subcat.categoria }}"
+                                            {% if subcategoria and subcategoria.parent_id == subcat.id %}selected{% endif %}>
+                                        {{ subcat.categoria }} → {{ subcat.nome }}
+                                    </option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                        <small class="text-muted">
+                            Ex: Roupas → Feminino (permite criar Vestido, Camisa como filhos de Feminino)
+                        </small>
+                    </div>
+
                     <!-- Ordem -->
                     <div class="col-md-6 mb-3">
                         <label for="ordem" class="form-label">Ordem de Exibição</label>
@@ -273,5 +293,36 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Filtrar subcategorias pai baseado na categoria selecionada
+        const categoriaSelect = document.getElementById('categoria');
+        const parentSelect = document.getElementById('parent_id');
+        const allParentOptions = Array.from(parentSelect.querySelectorAll('option[data-categoria]'));
+
+        categoriaSelect.addEventListener('change', function() {
+            const categoriaSelecionada = this.value;
+
+            // Resetar select de parent
+            parentSelect.value = '';
+
+            // Esconder todas as opções primeiro
+            allParentOptions.forEach(option => {
+                option.style.display = 'none';
+            });
+
+            // Mostrar apenas subcategorias da categoria selecionada
+            allParentOptions.forEach(option => {
+                if (option.dataset.categoria === categoriaSelecionada) {
+                    option.style.display = 'block';
+                }
+            });
+        });
+
+        // Executar ao carregar para aplicar filtro inicial
+        if (categoriaSelect.value) {
+            categoriaSelect.dispatchEvent(new Event('change'));
+        }
+    </script>
 </body>
 </html>

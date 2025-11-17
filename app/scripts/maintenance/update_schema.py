@@ -1,15 +1,33 @@
 """
-Script para migrar o banco de dados
-Adiciona campos 'destaque', 'visualizacoes' e 'imagens_adicionais' a tabela Produto
-Cria tabelas ProdutoVisualizacao, ConteudoPagina e Cupom
+Script de Atualização de Schema do Banco de Dados
+===================================================
+Adiciona novos campos e tabelas ao banco de dados existente (NON-DESTRUCTIVE)
+
+Execute este script quando precisar adicionar novos recursos ao banco:
+    python scripts/maintenance/update_schema.py
+
+⚠️ IMPORTANTE: Este script NÃO apaga dados! Ele apenas adiciona novos campos/tabelas.
+
+O que este script faz:
+- Adiciona campos 'destaque', 'visualizacoes', 'imagens_adicionais' à tabela produtos
+- Adiciona campo 'parent_id' à tabela subcategorias (para hierarquia)
+- Cria tabela 'produto_visualizacoes' (analytics)
+- Cria tabela 'conteudo_pagina' (CMS)
+- Cria tabela 'cupons' (sistema de cupons de desconto)
 """
+
+import sys
+import os
+
+# Adicionar diretório pai ao path para importar módulos
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 from main import app, db
 from models import Produto, ProdutoVisualizacao, ConteudoPagina, Cupom
 from sqlalchemy import inspect
 
-def migrate_database():
-    """Executa migracao do banco de dados"""
+def update_schema():
+    """Atualiza o schema do banco de dados adicionando novos campos e tabelas"""
 
     with app.app_context():
         inspector = inspect(db.engine)
@@ -69,7 +87,28 @@ def migrate_database():
         else:
             print("[OK] Tabela 'cupons' ja existe")
 
-        print("\n[SUCESSO] Migracao concluida!")
+        # Adicionar campo 'parent_id' na tabela subcategorias
+        if 'subcategorias' in inspector.get_table_names():
+            columns = [col['name'] for col in inspector.get_columns('subcategorias')]
+
+            if 'parent_id' not in columns:
+                print("Adicionando campo 'parent_id' a tabela subcategorias...")
+                db.session.execute(db.text('ALTER TABLE subcategorias ADD COLUMN parent_id INTEGER REFERENCES subcategorias(id)'))
+                db.session.commit()
+                print("[OK] Campo 'parent_id' adicionado (hierarquia de subcategorias)")
+            else:
+                print("[OK] Campo 'parent_id' ja existe")
+
+        print("\n[SUCESSO] Schema atualizado com sucesso!")
 
 if __name__ == '__main__':
-    migrate_database()
+    print("\n" + "="*70)
+    print("🔧 ATUALIZAÇÃO DE SCHEMA - XODÓ DA PRETA")
+    print("="*70)
+    print("\n📋 Este script irá:")
+    print("   - Adicionar novos campos às tabelas existentes")
+    print("   - Criar novas tabelas se não existirem")
+    print("   - PRESERVAR todos os dados existentes (não-destrutivo)")
+    print("\n✅ É seguro executar este script múltiplas vezes.\n")
+
+    update_schema()

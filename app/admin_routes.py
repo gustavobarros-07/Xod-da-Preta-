@@ -171,15 +171,22 @@ def dashboard():
             # Para percentuais, usar preço médio como base de cálculo
             total_descontos_valor += (preco_medio * (cupom.valor_desconto / 100)) * cupom.quantidade_usada
 
-    # ===== RANKING DE CATEGORIAS (por quantidade de produtos) =====
+    # ===== RANKING DE CATEGORIAS (por média de visualizações) =====
     categorias_ranking_raw = db.session.query(
         Produto.categoria,
         db.func.count(Produto.id).label('total'),
         db.func.sum(Produto.visualizacoes).label('views_total')
-    ).group_by(Produto.categoria).order_by(db.text('total DESC')).all()
+    ).group_by(Produto.categoria).all()
 
-    # Converter Row objects para listas simples (JSON serializable)
-    categorias_ranking = [[cat, total, views or 0] for cat, total, views in categorias_ranking_raw]
+    # Converter Row objects para listas e calcular média
+    categorias_ranking = []
+    for cat, total, views in categorias_ranking_raw:
+        views_total = views or 0
+        media = views_total / total if total > 0 else 0
+        categorias_ranking.append([cat, total, views_total, media])
+
+    # Ordenar por média de visualizações (maior para menor)
+    categorias_ranking.sort(key=lambda x: x[3], reverse=True)
 
     return render_template('admin/dashboard.html',
                          # Estatísticas básicas
@@ -462,7 +469,10 @@ def configuracoes():
             'loja_email',
             'loja_instagram',
             'loja_facebook',
-            'loja_endereco'
+            'loja_endereco',
+            'cor_primaria',
+            'cor_secundaria',
+            'cor_destaque'
         ]
 
         for config_key in configs:
@@ -485,7 +495,10 @@ def configuracoes():
         'loja_instagram': Configuracao.get_valor('loja_instagram', ''),
         'loja_facebook': Configuracao.get_valor('loja_facebook', ''),
         'loja_endereco': Configuracao.get_valor('loja_endereco', ''),
-        'topbar_ativo': Configuracao.get_valor('topbar_ativo', '1') == '1'
+        'topbar_ativo': Configuracao.get_valor('topbar_ativo', '1') == '1',
+        'cor_primaria': Configuracao.get_valor('cor_primaria', '#ffc107'),
+        'cor_secundaria': Configuracao.get_valor('cor_secundaria', '#000000'),
+        'cor_destaque': Configuracao.get_valor('cor_destaque', '#ff9800')
     }
 
     return render_template('admin/config.html', configs=configs)
@@ -518,11 +531,18 @@ def subcategoria_nova():
     if request.method == 'POST':
         nome = request.form.get('nome')
         categoria = request.form.get('categoria')
+        parent_id = request.form.get('parent_id')
         ativo = request.form.get('ativo') == 'on'
         ordem = int(request.form.get('ordem', 0))
 
+        # Converter parent_id vazio para None
+        if parent_id == '' or parent_id == 'None':
+            parent_id = None
+        else:
+            parent_id = int(parent_id)
+
         # Verificar se já existe
-        existe = Subcategoria.query.filter_by(nome=nome, categoria=categoria).first()
+        existe = Subcategoria.query.filter_by(nome=nome, categoria=categoria, parent_id=parent_id).first()
         if existe:
             flash(f'Subcategoria "{nome}" já existe para a categoria "{categoria}".', 'warning')
             return redirect(url_for('admin.subcategoria_nova'))
@@ -531,6 +551,7 @@ def subcategoria_nova():
         subcategoria = Subcategoria(
             nome=nome,
             categoria=categoria,
+            parent_id=parent_id,
             ativo=ativo,
             ordem=ordem
         )
@@ -541,9 +562,13 @@ def subcategoria_nova():
         flash(f'Subcategoria "{nome}" adicionada com sucesso!', 'success')
         return redirect(url_for('admin.subcategorias'))
 
+    # Buscar todas as subcategorias para mostrar como opções de pai
+    subcategorias_disponiveis = Subcategoria.query.filter_by(ativo=True).order_by(Subcategoria.categoria, Subcategoria.ordem).all()
+
     return render_template('admin/subcategoria_form.html',
                          categorias=Config.CATEGORIES,
-                         subcategoria=None)
+                         subcategoria=None,
+                         subcategorias_disponiveis=subcategorias_disponiveis)
 
 @admin_bp.route('/subcategorias/<int:subcategoria_id>/editar', methods=['GET', 'POST'])
 @login_required
@@ -554,23 +579,49 @@ def subcategoria_editar(subcategoria_id):
     if request.method == 'POST':
         nome = request.form.get('nome')
         categoria = request.form.get('categoria')
+        parent_id = request.form.get('parent_id')
+
+        # Converter parent_id vazio para None
+        if parent_id == '' or parent_id == 'None':
+            parent_id = None
+        else:
+            parent_id = int(parent_id)
+
+        # Impedir que uma subcategoria seja pai dela mesma
+        if parent_id == subcategoria_id:
+            flash('Uma subcategoria não pode ser pai dela mesma.', 'danger')
+            subcategorias_disponiveis = Subcategoria.query.filter(
+                Subcategoria.id != subcategoria_id,
+                Subcategoria.ativo == True
+            ).order_by(Subcategoria.categoria, Subcategoria.ordem).all()
+            return render_template('admin/subcategoria_form.html',
+                                 categorias=Config.CATEGORIES,
+                                 subcategoria=subcategoria,
+                                 subcategorias_disponiveis=subcategorias_disponiveis)
 
         # Verificar se já existe (exceto a atual)
         existe = Subcategoria.query.filter(
             Subcategoria.nome == nome,
             Subcategoria.categoria == categoria,
+            Subcategoria.parent_id == parent_id,
             Subcategoria.id != subcategoria_id
         ).first()
 
         if existe:
             flash(f'Subcategoria "{nome}" já existe para a categoria "{categoria}".', 'warning')
+            subcategorias_disponiveis = Subcategoria.query.filter(
+                Subcategoria.id != subcategoria_id,
+                Subcategoria.ativo == True
+            ).order_by(Subcategoria.categoria, Subcategoria.ordem).all()
             return render_template('admin/subcategoria_form.html',
                                  categorias=Config.CATEGORIES,
-                                 subcategoria=subcategoria)
+                                 subcategoria=subcategoria,
+                                 subcategorias_disponiveis=subcategorias_disponiveis)
 
         # Atualizar dados
         subcategoria.nome = nome
         subcategoria.categoria = categoria
+        subcategoria.parent_id = parent_id
         subcategoria.ativo = request.form.get('ativo') == 'on'
         subcategoria.ordem = int(request.form.get('ordem', 0))
 
@@ -579,9 +630,16 @@ def subcategoria_editar(subcategoria_id):
         flash(f'Subcategoria "{subcategoria.nome}" atualizada com sucesso!', 'success')
         return redirect(url_for('admin.subcategorias'))
 
+    # Buscar subcategorias disponíveis (exceto a própria)
+    subcategorias_disponiveis = Subcategoria.query.filter(
+        Subcategoria.id != subcategoria_id,
+        Subcategoria.ativo == True
+    ).order_by(Subcategoria.categoria, Subcategoria.ordem).all()
+
     return render_template('admin/subcategoria_form.html',
                          categorias=Config.CATEGORIES,
-                         subcategoria=subcategoria)
+                         subcategoria=subcategoria,
+                         subcategorias_disponiveis=subcategorias_disponiveis)
 
 @admin_bp.route('/subcategorias/<int:subcategoria_id>/deletar', methods=['POST'])
 @login_required
@@ -1164,57 +1222,3 @@ def cupom_deletar(cupom_id):
 
     flash(f'Cupom "{codigo}" deletado com sucesso!', 'success')
     return redirect(url_for('admin.cupons'))
-
-
-# ==========================================
-# DEBUG - TEMPORÁRIO
-# ==========================================
-
-@admin_bp.route('/debug/config')
-@login_required
-def debug_config():
-    """Debug de configurações - TEMPORÁRIO"""
-    from flask import Response
-
-    output = []
-    output.append("=== DEBUG DE CONFIGURAÇÕES ===\n\n")
-
-    # Todas as configs
-    output.append("TODAS AS CONFIGURAÇÕES NO BANCO:\n")
-    all_configs = Configuracao.query.all()
-    for c in all_configs:
-        output.append(f"  {c.chave:25} = '{c.valor}' (type: {type(c.valor).__name__})\n")
-
-    output.append("\n" + "="*50 + "\n\n")
-
-    # Teste específico do topbar
-    output.append("TESTE TOPBAR_ATIVO:\n")
-    topbar_valor = Configuracao.get_valor('topbar_ativo', '1')
-    output.append(f"  get_valor('topbar_ativo', '1') = '{topbar_valor}'\n")
-    output.append(f"  type = {type(topbar_valor).__name__}\n")
-    output.append(f"  '{topbar_valor}' == '1' ? {topbar_valor == '1'}\n")
-    output.append(f"  bool('{topbar_valor}') = {bool(topbar_valor)}\n")
-
-    output.append("\n" + "="*50 + "\n\n")
-
-    # Context processor
-    output.append("CONTEXT PROCESSOR:\n")
-    result = topbar_valor == '1'
-    output.append(f"  config_topbar_ativo = {result}\n")
-
-    if result:
-        output.append("\n✓ Top Bar DEVERIA APARECER\n")
-    else:
-        output.append("\n✗ Top Bar NÃO VAI APARECER\n")
-        output.append("  Solução: Marcar checkbox em /admin/configuracoes\n")
-
-    return Response(''.join(output), mimetype='text/plain')
-
-
-@admin_bp.route('/debug/fix-topbar')
-@login_required
-def debug_fix_topbar():
-    """Força topbar_ativo = 1"""
-    Configuracao.set_valor('topbar_ativo', '1', 'Controla exibição do top bar')
-    flash('topbar_ativo forçado para "1" (ativo)', 'success')
-    return redirect(url_for('admin.debug_config'))

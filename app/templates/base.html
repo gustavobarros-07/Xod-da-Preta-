@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Xodó da Preta{% endblock %}</title>
 
@@ -16,11 +16,75 @@
     <!-- Design System Xodó da Preta -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/design-system.css') }}">
 
-    <!-- Sobrescrita de Cores (Remove Verde, Aplica Dourado) -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom-colors.css') }}">
+    <!-- Cores Personalizadas (Dinâmico - Admin) -->
+    <link rel="stylesheet" href="{{ url_for('custom_colors_css') }}">
 
     <!-- Google Fonts -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;200;300;400;500;700;900&display=swap">
+
+    <style>
+        /* Header Sticky - Fixo ao scrollar */
+        #templatemo_main_nav_container {
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        #templatemo_main_nav_container.scrolled {
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Garantir que body tenha espaço para o header fixo */
+        body {
+            padding-top: 0;
+        }
+
+        /* Mobile - Ícones fixos no topo */
+        @media (max-width: 991px) {
+            /* Ícones do carrinho e busca sempre visíveis no mobile */
+            .mobile-nav-icons {
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                z-index: 1040;
+                display: flex;
+                gap: 15px;
+                background: white;
+                padding: 8px 12px;
+                border-radius: 25px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+            }
+
+            .mobile-nav-icons a {
+                font-size: 20px;
+            }
+
+            .mobile-nav-icons .badge {
+                font-size: 10px;
+                padding: 2px 5px;
+            }
+
+            /* Esconder os ícones do navbar padrão no mobile */
+            #templatemo_main_nav .navbar-align-self-center {
+                display: none !important;
+            }
+
+            /* Ajustar espaço do navbar toggler */
+            .navbar-toggler {
+                margin-right: 80px;
+            }
+        }
+
+        /* Desktop - esconder ícones fixos */
+        @media (min-width: 992px) {
+            .mobile-nav-icons {
+                display: none !important;
+            }
+        }
+    </style>
 
     {% block extra_css %}{% endblock %}
 </head>
@@ -29,46 +93,59 @@
     <!-- Start Top Nav -->
     {% include 'partials/topbar.html' %}
 
-    <!-- Header -->
-    <nav class="navbar navbar-expand-lg navbar-light shadow">
-        <div class="container d-flex justify-content-between align-items-center">
-            <a class="navbar-brand text-warning logo h1 align-self-center" href="{{ url_for('home') }}">
-                Xodó da Preta
-            </a>
+    <!-- Mobile - Ícones Fixos (visível apenas em mobile) -->
+    <div class="mobile-nav-icons">
+        <a class="nav-icon position-relative text-decoration-none" href="#" data-bs-toggle="modal" data-bs-target="#templatemo_search">
+            <i class="fa fa-fw fa-search text-dark"></i>
+        </a>
+        <a class="nav-icon position-relative text-decoration-none" href="{{ url_for('carrinho') }}">
+            <i class="fa fa-fw fa-shopping-bag text-dark"></i>
+            <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-warning text-dark" id="cart-badge-mobile">0</span>
+        </a>
+    </div>
 
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#templatemo_main_nav" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+    <!-- Header Sticky -->
+    <div id="templatemo_main_nav_container">
+        <nav class="navbar navbar-expand-lg navbar-light shadow">
+            <div class="container d-flex justify-content-between align-items-center">
+                <a class="navbar-brand text-warning logo h1 align-self-center" href="{{ url_for('home') }}">
+                    Xodó da Preta
+                </a>
 
-            <div class="align-self-center collapse navbar-collapse flex-fill d-lg-flex justify-content-lg-between" id="templatemo_main_nav">
-                <div class="flex-fill">
-                    <ul class="nav navbar-nav d-flex justify-content-between mx-lg-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('home') }}">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('about') }}">Sobre mim</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('shop') }}">Loja</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('contact') }}">Contato</a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="navbar align-self-center d-flex">
-                    <a class="nav-icon position-relative text-decoration-none me-3" href="#" data-bs-toggle="modal" data-bs-target="#templatemo_search">
-                        <i class="fa fa-fw fa-search text-dark"></i>
-                    </a>
-                    <a class="nav-icon position-relative text-decoration-none" href="{{ url_for('carrinho') }}">
-                        <i class="fa fa-fw fa-cart-arrow-down text-dark mr-1"></i>
-                        <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-warning text-dark" id="cart-badge">0</span>
-                    </a>
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#templatemo_main_nav" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="align-self-center collapse navbar-collapse flex-fill d-lg-flex justify-content-lg-between" id="templatemo_main_nav">
+                    <div class="flex-fill">
+                        <ul class="nav navbar-nav d-flex justify-content-between mx-lg-auto">
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('home') }}">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('about') }}">Sobre mim</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('shop') }}">Loja</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('contact') }}">Contato</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="navbar align-self-center d-flex">
+                        <a class="nav-icon position-relative text-decoration-none me-3" href="#" data-bs-toggle="modal" data-bs-target="#templatemo_search">
+                            <i class="fa fa-fw fa-search text-dark"></i>
+                        </a>
+                        <a class="nav-icon position-relative text-decoration-none" href="{{ url_for('carrinho') }}">
+                            <i class="fa fa-fw fa-shopping-bag text-dark mr-1"></i>
+                            <span class="position-absolute top-0 left-100 translate-middle badge rounded-pill bg-warning text-dark" id="cart-badge">0</span>
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
-    </nav>
+        </nav>
+    </div>
     <!-- Close Header -->
 
     <!-- Modal de Busca -->
@@ -107,9 +184,15 @@
             fetch('/api/carrinho/total')
                 .then(response => response.json())
                 .then(data => {
-                    const badge = document.getElementById('cart-badge');
-                    if (badge) {
-                        badge.textContent = data.total_itens || '0';
+                    const badgeDesktop = document.getElementById('cart-badge');
+                    const badgeMobile = document.getElementById('cart-badge-mobile');
+                    const total = data.total_itens || '0';
+
+                    if (badgeDesktop) {
+                        badgeDesktop.textContent = total;
+                    }
+                    if (badgeMobile) {
+                        badgeMobile.textContent = total;
                     }
                 })
                 .catch(error => console.error('Erro ao atualizar badge do carrinho:', error));
@@ -117,6 +200,18 @@
 
         // Atualizar ao carregar a página
         document.addEventListener('DOMContentLoaded', atualizarBadgeCarrinho);
+
+        // Header Sticky - Adicionar classe ao scrollar
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('templatemo_main_nav_container');
+            if (header) {
+                if (window.scrollY > 50) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            }
+        });
     </script>
 
     {% block extra_js %}{% endblock %}

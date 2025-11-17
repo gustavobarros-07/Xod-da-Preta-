@@ -473,62 +473,57 @@ function atualizarTotalComDesconto() {
 
 // Finalizar pedido via WhatsApp
 document.getElementById('checkout-btn')?.addEventListener('click', function() {
-    // Cabeçalho da mensagem
-    let mensagem = '🛍️ *NOVO PEDIDO - XODÓ DA PRETA*\n';
-    mensagem += '━━━━━━━━━━━━━━━━━━━━━━━\n\n';
+    // Mensagem otimizada - ~300 caracteres (seguro para todas as plataformas)
+    let mensagem = '🛍️ *Olá! Quero finalizar meu pedido*\n\n';
 
-    // Itens do pedido
-    mensagem += '📦 *PRODUTOS:*\n\n';
-    document.querySelectorAll('.cart-item').forEach((item, index) => {
+    // Listar produtos resumidamente
+    const items = document.querySelectorAll('.cart-item');
+    mensagem += '*Itens:*\n';
+
+    items.forEach((item, index) => {
         const nome = item.querySelector('h5').textContent.trim();
-        const categoria = item.querySelector('.text-muted.small:nth-of-type(1)').textContent.trim();
-        const quantidade = item.querySelector('.quantity-input').value;
-        const subtotal = item.querySelector('.item-subtotal').textContent.trim();
-
-        // Verificar se tem tamanho
-        const tamanhoElements = item.querySelectorAll('.text-muted.small');
-        let tamanho = null;
-        if (tamanhoElements.length > 1) {
-            const tamanhoText = tamanhoElements[1].textContent.trim();
-            if (tamanhoText.startsWith('Tamanho:')) {
-                tamanho = tamanhoText.replace('Tamanho:', '').trim();
-            }
-        }
-
-        mensagem += `*${index + 1}. ${nome}*\n`;
-        mensagem += `   📁 ${categoria}\n`;
-        if (tamanho) {
-            mensagem += `   📏 Tamanho: ${tamanho}\n`;
-        }
-        mensagem += `   🔢 Quantidade: ${quantidade}\n`;
-        mensagem += `   💰 Subtotal: ${subtotal}\n\n`;
+        const qtd = item.querySelector('.quantity-input').value;
+        mensagem += `${index + 1}. ${nome} (${qtd}x)\n`;
     });
 
-    // Resumo financeiro
-    mensagem += '━━━━━━━━━━━━━━━━━━━━━━━\n';
-    mensagem += '💵 *RESUMO FINANCEIRO:*\n\n';
-
-    const subtotal = document.getElementById('cart-subtotal').textContent.trim();
-    mensagem += `Subtotal: ${subtotal}\n`;
-
-    // Se houver cupom aplicado
-    if (cupomAplicado && valorDesconto > 0) {
-        const desconto = document.getElementById('desconto-valor').textContent.trim();
-        mensagem += `Desconto (${cupomAplicado.codigo}): ${desconto}\n`;
-    }
-
+    // Total e fechamento
     const total = document.getElementById('cart-total').textContent.trim();
-    mensagem += `\n*TOTAL: ${total}*\n\n`;
+    mensagem += `\n💰 *Total: ${total}*\n\n`;
+    mensagem += 'Aguardo contato para combinar entrega! 😊';
 
-    mensagem += '🚚 _Frete a combinar_\n\n';
-    mensagem += '━━━━━━━━━━━━━━━━━━━━━━━\n\n';
-    mensagem += 'Aguardo retorno para confirmar o pedido e combinarmos a forma de entrega! 😊';
+    // Copiar para área de transferência como fallback
+    navigator.clipboard.writeText(mensagem).catch(err => {
+        console.warn('Não foi possível copiar automaticamente');
+    });
 
     // Número do WhatsApp da configuração
     const phoneNumber = '{{ config_loja_telefone|replace(" ", "")|replace("-", "") }}';
     const whatsappURL = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(mensagem)}`;
 
-    window.open(whatsappURL, '_blank');
+    // Detectar se é mobile ou desktop
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    if (isMobile) {
+        // Mobile: Abrir direto (mensagem geralmente preenche automaticamente)
+        window.open(whatsappURL, '_blank');
+
+        // Feedback sutil
+        setTimeout(() => {
+            alert('💬 Abrindo WhatsApp...\n\nSe a mensagem não aparecer, ela foi copiada para você colar!');
+        }, 500);
+    } else {
+        // Desktop: Avisar sobre a cópia
+        const confirmacao = confirm(
+            '📋 Mensagem copiada para área de transferência!\n\n' +
+            'O WhatsApp Desktop geralmente não preenche automaticamente.\n\n' +
+            'Quando abrir o WhatsApp, cole a mensagem com Ctrl+V (ou Cmd+V no Mac).\n\n' +
+            'Clique OK para continuar.'
+        );
+
+        if (confirmacao) {
+            window.open(whatsappURL, '_blank');
+        }
+    }
 });
 
 // Atualizar badge do carrinho no header
@@ -536,7 +531,7 @@ function atualizarBadgeCarrinho() {
     fetch('/api/carrinho/total')
         .then(response => response.json())
         .then(data => {
-            const badge = document.querySelector('.fa-cart-arrow-down + .badge');
+            const badge = document.querySelector('.fa-shopping-bag + .badge');
             if (badge) {
                 badge.textContent = data.total_itens || '0';
             }

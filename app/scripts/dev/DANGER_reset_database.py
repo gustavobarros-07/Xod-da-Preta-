@@ -1,10 +1,30 @@
 """
-Script para configuração inicial do projeto Xodó da Preta
-Execute APENAS na primeira vez que instalar o projeto: python setup_inicial.py
+🚨🚨🚨 PERIGO - SCRIPT DESTRUTIVO 🚨🚨🚨
+=====================================
+⚠️ ATENÇÃO: Este script APAGA TODOS os dados do banco de dados!
 
-⚠️ ATENÇÃO: Este script apaga TODOS os dados existentes!
-Para apenas adicionar produtos de exemplo, use: python populate_products.py
+Execute APENAS em ambiente de DESENVOLVIMENTO ou na primeira instalação!
+NUNCA execute em produção!
+
+Execute: python scripts/dev/DANGER_reset_database.py
+
+O que este script faz:
+- ❌ APAGA todas as tabelas (db.drop_all)
+- ✅ Recria todas as tabelas do zero
+- ✅ Cria usuário admin padrão (admin/admin123)
+- ✅ Adiciona configurações iniciais da loja
+- ✅ Cria 6 produtos de exemplo
+
+💡 Alternativas mais seguras:
+- Para adicionar produtos: use populate_products.py
+- Para atualizar schema: use scripts/maintenance/update_schema.py
 """
+
+import sys
+import os
+
+# Adicionar diretório pai ao path para importar módulos
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 from main import app
 from database import db
@@ -128,26 +148,36 @@ def init_database():
         print("\n🚀 Inicie o servidor com: python main.py")
 
 if __name__ == '__main__':
-    print("\n" + "="*60)
-    print("🎯 SETUP INICIAL - XODÓ DA PRETA")
-    print("="*60)
-    print("\n⚠️  ATENÇÃO: Isso vai APAGAR todos os dados existentes!")
-    print("📋 O que será feito:")
-    print("   - Recriar todas as tabelas do banco")
-    print("   - Criar usuário admin padrão")
-    print("   - Configurar informações da loja")
-    print("   - Adicionar alguns produtos de exemplo")
-    print("\n💡 Dica: Para apenas adicionar produtos, use 'populate_products.py'\n")
+    print("\n" + "="*70)
+    print("🚨🚨🚨 PERIGO - SCRIPT DESTRUTIVO 🚨🚨🚨")
+    print("="*70)
+    print("\n⚠️  ATENÇÃO: Isso vai APAGAR TODOS os dados existentes!")
+    print("\n📋 O que será feito:")
+    print("   - ❌ APAGAR todas as tabelas do banco (db.drop_all)")
+    print("   - ✅ Recriar todas as tabelas do zero")
+    print("   - ✅ Criar usuário admin padrão")
+    print("   - ✅ Configurar informações da loja")
+    print("   - ✅ Adicionar 6 produtos de exemplo")
+    print("\n💡 Alternativas mais seguras:")
+    print("   - Para adicionar produtos: python scripts/dev/populate_products.py")
+    print("   - Para atualizar schema: python scripts/maintenance/update_schema.py")
+    print("\n🔴 EXECUTE APENAS EM DESENVOLVIMENTO! NUNCA EM PRODUÇÃO!\n")
 
-    resposta = input("Deseja continuar? (s/n): ")
+    resposta = input("🚨 Tem certeza que deseja APAGAR TUDO? Digite 'SIM APAGAR TUDO' para continuar: ")
 
-    if resposta.lower() == 's':
-        init_database()
-        print("\n📝 Próximos passos:")
-        print("   1. Execute: python populate_products.py (para mais produtos)")
-        print("   2. Inicie o servidor: python main.py")
-        print("   3. Acesse http://localhost:5000/admin/login")
-        print("   4. Login: admin / Senha: admin123")
-        print("   5. ⚠️ TROQUE A SENHA IMEDIATAMENTE!")
+    if resposta == 'SIM APAGAR TUDO':
+        print("\n⚠️  Última chance! Este é um processo IRREVERSÍVEL!")
+        confirmacao = input("Digite 'CONFIRMO' para prosseguir: ")
+
+        if confirmacao == 'CONFIRMO':
+            init_database()
+            print("\n📝 Próximos passos:")
+            print("   1. Execute: python scripts/dev/populate_products.py (para mais produtos)")
+            print("   2. Inicie o servidor: python main.py")
+            print("   3. Acesse http://localhost:5000/admin/login")
+            print("   4. Login: admin / Senha: admin123")
+            print("   5. ⚠️ TROQUE A SENHA IMEDIATAMENTE!")
+        else:
+            print("\n✅ Operação cancelada com segurança.")
     else:
-        print("\n❌ Operação cancelada.")
+        print("\n✅ Operação cancelada com segurança.")

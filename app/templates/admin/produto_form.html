@@ -12,7 +12,7 @@
     <style>
         :root {
             --cor-preta: #000000;
-            --cor-dourada: #D4AF37;
+            --cor-dourada: #ffc107;
             --cor-bege: #F5F5F5;
             --cor-cinza-escuro: #333333;
         }
@@ -110,7 +110,7 @@
         }
         
         .btn-save:hover {
-            background-color: #C48835;
+            background-color: var(--cor-dourada-escura);
             color: var(--cor-preta);
         }
         
@@ -261,7 +261,7 @@
                                     <i class="fas fa-list"></i> Categoria *
                                 </label>
                                 <select class="form-select" id="categoria" name="categoria" required>
-                                    <option value="">Selecione...</option>
+                                    <option value="" disabled selected>Selecione...</option>
                                     {% for cat in categorias %}
                                     <option value="{{ cat }}" {% if produto and produto.categoria == cat %}selected{% endif %}>
                                         {{ cat }}
@@ -282,8 +282,22 @@
                                         <option value="">Selecione...</option>
                                         <option value="Feminino" {% if produto and produto.subcategoria == 'Feminino' %}selected{% endif %}>Feminino</option>
                                         <option value="Masculino" {% if produto and produto.subcategoria == 'Masculino' %}selected{% endif %}>Masculino</option>
+                                        <option value="Unissex" {% if produto and produto.subcategoria == 'Unissex' %}selected{% endif %}>Unissex</option>
+
+                                        <!-- Subcategorias Dinâmicas (criadas no admin) -->
+                                        {% if subcategorias %}
+                                            {% for subcat in subcategorias %}
+                                                {% if subcat.categoria == 'Roupas' %}
+                                                <option value="{{ subcat.nome }}"
+                                                        data-subcat-id="{{ subcat.id }}"
+                                                        {% if produto and produto.subcategoria == subcat.nome %}selected{% endif %}>
+                                                    {{ subcat.nome }}
+                                                </option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
                                     </select>
-                                    <small class="text-muted">Selecione o gênero do produto</small>
+                                    <small class="text-muted">Selecione o gênero ou subcategoria</small>
                                 </div>
 
                                 <div class="col-md-6 mb-3">

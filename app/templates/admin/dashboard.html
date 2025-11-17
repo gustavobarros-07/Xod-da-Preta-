@@ -14,13 +14,14 @@
     <style>
         :root {
             --cor-preta: #000000;
-            --cor-dourada: #D4AF37;
-            --cor-dourada-escura: #C48835;
+            --cor-dourada: #ffc107;
+            --cor-dourada-escura: #B8941E;
             --cor-bege: #F5F5F5;
             --cor-cinza-escuro: #333333;
-            --cor-sucesso: #28a745;
-            --cor-perigo: #dc3545;
-            --cor-info: #17a2b8;
+            --cor-laranja: #ff9800;
+            --cor-hover: #ffcd38;
+            --cor-sucesso: #ffc107;
+            --cor-erro: #C44835;
         }
 
         body {
@@ -35,7 +36,7 @@
             left: 0;
             height: 100vh;
             width: 260px;
-            background: linear-gradient(180deg, var(--cor-preta) 0%, #1a1a1a 100%);
+            background: linear-gradient(180deg, var(--cor-preta) 0%, var(--cor-cinza-escuro) 100%);
             padding: 0;
             z-index: 1000;
             box-shadow: 4px 0 15px rgba(0, 0, 0, 0.2);
@@ -162,17 +163,17 @@
         }
 
         .kpi-card.success .icon {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
+            background: linear-gradient(135deg, var(--cor-sucesso) 0%, var(--cor-hover) 100%);
+            color: var(--cor-preta);
         }
 
         .kpi-card.danger .icon {
-            background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);
+            background: linear-gradient(135deg, var(--cor-erro) 0%, #e83e8c 100%);
             color: white;
         }
 
         .kpi-card.info .icon {
-            background: linear-gradient(135deg, #17a2b8 0%, #3498db 100%);
+            background: linear-gradient(135deg, var(--cor-laranja) 0%, var(--cor-hover) 100%);
             color: white;
         }
 
@@ -193,7 +194,7 @@
         .kpi-card .trend {
             margin-top: 10px;
             font-size: 12px;
-            color: #28a745;
+            color: var(--cor-sucesso);
         }
 
         /* Quick Actions */
@@ -534,13 +535,13 @@
                     </a>
                 </div>
                 <div class="col-md-3">
-                    <a href="{{ url_for('admin.configuracoes') }}" class="btn-quick-action w-100" style="background: linear-gradient(135deg, #17a2b8 0%, #3498db 100%); color: white; border-color: #17a2b8;">
+                    <a href="{{ url_for('admin.configuracoes') }}" class="btn-quick-action w-100" style="background: linear-gradient(135deg, var(--cor-laranja) 0%, var(--cor-hover) 100%); color: white; border-color: var(--cor-laranja);">
                         <i class="fas fa-cog"></i>
                         <span>Configurações</span>
                     </a>
                 </div>
                 <div class="col-md-3">
-                    <a href="{{ url_for('home') }}" target="_blank" class="btn-quick-action w-100" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border-color: #28a745;">
+                    <a href="{{ url_for('home') }}" target="_blank" class="btn-quick-action w-100" style="background: linear-gradient(135deg, var(--cor-sucesso) 0%, var(--cor-hover) 100%); color: var(--cor-preta); border-color: var(--cor-sucesso);">
                         <i class="fas fa-external-link-alt"></i>
                         <span>Ver Site</span>
                     </a>
@@ -721,7 +722,7 @@
             <!-- Cupons Mais Usados -->
             <div class="col-md-6">
                 <div class="top-products">
-                    <h5><i class="fas fa-fire me-2" style="color: #dc3545;"></i> Top 5 Cupons Mais Usados</h5>
+                    <h5><i class="fas fa-fire me-2" style="color: var(--cor-erro);"></i> Top 5 Cupons Mais Usados</h5>
                     {% if cupons_mais_usados %}
                         {% for cupom in cupons_mais_usados %}
                         <div class="product-item">
@@ -781,7 +782,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for categoria, total, views in categorias_ranking %}
+                                {% for categoria, total, views, media in categorias_ranking %}
                                 <tr>
                                     <td>
                                         <div style="width: 30px; height: 30px; background: {% if loop.index == 1 %}#FFD700{% elif loop.index == 2 %}#C0C0C0{% elif loop.index == 3 %}#CD7F32{% else %}#ddd{% endif %}; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: {% if loop.index <= 3 %}white{% else %}#666{% endif %};">
@@ -793,11 +794,11 @@
                                         <span class="badge bg-primary">{{ total }} produto(s)</span>
                                     </td>
                                     <td>
-                                        <i class="fas fa-eye text-muted"></i> {{ views or 0 }} visualizações
+                                        <i class="fas fa-eye text-muted"></i> {{ views }} visualizações
                                     </td>
                                     <td>
                                         <strong style="color: var(--cor-dourada);">
-                                            {{ "%.1f"|format((views or 0) / total) }} views/produto
+                                            {{ "%.1f"|format(media) }} views/produto
                                         </strong>
                                     </td>
                                 </tr>
@@ -821,12 +822,12 @@
     <!-- Chart.js Configuration -->
     <script>
         // Cores do tema - Paleta Dourada/Bege/Preta
-        const goldColor = '#D4AF37';
+        const goldColor = '#ffc107';
         const goldDarkColor = '#B8941E';
-        const beigeColor = '#F5E6D3';
-        const beigeDarkColor = '#E8D4B8';
-        const blackColor = '#1a1a1a';
-        const grayColor = '#4a4a4a';
+        const beigeColor = '#F5F5F5';
+        const orangeColor = '#ff9800';
+        const blackColor = '#000000';
+        const grayColor = '#333333';
 
         // ===== GRÁFICO DE PIZZA - Produtos por Categoria =====
         const categoriasCtx = document.getElementById('categoriasChart');
@@ -839,14 +840,14 @@
                         label: 'Produtos',
                         data: {{ categorias_valores|tojson }},
                         backgroundColor: [
-                            '#D4AF37',  // Dourado principal
+                            '#ffc107',  // Dourado principal
                             '#B8941E',  // Dourado escuro
-                            '#8B7355',  // Marrom médio
-                            '#F5E6D3',  // Bege claro
-                            '#CD853F',  // Peru (tom terroso)
-                            '#DEB887',  // Madeira clara
-                            '#D2691E',  // Chocolate
-                            '#C19A6B'   // Camelo
+                            '#ff9800',  // Laranja
+                            '#ffcd38',  // Dourado hover
+                            '#F5F5F5',  // Bege
+                            '#333333',  // Cinza escuro
+                            '#000000',  // Preto
+                            '#C44835'   // Vermelho erro
                         ],
                         borderWidth: 3,
                         borderColor: '#fff'
@@ -895,8 +896,8 @@
                         borderColor: goldColor,
                         backgroundColor: function(context) {
                             const gradient = context.chart.ctx.createLinearGradient(0, 0, 0, 300);
-                            gradient.addColorStop(0, 'rgba(212, 175, 55, 0.3)');
-                            gradient.addColorStop(1, 'rgba(212, 175, 55, 0)');
+                            gradient.addColorStop(0, 'rgba(255, 193, 7, 0.3)');
+                            gradient.addColorStop(1, 'rgba(255, 193, 7, 0)');
                             return gradient;
                         },
                         borderWidth: 3,
@@ -979,8 +980,8 @@
                         {
                             label: 'Visualizações',
                             data: rankingViews,
-                            backgroundColor: 'rgba(23, 162, 184, 0.7)',
-                            borderColor: '#17a2b8',
+                            backgroundColor: 'rgba(255, 152, 0, 0.7)',
+                            borderColor: '#ff9800',
                             borderWidth: 2,
                             borderRadius: 8,
                             borderSkipped: false

@@ -11,12 +11,16 @@ class Subcategoria(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(50), nullable=False)
     categoria = db.Column(db.String(50), nullable=False)  # Categoria pai
+    parent_id = db.Column(db.Integer, db.ForeignKey('subcategorias.id'), nullable=True)  # Subcategoria pai (para hierarquia)
     ativo = db.Column(db.Boolean, default=True)
     ordem = db.Column(db.Integer, default=0)  # Para ordenação
     data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relacionamento com produtos
     produtos = db.relationship('Produto', backref='subcategoria_obj', lazy=True)
+
+    # Relacionamento hierárquico (subcategorias filhas)
+    filhas = db.relationship('Subcategoria', backref=db.backref('parent', remote_side=[id]), lazy=True)
 
     def __repr__(self):
         return f'<Subcategoria {self.categoria} - {self.nome}>'
@@ -27,6 +31,8 @@ class Subcategoria(db.Model):
             'id': self.id,
             'nome': self.nome,
             'categoria': self.categoria,
+            'parent_id': self.parent_id,
+            'parent_nome': self.parent.nome if self.parent else None,
             'ativo': self.ativo,
             'ordem': self.ordem
         }
