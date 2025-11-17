@@ -28,29 +28,24 @@ Isso instalará:
 
 ---
 
-### 2️⃣ Inicializar Flask-Migrate (PRIMEIRA VEZ)
+### 2️⃣ Inicializar Flask-Migrate (JÁ ESTÁ PRONTO!)
 
-**⚠️ IMPORTANTE:** Se o banco `instance/loja.db` já existe com dados:
+**✅ PRONTO!** O Flask-Migrate já foi configurado e testado!
+
+Os arquivos de migration já estão criados:
+- `app/.flaskenv` - Configuração do Flask CLI
+- `app/migrations/` - Pasta de migrations
+
+**Você não precisa fazer nada!** Migrations futuras:
 
 ```bash
 cd app
 
-# 1. Fazer BACKUP do banco atual
-cp ../instance/loja.db ../instance/loja_backup_antes_migrate.db
+# Após mudar models.py, criar nova migration:
+python -m flask --app main db migrate -m "Descrição da mudança"
 
-# 2. Inicializar migrations
-flask db init
-
-# 3. Criar migration inicial
-flask db migrate -m "Initial migration"
-
-# 4. Aplicar migration
-flask db upgrade
-```
-
-**Se der erro:** Restaure o backup e peça ajuda:
-```bash
-cp ../instance/loja_backup_antes_migrate.db ../instance/loja.db
+# Aplicar migration:
+python -m flask --app main db upgrade
 ```
 
 ---
