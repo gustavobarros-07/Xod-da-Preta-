@@ -7,6 +7,10 @@ import uuid
 import logging
 from logging.handlers import RotatingFileHandler
 import os
+from flask_wtf.csrf import CSRFProtect
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from flask_migrate import Migrate
 
 # Diretório base
 BASE_DIR = Path(__file__).resolve().parent
@@ -46,11 +50,27 @@ if not app.debug:
 # Inicializar banco de dados
 db.init_app(app)
 
-# Criar tabelas se não existirem
+# Inicializar Flask-Migrate para migrations
+migrate = Migrate(app, db)
+
+# Inicializar CSRF Protection
+csrf = CSRFProtect(app)
+
+# Inicializar Rate Limiter
+limiter = Limiter(
+    app=app,
+    key_func=get_remote_address,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://"
+)
+
+# Importar modelos para que o Flask-Migrate os reconheça
 with app.app_context():
-    # Importar modelos para garantir que sejam registrados
     from models import Produto, Admin, Configuracao, Subcategoria, ConteudoPagina
-    db.create_all()
+    # db.create_all() foi removido - agora use Flask-Migrate:
+    # flask db init (primeira vez)
+    # flask db migrate -m "Initial migration"
+    # flask db upgrade
 
 # Registrar Blueprint do Admin
 app.register_blueprint(admin_bp)
@@ -120,7 +140,7 @@ def contact():
 
 @app.route("/shop")
 def shop():
-    """Página da loja com filtros hierárquicos (3 níveis)"""
+    """Página da loja com filtros hierárquicos (3 níveis) e paginação"""
     from models import Produto, Subcategoria
     from config import Config
 
@@ -132,6 +152,7 @@ def shop():
     preco_min = request.args.get('preco_min', type=int)
     preco_max = request.args.get('preco_max', type=int)
     ordenar = request.args.get('ordenar', 'padrao')  # Ordenação
+    page = request.args.get('page', 1, type=int)  # Paginação
 
     # Query base: produtos ativos
     query = Produto.query.filter_by(ativo=True)
@@ -179,8 +200,13 @@ def shop():
     else:  # padrao
         query = query.order_by(Produto.ordem, Produto.id.desc())
 
-    # Buscar produtos
-    produtos = query.all()
+    # Aplicar paginação
+    pagination = query.paginate(
+        page=page,
+        per_page=Config.PRODUCTS_PER_PAGE,
+        error_out=False
+    )
+    produtos = pagination.items
 
     # Buscar subcategorias antigas (legado - manter compatibilidade)
     subcategorias_legado = Subcategoria.query.filter_by(ativo=True).order_by(Subcategoria.categoria, Subcategoria.ordem).all()
@@ -188,6 +214,7 @@ def shop():
     return render_template(
         "shop.html",
         produtos=produtos,
+        pagination=pagination,
         categoria_filtro=categoria_filtro,
         subcategoria_filtro=subcategoria_filtro,
         tipo_filtro=tipo_filtro,
@@ -465,26 +492,36 @@ def validar_cupom():
 
 @app.route("/busca")
 def busca():
-    """Busca de produtos"""
+    """Busca de produtos com paginação"""
     from models import Produto
+    from config import Config
 
-    # Termo de busca
+    # Termo de busca e página
     termo = request.args.get('q', '').strip()
+    page = request.args.get('page', 1, type=int)
 
     if not termo:
-        return render_template("busca.html", produtos=[], termo='')
+        return render_template("busca.html", produtos=[], termo='', pagination=None)
 
     # Buscar produtos por nome ou descrição
-    produtos = Produto.query.filter(
+    query = Produto.query.filter(
         Produto.ativo == True,
         db.or_(
             Produto.nome.ilike(f'%{termo}%'),
             Produto.descricao.ilike(f'%{termo}%'),
             Produto.categoria.ilike(f'%{termo}%')
         )
-    ).order_by(Produto.ordem).all()
+    ).order_by(Produto.ordem)
 
-    return render_template("busca.html", produtos=produtos, termo=termo)
+    # Aplicar paginação
+    pagination = query.paginate(
+        page=page,
+        per_page=Config.PRODUCTS_PER_PAGE,
+        error_out=False
+    )
+    produtos = pagination.items
+
+    return render_template("busca.html", produtos=produtos, termo=termo, pagination=pagination)
 
 # ========================================
 # FILTROS JINJA2 PERSONALIZADOS

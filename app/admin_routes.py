@@ -17,6 +17,14 @@ from config import Config
 # Criar Blueprint para rotas do admin
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 
+# Variável global para o limiter (será definida no main.py)
+limiter = None
+
+def init_limiter(limiter_instance):
+    """Inicializa o limiter para uso nas rotas do admin"""
+    global limiter
+    limiter = limiter_instance
+
 # Decorator para proteger rotas (só admin logado acessa)
 def login_required(f):
     @wraps(f)
@@ -41,11 +49,125 @@ def save_product_image(file):
         timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
         name, ext = os.path.splitext(filename)
         filename = f"{name}_{timestamp}{ext}"
-        
+
         filepath = Config.UPLOAD_FOLDER / filename
         file.save(filepath)
         return filename
     return None
+
+def validate_and_get_product_data(form_data, is_edit=False, produto_id=None):
+    """
+    Valida e retorna dados do produto a partir do formulário.
+    Retorna (dados, erro) onde erro é None se validação passou.
+    """
+    # Obter dados do formulário
+    nome = form_data.get('nome', '').strip()
+    descricao = form_data.get('descricao', '').strip()
+    preco_str = form_data.get('preco', '0')
+    categoria = form_data.get('categoria', '').strip()
+    subcategoria = form_data.get('subcategoria')
+    tipo = form_data.get('tipo')
+    subcategoria_id = form_data.get('subcategoria_id')
+    tamanhos = form_data.getlist('tamanhos')
+    ativo = form_data.get('ativo') == 'on'
+    destaque = form_data.get('destaque') == 'on'
+    ordem_str = form_data.get('ordem', '0')
+
+    # Determinar URL de redirect em caso de erro
+    redirect_url = url_for('admin.produto_editar', produto_id=produto_id) if is_edit else url_for('admin.produto_novo')
+
+    # VALIDAÇÃO DE CAMPOS OBRIGATÓRIOS
+    if not nome:
+        return None, ('Nome do produto é obrigatório', redirect_url)
+
+    if not categoria:
+        return None, ('Categoria é obrigatória', redirect_url)
+
+    # VALIDAÇÃO DE PREÇO
+    try:
+        preco = float(preco_str)
+        if preco < 0:
+            return None, ('Preço não pode ser negativo', redirect_url)
+    except (ValueError, TypeError):
+        return None, ('Preço inválido. Use apenas números (ex: 49.90)', redirect_url)
+
+    # VALIDAÇÃO DE ORDEM
+    try:
+        ordem = int(ordem_str)
+    except (ValueError, TypeError):
+        ordem = 0
+
+    # Retornar dados validados
+    return {
+        'nome': nome,
+        'descricao': descricao,
+        'preco': preco,
+        'categoria': categoria,
+        'subcategoria': subcategoria if subcategoria else None,
+        'tipo': tipo if tipo else None,
+        'subcategoria_id': int(subcategoria_id) if subcategoria_id else None,
+        'tamanhos': json.dumps(tamanhos),
+        'ativo': ativo,
+        'destaque': destaque,
+        'ordem': ordem
+    }, None
+
+def process_product_images(files, old_imagem=None, old_imagens_adicionais=None):
+    """
+    Processa upload de imagens do produto.
+    Retorna (imagem_principal, imagens_adicionais_list).
+    """
+    # Upload de imagem principal
+    imagem_file = files.get('imagem')
+    imagem_filename = None
+
+    if imagem_file and imagem_file.filename:
+        # Se está editando e tem imagem antiga, deletar
+        if old_imagem:
+            old_image_path = Config.UPLOAD_FOLDER / old_imagem
+            if old_image_path.exists():
+                try:
+                    old_image_path.unlink()
+                except OSError:
+                    pass
+        imagem_filename = save_product_image(imagem_file)
+    elif old_imagem:
+        # Manter imagem antiga se não enviou nova
+        imagem_filename = old_imagem
+
+    # Upload de imagens adicionais (galeria)
+    imagens_adicionais_files = files.getlist('imagens_adicionais')
+    imagens_adicionais_list = []
+
+    if imagens_adicionais_files and any(f.filename for f in imagens_adicionais_files):
+        # Se está editando e tem imagens antigas, deletar
+        if old_imagens_adicionais:
+            try:
+                old_images = json.loads(old_imagens_adicionais)
+                for old_img in old_images:
+                    old_img_path = Config.UPLOAD_FOLDER / old_img
+                    if old_img_path.exists():
+                        try:
+                            old_img_path.unlink()
+                        except OSError:
+                            pass
+            except (json.JSONDecodeError, TypeError):
+                pass
+
+        # Salvar novas imagens
+        for img_file in imagens_adicionais_files:
+            if img_file and img_file.filename:
+                filename = save_product_image(img_file)
+                if filename:
+                    imagens_adicionais_list.append(filename)
+    elif old_imagens_adicionais:
+        # Manter imagens antigas se não enviou novas
+        try:
+            imagens_adicionais_list = json.loads(old_imagens_adicionais)
+        except (json.JSONDecodeError, TypeError):
+            imagens_adicionais_list = []
+
+    return imagem_filename, imagens_adicionais_list
 
 # ========================================
 # ROTAS DE AUTENTICAÇÃO
@@ -53,20 +175,42 @@ def save_product_image(file):
 
 @admin_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    """Página de login do admin"""
+    """Página de login do admin com rate limiting"""
     # Se já estiver logado, redireciona para dashboard
     if 'admin_logged_in' in session:
         return redirect(url_for('admin.dashboard'))
-    
+
     if request.method == 'POST':
+        # Rate limiting simples: verificar tentativas de login
+        login_attempts_key = 'login_attempts'
+        login_timestamp_key = 'login_last_attempt'
+
+        # Obter tentativas e timestamp da sessão
+        attempts = session.get(login_attempts_key, 0)
+        last_attempt = session.get(login_timestamp_key)
+
+        # Resetar contador se passaram mais de 1 minuto
+        if last_attempt:
+            last_attempt_time = datetime.fromisoformat(last_attempt)
+            if datetime.utcnow() - last_attempt_time > timedelta(minutes=1):
+                attempts = 0
+
+        # Verificar se excedeu o limite (5 tentativas por minuto)
+        if attempts >= 5:
+            flash('Muitas tentativas de login. Aguarde 1 minuto e tente novamente.', 'danger')
+            return render_template('admin/login.html'), 429
+
         username = request.form.get('username')
         password = request.form.get('password')
-        
+
         # Buscar admin no banco
         admin = Admin.query.filter_by(username=username).first()
-        
+
         if admin and admin.check_password(password):
-            # Login bem-sucedido
+            # Login bem-sucedido - resetar contador
+            session.pop(login_attempts_key, None)
+            session.pop(login_timestamp_key, None)
+
             session['admin_logged_in'] = True
             session['admin_id'] = admin.id
             session['admin_username'] = admin.username
@@ -74,12 +218,15 @@ def login():
             # Atualizar último login
             admin.ultimo_login = datetime.utcnow()
             db.session.commit()
-            
+
             flash('Login realizado com sucesso!', 'success')
             return redirect(url_for('admin.dashboard'))
         else:
+            # Incrementar contador de tentativas
+            session[login_attempts_key] = attempts + 1
+            session[login_timestamp_key] = datetime.utcnow().isoformat()
             flash('Usuário ou senha incorretos.', 'danger')
-    
+
     return render_template('admin/login.html')
 
 @admin_bp.route('/logout')
@@ -233,72 +380,20 @@ def produtos():
 def produto_novo():
     """Adicionar novo produto"""
     if request.method == 'POST':
-        # Obter dados do formulário
-        nome = request.form.get('nome', '').strip()
-        descricao = request.form.get('descricao', '').strip()
-        preco_str = request.form.get('preco', '0')
-        categoria = request.form.get('categoria', '').strip()
-        subcategoria = request.form.get('subcategoria')  # Feminino/Masculino
-        tipo = request.form.get('tipo')  # Vestido, Camisa, etc.
-        subcategoria_id = request.form.get('subcategoria_id')  # Legado
-        tamanhos = request.form.getlist('tamanhos')
-        ativo = request.form.get('ativo') == 'on'
-        destaque = request.form.get('destaque') == 'on'
-        ordem_str = request.form.get('ordem', '0')
+        # Validar e obter dados do formulário
+        dados, erro = validate_and_get_product_data(request.form, is_edit=False)
 
-        # VALIDAÇÃO DE CAMPOS OBRIGATÓRIOS
-        if not nome:
-            flash('Nome do produto é obrigatório', 'danger')
-            return redirect(url_for('admin.produto_novo'))
+        if erro:
+            mensagem, redirect_url = erro
+            flash(mensagem, 'danger')
+            return redirect(redirect_url)
 
-        if not categoria:
-            flash('Categoria é obrigatória', 'danger')
-            return redirect(url_for('admin.produto_novo'))
-
-        # VALIDAÇÃO DE PREÇO
-        try:
-            preco = float(preco_str)
-            if preco < 0:
-                flash('Preço não pode ser negativo', 'danger')
-                return redirect(url_for('admin.produto_novo'))
-        except (ValueError, TypeError):
-            flash('Preço inválido. Use apenas números (ex: 49.90)', 'danger')
-            return redirect(url_for('admin.produto_novo'))
-
-        # VALIDAÇÃO DE ORDEM
-        try:
-            ordem = int(ordem_str)
-        except (ValueError, TypeError):
-            ordem = 0
-
-        # Upload de imagem principal
-        imagem_file = request.files.get('imagem')
-        imagem_filename = save_product_image(imagem_file) if imagem_file else None
-
-        # Upload de imagens adicionais (galeria)
-        imagens_adicionais_files = request.files.getlist('imagens_adicionais')
-        imagens_adicionais_list = []
-        for img_file in imagens_adicionais_files:
-            if img_file and img_file.filename:
-                filename = save_product_image(img_file)
-                if filename:
-                    imagens_adicionais_list.append(filename)
+        # Processar upload de imagens
+        imagem_filename, imagens_adicionais_list = process_product_images(request.files)
 
         # Criar produto
-        produto = Produto(
-            nome=nome,
-            descricao=descricao,
-            preco=preco,
-            categoria=categoria,
-            subcategoria=subcategoria if subcategoria else None,
-            tipo=tipo if tipo else None,
-            subcategoria_id=int(subcategoria_id) if subcategoria_id else None,
-            tamanhos=json.dumps(tamanhos),
-            imagem=imagem_filename,
-            ativo=ativo,
-            destaque=destaque,
-            ordem=ordem
-        )
+        produto = Produto(**dados)
+        produto.imagem = imagem_filename
 
         # Adicionar imagens adicionais ao produto
         if imagens_adicionais_list:
@@ -307,7 +402,7 @@ def produto_novo():
         db.session.add(produto)
         db.session.commit()
 
-        flash(f'Produto "{nome}" adicionado com sucesso!', 'success')
+        flash(f'Produto "{dados["nome"]}" adicionado com sucesso!', 'success')
         return redirect(url_for('admin.produtos'))
 
     # Buscar todas as subcategorias para o formulário
@@ -324,97 +419,34 @@ def produto_novo():
 def produto_editar(produto_id):
     """Editar produto existente"""
     produto = Produto.query.get_or_404(produto_id)
-    
+
     if request.method == 'POST':
-        # Obter e validar dados
-        nome = request.form.get('nome', '').strip()
-        descricao = request.form.get('descricao', '').strip()
-        preco_str = request.form.get('preco', '0')
-        categoria = request.form.get('categoria', '').strip()
-        subcategoria = request.form.get('subcategoria') or None
-        tipo = request.form.get('tipo') or None
-        subcategoria_id = request.form.get('subcategoria_id')
-        tamanhos = request.form.getlist('tamanhos')
-        ativo = request.form.get('ativo') == 'on'
-        destaque = request.form.get('destaque') == 'on'
-        ordem_str = request.form.get('ordem', '0')
+        # Validar e obter dados do formulário
+        dados, erro = validate_and_get_product_data(request.form, is_edit=True, produto_id=produto_id)
 
-        # VALIDAÇÃO DE CAMPOS OBRIGATÓRIOS
-        if not nome:
-            flash('Nome do produto é obrigatório', 'danger')
-            return redirect(url_for('admin.produto_editar', produto_id=produto_id))
+        if erro:
+            mensagem, redirect_url = erro
+            flash(mensagem, 'danger')
+            return redirect(redirect_url)
 
-        if not categoria:
-            flash('Categoria é obrigatória', 'danger')
-            return redirect(url_for('admin.produto_editar', produto_id=produto_id))
-
-        # VALIDAÇÃO DE PREÇO
-        try:
-            preco = float(preco_str)
-            if preco < 0:
-                flash('Preço não pode ser negativo', 'danger')
-                return redirect(url_for('admin.produto_editar', produto_id=produto_id))
-        except (ValueError, TypeError):
-            flash('Preço inválido. Use apenas números (ex: 49.90)', 'danger')
-            return redirect(url_for('admin.produto_editar', produto_id=produto_id))
-
-        # VALIDAÇÃO DE ORDEM
-        try:
-            ordem = int(ordem_str)
-        except (ValueError, TypeError):
-            ordem = 0
+        # Processar upload de imagens (manter antigas se não enviou novas)
+        imagem_filename, imagens_adicionais_list = process_product_images(
+            request.files,
+            old_imagem=produto.imagem,
+            old_imagens_adicionais=produto.imagens_adicionais
+        )
 
         # Atualizar dados do produto
-        produto.nome = nome
-        produto.descricao = descricao
-        produto.preco = preco
-        produto.categoria = categoria
-        produto.subcategoria = subcategoria
-        produto.tipo = tipo
-        produto.subcategoria_id = int(subcategoria_id) if subcategoria_id else None
-        produto.tamanhos = json.dumps(tamanhos)
-        produto.ativo = ativo
-        produto.destaque = destaque
-        produto.ordem = ordem
+        for key, value in dados.items():
+            setattr(produto, key, value)
 
-        # Upload de nova imagem principal (opcional)
-        imagem_file = request.files.get('imagem')
-        if imagem_file and imagem_file.filename:
-            # Deletar imagem antiga se existir
-            if produto.imagem:
-                old_image_path = Config.UPLOAD_FOLDER / produto.imagem
-                if old_image_path.exists():
-                    old_image_path.unlink()
+        produto.imagem = imagem_filename
 
-            # Salvar nova imagem
-            produto.imagem = save_product_image(imagem_file)
-
-        # Upload de novas imagens adicionais (galeria) - opcional
-        imagens_adicionais_files = request.files.getlist('imagens_adicionais')
-        if imagens_adicionais_files and any(f.filename for f in imagens_adicionais_files):
-            # Deletar imagens adicionais antigas se existir
-            if produto.imagens_adicionais:
-                try:
-                    old_images = json.loads(produto.imagens_adicionais)
-                    for old_img in old_images:
-                        old_img_path = Config.UPLOAD_FOLDER / old_img
-                        if old_img_path.exists():
-                            old_img_path.unlink()
-                except (json.JSONDecodeError, TypeError, OSError):
-                    pass
-
-            # Salvar novas imagens
-            imagens_adicionais_list = []
-            for img_file in imagens_adicionais_files:
-                if img_file and img_file.filename:
-                    filename = save_product_image(img_file)
-                    if filename:
-                        imagens_adicionais_list.append(filename)
-
-            if imagens_adicionais_list:
-                produto.set_imagens_adicionais(imagens_adicionais_list)
-            else:
-                produto.imagens_adicionais = None
+        # Atualizar imagens adicionais
+        if imagens_adicionais_list:
+            produto.set_imagens_adicionais(imagens_adicionais_list)
+        else:
+            produto.imagens_adicionais = None
 
         db.session.commit()
 
