@@ -32,3 +32,4 @@ app/static/uploads/*
 
 # Logs
 *.log
+logs/

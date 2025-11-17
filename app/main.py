@@ -4,13 +4,16 @@ from config import Config
 from database import db
 from admin_routes import admin_bp
 import uuid
+import logging
+from logging.handlers import RotatingFileHandler
+import os
 
 # Diretório base
 BASE_DIR = Path(__file__).resolve().parent
 
 # Criar aplicação Flask
 app = Flask(
-    __name__, 
+    __name__,
     template_folder=str(BASE_DIR / "templates"),
     static_folder=str(BASE_DIR / "static")
 )
@@ -18,6 +21,27 @@ app = Flask(
 # Carregar configurações
 app.config.from_object(Config)
 Config.init_app(app)
+
+# Configurar logging
+if not app.debug:
+    # Criar pasta de logs se não existir
+    logs_dir = BASE_DIR.parent / 'logs'
+    logs_dir.mkdir(exist_ok=True)
+
+    # Configurar handler de arquivo com rotação
+    file_handler = RotatingFileHandler(
+        logs_dir / 'xodo_da_preta.log',
+        maxBytes=10240000,  # 10MB
+        backupCount=10
+    )
+    file_handler.setFormatter(logging.Formatter(
+        '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'
+    ))
+    file_handler.setLevel(logging.INFO)
+    app.logger.addHandler(file_handler)
+
+    app.logger.setLevel(logging.INFO)
+    app.logger.info('Xodó da Preta startup')
 
 # Inicializar banco de dados
 db.init_app(app)
@@ -219,8 +243,19 @@ def adicionar_ao_carrinho():
         quantidade = data.get('quantidade', 1)
         tamanho = data.get('tamanho')
 
+        # Validação de entrada
         if not produto_id:
             return jsonify({'success': False, 'message': 'Produto não especificado'}), 400
+
+        # Validação de quantidade
+        if not isinstance(quantidade, int):
+            try:
+                quantidade = int(quantidade)
+            except (ValueError, TypeError):
+                return jsonify({'success': False, 'message': 'Quantidade inválida'}), 400
+
+        if quantidade < 1 or quantidade > 100:
+            return jsonify({'success': False, 'message': 'Quantidade deve estar entre 1 e 100'}), 400
 
         # Verificar se o produto existe
         produto = Produto.query.get(produto_id)
@@ -404,7 +439,7 @@ def validar_cupom():
         })
 
     except Exception as e:
-        print(f"Erro ao validar cupom: {e}")
+        app.logger.error(f"Erro ao validar cupom: {e}", exc_info=True)
         return jsonify({'success': False, 'message': 'Erro ao validar cupom'}), 500
 
 # ========================================

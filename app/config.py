@@ -5,17 +5,24 @@ from dotenv import load_dotenv
 # Carregar variáveis de ambiente
 load_dotenv()
 
-# Diretório base do projeto
+# Diretório base do projeto (pasta app/)
 BASE_DIR = Path(__file__).resolve().parent
+# Diretório raiz do projeto (pasta acima de app/)
+PROJECT_ROOT = BASE_DIR.parent
 
 class Config:
     """Configurações da aplicação Flask"""
-    
-    # Chave secreta (vem do .env)
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-key-change-in-production'
-    
-    # Banco de dados SQLite
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + str(BASE_DIR / 'loja.db')
+
+    # Chave secreta (vem do .env) - OBRIGATÓRIO em produção
+    SECRET_KEY = os.environ.get('SECRET_KEY')
+    if not SECRET_KEY:
+        raise RuntimeError(
+            "SECRET_KEY não definida no arquivo .env\n"
+            "Gere uma chave com: python -c \"import secrets; print(secrets.token_hex(32))\""
+        )
+
+    # Banco de dados SQLite (agora em instance/)
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + str(PROJECT_ROOT / 'instance' / 'loja.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # Upload de imagens
@@ -23,9 +30,15 @@ class Config:
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB máximo
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
     
-    # Configurações do admin (vem do .env)
-    ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME') or 'admin'
-    ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD') or 'change-me'
+    # Configurações do admin (vem do .env) - OBRIGATÓRIO
+    ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME')
+    ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD')
+
+    if not ADMIN_USERNAME or not ADMIN_PASSWORD:
+        raise RuntimeError(
+            "ADMIN_USERNAME e ADMIN_PASSWORD devem estar definidos no arquivo .env\n"
+            "Use uma senha forte com letras, números e símbolos"
+        )
     
     # Paginação
     PRODUCTS_PER_PAGE = 9
@@ -51,7 +64,7 @@ class Config:
         # Criar pasta de uploads se não existir
         upload_folder = Config.UPLOAD_FOLDER
         upload_folder.mkdir(parents=True, exist_ok=True)
-        
-        # Criar pasta instance se não existir
-        instance_folder = BASE_DIR / 'instance'
+
+        # Criar pasta instance se não existir (para banco de dados)
+        instance_folder = PROJECT_ROOT / 'instance'
         instance_folder.mkdir(exist_ok=True)

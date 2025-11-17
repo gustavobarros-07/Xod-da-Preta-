@@ -10,8 +10,8 @@ class Subcategoria(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(50), nullable=False)
-    categoria = db.Column(db.String(50), nullable=False)  # Categoria pai
-    parent_id = db.Column(db.Integer, db.ForeignKey('subcategorias.id'), nullable=True)  # Subcategoria pai (para hierarquia)
+    categoria = db.Column(db.String(50), nullable=False, index=True)  # Categoria pai (com índice)
+    parent_id = db.Column(db.Integer, db.ForeignKey('subcategorias.id', ondelete='CASCADE'), nullable=True)  # Subcategoria pai (para hierarquia)
     ativo = db.Column(db.Boolean, default=True)
     ordem = db.Column(db.Integer, default=0)  # Para ordenação
     data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
@@ -43,13 +43,13 @@ class Produto(db.Model):
     __tablename__ = 'produtos'
 
     id = db.Column(db.Integer, primary_key=True)
-    nome = db.Column(db.String(100), nullable=False)
+    nome = db.Column(db.String(100), nullable=False, index=True)  # Índice para buscas
     descricao = db.Column(db.Text, nullable=True)
     preco = db.Column(db.Float, nullable=False)
-    categoria = db.Column(db.String(50), nullable=False)  # Nível 1: Brincos, Roupas, Colares, etc.
+    categoria = db.Column(db.String(50), nullable=False, index=True)  # Nível 1: Brincos, Roupas, Colares, etc. (com índice)
     subcategoria = db.Column(db.String(50), nullable=True)  # Nível 2: Feminino, Masculino (para Roupas)
     tipo = db.Column(db.String(50), nullable=True)  # Nível 3: Vestido, Camisa, Saia, etc.
-    subcategoria_id = db.Column(db.Integer, db.ForeignKey('subcategorias.id'), nullable=True)  # Legado - manter por compatibilidade
+    subcategoria_id = db.Column(db.Integer, db.ForeignKey('subcategorias.id', ondelete='SET NULL'), nullable=True, index=True)  # Legado - com índice
     tamanhos = db.Column(db.String(200), nullable=True)  # JSON string: ["P", "M", "G"]
     imagem = db.Column(db.String(200), nullable=True)  # Nome do arquivo (imagem principal)
     imagens_adicionais = db.Column(db.Text, nullable=True)  # JSON string: ["img1.jpg", "img2.jpg", "img3.jpg"]
@@ -161,8 +161,8 @@ class ItemCarrinho(db.Model):
     __tablename__ = 'itens_carrinho'
 
     id = db.Column(db.Integer, primary_key=True)
-    session_id = db.Column(db.String(100), nullable=False)  # ID da sessão do usuário
-    produto_id = db.Column(db.Integer, db.ForeignKey('produtos.id'), nullable=False)
+    session_id = db.Column(db.String(100), nullable=False, index=True)  # ID da sessão do usuário (com índice)
+    produto_id = db.Column(db.Integer, db.ForeignKey('produtos.id', ondelete='CASCADE'), nullable=False, index=True)  # CASCADE quando produto é deletado
     quantidade = db.Column(db.Integer, default=1)
     tamanho = db.Column(db.String(10), nullable=True)  # Tamanho selecionado (se aplicável)
     data_adicao = db.Column(db.DateTime, default=datetime.utcnow)
@@ -192,11 +192,16 @@ class ProdutoVisualizacao(db.Model):
     __tablename__ = 'produto_visualizacoes'
 
     id = db.Column(db.Integer, primary_key=True)
-    produto_id = db.Column(db.Integer, db.ForeignKey('produtos.id'), nullable=False)
-    data_visualizacao = db.Column(db.DateTime, default=datetime.utcnow)
+    produto_id = db.Column(db.Integer, db.ForeignKey('produtos.id', ondelete='CASCADE'), nullable=False, index=True)  # CASCADE quando produto é deletado
+    data_visualizacao = db.Column(db.DateTime, default=datetime.utcnow, index=True)  # Índice para queries por data
 
     # Relacionamento
     produto = db.relationship('Produto', backref='visualizacoes_registro')
+
+    # Índice composto para queries frequentes (produto + data)
+    __table_args__ = (
+        db.Index('idx_produto_data', 'produto_id', 'data_visualizacao'),
+    )
 
     def __repr__(self):
         return f'<ProdutoVisualizacao produto_id={self.produto_id} em {self.data_visualizacao}>'
@@ -207,7 +212,7 @@ class Cupom(db.Model):
     __tablename__ = 'cupons'
 
     id = db.Column(db.Integer, primary_key=True)
-    codigo = db.Column(db.String(50), unique=True, nullable=False)  # Ex: PRIMEIRACOMPRA10
+    codigo = db.Column(db.String(50), unique=True, nullable=False, index=True)  # Ex: PRIMEIRACOMPRA10 (com índice para buscas rápidas)
     descricao = db.Column(db.String(200), nullable=True)  # Descrição do cupom
 
     # Tipo de desconto
