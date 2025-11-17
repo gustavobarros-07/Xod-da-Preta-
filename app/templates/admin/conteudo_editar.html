@@ -181,6 +181,8 @@
         <div class="card shadow-sm">
             <div class="card-body">
                 <form method="POST" action="{{ url_for('admin.conteudo_salvar', pagina=pagina) }}" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
 
                     {% for campo in estrutura %}
                     <div class="mb-4 pb-3 border-bottom">

@@ -210,6 +210,8 @@
         <!-- Formulário -->
         <div class="form-container">
             <form method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
                 <div class="row">
                     <!-- Nome -->
                     <div class="col-md-6 mb-3">

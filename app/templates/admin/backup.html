@@ -219,6 +219,8 @@
         <div class="admin-header">
             <h1><i class="fas fa-hdd"></i> Sistema de Backup</h1>
             <form method="POST" action="{{ url_for('admin.backup_criar') }}" style="display: inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
                 <button type="submit" class="btn btn-create-backup">
                     <i class="fas fa-plus"></i> Criar Novo Backup
                 </button>
@@ -316,6 +318,8 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <form id="deleteForm" method="POST" style="display: inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
                         <button type="submit" class="btn btn-danger">
                             <i class="fas fa-trash"></i> Deletar
                         </button>
