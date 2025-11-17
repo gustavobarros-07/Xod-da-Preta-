@@ -64,14 +64,31 @@ def inject_configuracoes():
     """Injeta configurações da loja em todos os templates"""
     from models import Configuracao
 
+    # Buscar todas as configurações de uma vez (mais eficiente)
+    loja_nome = Configuracao.get_valor('loja_nome', 'Xodó da Preta')
+    loja_telefone = Configuracao.get_valor('loja_telefone', '55 11 95437-5056')
+    loja_email = Configuracao.get_valor('loja_email', '')
+    loja_instagram = Configuracao.get_valor('loja_instagram', '@xododapreta')
+    loja_facebook = Configuracao.get_valor('loja_facebook', '')
+    loja_endereco = Configuracao.get_valor('loja_endereco', 'São Paulo, SP')
+    topbar_ativo = Configuracao.get_valor('topbar_ativo', '1') == '1'
+
     return {
-        'config_loja_nome': Configuracao.get_valor('loja_nome', 'Xodó da Preta'),
-        'config_loja_telefone': Configuracao.get_valor('loja_telefone', '55 11 95437-5056'),
-        'config_loja_email': Configuracao.get_valor('loja_email', ''),
-        'config_loja_instagram': Configuracao.get_valor('loja_instagram', '@xododapreta'),
-        'config_loja_facebook': Configuracao.get_valor('loja_facebook', ''),
-        'config_loja_endereco': Configuracao.get_valor('loja_endereco', 'São Paulo, SP'),
-        'config_topbar_ativo': Configuracao.get_valor('topbar_ativo', '1') == '1',
+        # Configurações com prefixo config_ (mantido para compatibilidade)
+        'config_loja_nome': loja_nome,
+        'config_loja_telefone': loja_telefone,
+        'config_loja_email': loja_email,
+        'config_loja_instagram': loja_instagram,
+        'config_loja_facebook': loja_facebook,
+        'config_loja_endereco': loja_endereco,
+        'config_topbar_ativo': topbar_ativo,
+        # Configurações sem prefixo (para uso mais simples)
+        'loja_nome': loja_nome,
+        'loja_telefone': loja_telefone,
+        'loja_email': loja_email,
+        'loja_instagram': loja_instagram,
+        'loja_facebook': loja_facebook,
+        'loja_endereco': loja_endereco,
     }
 
 # ========================================
@@ -491,22 +508,6 @@ def from_json_filter(value):
         return []
 
 # ========================================
-# CONTEXTO GLOBAL (disponível em todos os templates)
-# ========================================
-
-@app.context_processor
-def inject_global_vars():
-    """Injeta variáveis globais em todos os templates"""
-    from models import Configuracao
-    
-    return {
-        'loja_nome': Configuracao.get_valor('loja_nome', 'Xodó da Preta'),
-        'loja_telefone': Configuracao.get_valor('loja_telefone', '55 11 954375056'),
-        'loja_email': Configuracao.get_valor('loja_email', 'contato@xododapreta.com'),
-        'loja_instagram': Configuracao.get_valor('loja_instagram', '@xododapreta'),
-    }
-
-# ========================================
 # ROTA DE CSS DINÂMICO (CORES PERSONALIZÁVEIS)
 # ========================================
 
@@ -605,6 +606,29 @@ def custom_colors_css():
 """
 
     return Response(css_content, mimetype='text/css')
+
+# ========================================
+# ERROR HANDLERS
+# ========================================
+
+@app.errorhandler(404)
+def not_found_error(_):
+    """Página de erro 404 - Página não encontrada"""
+    app.logger.warning(f'Página não encontrada: {request.url}')
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def internal_error(e):
+    """Página de erro 500 - Erro interno do servidor"""
+    db.session.rollback()  # Rollback em caso de erro de banco
+    app.logger.error(f'Erro interno do servidor: {e}', exc_info=True)
+    return render_template('500.html'), 500
+
+@app.errorhandler(403)
+def forbidden_error(_):
+    """Página de erro 403 - Acesso negado"""
+    app.logger.warning(f'Acesso negado: {request.url}')
+    return render_template('403.html'), 403
 
 # ========================================
 # EXECUTAR APLICAÇÃO

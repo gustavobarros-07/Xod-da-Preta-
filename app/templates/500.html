@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Erro Interno - Xodó da Preta{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="error-page">
+                <h1 class="display-1" style="color: var(--cor-erro); font-weight: 700;">500</h1>
+                <h2 class="mb-4">Erro Interno do Servidor</h2>
+                <p class="lead text-muted mb-5">
+                    Desculpe, algo deu errado em nosso servidor.<br>
+                    Já fomos notificados e estamos trabalhando para corrigir.
+                </p>
+
+                <div class="mb-5">
+                    <i class="fas fa-tools" style="font-size: 100px; color: var(--cor-bege);"></i>
+                </div>
+
+                <div class="d-flex gap-3 justify-content-center flex-wrap">
+                    <a href="{{ url_for('home') }}" class="btn btn-success btn-lg">
+                        <i class="fas fa-home"></i> Voltar para Home
+                    </a>
+                    <button onclick="history.back()" class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </button>
+                </div>
+
+                <div class="mt-5">
+                    <p class="text-muted small">
+                        Se o problema persistir, entre em contato conosco pelo WhatsApp.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.error-page {
+    padding: 60px 20px;
+}
+
+.error-page h1 {
+    font-size: 120px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 768px) {
+    .error-page h1 {
+        font-size: 80px;
+    }
+}
+</style>
+{% endblock %}

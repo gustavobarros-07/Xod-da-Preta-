@@ -3,7 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Xodó da Preta{% endblock %}</title>
+    <title>{% block title %}Xodó da Preta - Moda Afro Autoral{% endblock %}</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="{% block description %}Xodó da Preta - Moda afro autoral, peças exclusivas que celebram a cultura e beleza negra. Roupas, acessórios e muito mais.{% endblock %}">
+    <meta name="keywords" content="moda afro, roupas afro, acessórios afro, cultura negra, moda autoral, {{ loja_nome }}">
+    <meta name="author" content="{{ loja_nome }}">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:title" content="{% block og_title %}{{ self.title() }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{{ self.description() }}{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}{{ url_for('static', filename='zay/assets/img/feature_prod_01.jpg', _external=True) }}{% endblock %}">
+    <meta property="og:site_name" content="{{ loja_nome }}">
+    <meta property="og:locale" content="pt_BR">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ request.url }}">
+    <meta property="twitter:title" content="{% block twitter_title %}{{ self.title() }}{% endblock %}">
+    <meta property="twitter:description" content="{% block twitter_description %}{{ self.description() }}{% endblock %}">
+    <meta property="twitter:image" content="{% block twitter_image %}{{ self.og_image() }}{% endblock %}">
 
     <!-- Ícones removidos até termos os personalizados da marca -->
 
