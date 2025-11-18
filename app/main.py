@@ -11,6 +11,7 @@ from flask_wtf.csrf import CSRFProtect
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_migrate import Migrate
+from flask_caching import Cache
 
 # Diretório base
 BASE_DIR = Path(__file__).resolve().parent
@@ -64,6 +65,12 @@ limiter = Limiter(
     storage_uri="memory://"
 )
 
+# Inicializar Cache
+cache = Cache(app, config={
+    'CACHE_TYPE': 'SimpleCache',  # Cache em memória
+    'CACHE_DEFAULT_TIMEOUT': 300  # 5 minutos
+})
+
 # Importar modelos para que o Flask-Migrate os reconheça
 with app.app_context():
     from models import Produto, Admin, Configuracao, Subcategoria, ConteudoPagina
@@ -79,36 +86,42 @@ app.register_blueprint(admin_bp)
 # CONTEXT PROCESSOR - Configurações globais
 # ========================================
 
+@cache.memoize(timeout=600)  # Cache por 10 minutos
+def get_configuracoes():
+    """Obtém configurações com cache"""
+    from models import Configuracao
+
+    return {
+        'loja_nome': Configuracao.get_valor('loja_nome', 'Xodó da Preta'),
+        'loja_telefone': Configuracao.get_valor('loja_telefone', '55 11 95437-5056'),
+        'loja_email': Configuracao.get_valor('loja_email', ''),
+        'loja_instagram': Configuracao.get_valor('loja_instagram', '@xododapreta'),
+        'loja_facebook': Configuracao.get_valor('loja_facebook', ''),
+        'loja_endereco': Configuracao.get_valor('loja_endereco', 'São Paulo, SP'),
+        'topbar_ativo': Configuracao.get_valor('topbar_ativo', '1') == '1'
+    }
+
 @app.context_processor
 def inject_configuracoes():
     """Injeta configurações da loja em todos os templates"""
-    from models import Configuracao
-
-    # Buscar todas as configurações de uma vez (mais eficiente)
-    loja_nome = Configuracao.get_valor('loja_nome', 'Xodó da Preta')
-    loja_telefone = Configuracao.get_valor('loja_telefone', '55 11 95437-5056')
-    loja_email = Configuracao.get_valor('loja_email', '')
-    loja_instagram = Configuracao.get_valor('loja_instagram', '@xododapreta')
-    loja_facebook = Configuracao.get_valor('loja_facebook', '')
-    loja_endereco = Configuracao.get_valor('loja_endereco', 'São Paulo, SP')
-    topbar_ativo = Configuracao.get_valor('topbar_ativo', '1') == '1'
+    configs = get_configuracoes()
 
     return {
         # Configurações com prefixo config_ (mantido para compatibilidade)
-        'config_loja_nome': loja_nome,
-        'config_loja_telefone': loja_telefone,
-        'config_loja_email': loja_email,
-        'config_loja_instagram': loja_instagram,
-        'config_loja_facebook': loja_facebook,
-        'config_loja_endereco': loja_endereco,
-        'config_topbar_ativo': topbar_ativo,
+        'config_loja_nome': configs['loja_nome'],
+        'config_loja_telefone': configs['loja_telefone'],
+        'config_loja_email': configs['loja_email'],
+        'config_loja_instagram': configs['loja_instagram'],
+        'config_loja_facebook': configs['loja_facebook'],
+        'config_loja_endereco': configs['loja_endereco'],
+        'config_topbar_ativo': configs['topbar_ativo'],
         # Configurações sem prefixo (para uso mais simples)
-        'loja_nome': loja_nome,
-        'loja_telefone': loja_telefone,
-        'loja_email': loja_email,
-        'loja_instagram': loja_instagram,
-        'loja_facebook': loja_facebook,
-        'loja_endereco': loja_endereco,
+        'loja_nome': configs['loja_nome'],
+        'loja_telefone': configs['loja_telefone'],
+        'loja_email': configs['loja_email'],
+        'loja_instagram': configs['loja_instagram'],
+        'loja_facebook': configs['loja_facebook'],
+        'loja_endereco': configs['loja_endereco'],
     }
 
 # ========================================
