@@ -226,6 +226,7 @@ document.querySelectorAll('.quantity-input').forEach(input => {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
             },
             body: JSON.stringify({ quantidade: quantidade })
         })
@@ -272,7 +273,10 @@ document.querySelectorAll('.btn-remove').forEach(btn => {
         const itemId = this.dataset.itemId;
 
         fetch(`/api/carrinho/remover/${itemId}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token() }}'
+            }
         })
         .then(response => response.json())
         .then(data => {

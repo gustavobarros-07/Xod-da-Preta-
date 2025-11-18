@@ -592,6 +592,7 @@ function addToCart() {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token() }}'
         },
         body: JSON.stringify({
             produto_id: {{ produto.id }},
