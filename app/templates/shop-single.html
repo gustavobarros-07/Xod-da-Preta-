@@ -413,7 +413,8 @@
                     <img src="{{ url_for('static', filename='uploads/' + imagem) }}"
                          alt="{{ produto.nome }}"
                          class="thumbnail {% if loop.first %}active{% endif %}"
-                         onclick="changeImage(this.src)">
+                         onclick="changeImage(this.src)"
+                         loading="lazy">
                     {% endfor %}
                 </div>
                 {% endif %}
@@ -506,8 +507,9 @@
                 <div class="related-card">
                     <a href="{{ url_for('shop_single', produto_id=related.id) }}">
                         {% if related.imagem %}
-                            <img src="{{ url_for('static', filename='uploads/' + related.imagem) }}" 
-                                 alt="{{ related.nome }}">
+                            <img src="{{ url_for('static', filename='uploads/' + related.imagem) }}"
+                                 alt="{{ related.nome }}"
+                                 loading="lazy">
                         {% else %}
                             <div class="no-image" style="height: 250px;">
                                 <i class="fas fa-image fa-3x text-muted"></i>

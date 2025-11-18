@@ -27,6 +27,10 @@
     <meta property="twitter:description" content="{% block twitter_description %}{{ self.description() }}{% endblock %}">
     <meta property="twitter:image" content="{% block twitter_image %}{{ self.og_image() }}{% endblock %}">
 
+    <!-- Additional SEO Tags -->
+    <meta name="theme-color" content="#000000">
+    <link rel="canonical" href="{{ request.url }}">
+
     <!-- Ícones removidos até termos os personalizados da marca -->
 
     <!-- CSS principal -->
@@ -44,69 +48,8 @@
     <!-- Google Fonts -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;200;300;400;500;700;900&display=swap">
 
-    <style>
-        /* Header Sticky - Fixo ao scrollar */
-        #templatemo_main_nav_container {
-            position: sticky;
-            top: 0;
-            z-index: 1030;
-            background: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        #templatemo_main_nav_container.scrolled {
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-        }
-
-        /* Garantir que body tenha espaço para o header fixo */
-        body {
-            padding-top: 0;
-        }
-
-        /* Mobile - Ícones fixos no topo */
-        @media (max-width: 991px) {
-            /* Ícones do carrinho e busca sempre visíveis no mobile */
-            .mobile-nav-icons {
-                position: fixed;
-                top: 10px;
-                right: 10px;
-                z-index: 1040;
-                display: flex;
-                gap: 15px;
-                background: white;
-                padding: 8px 12px;
-                border-radius: 25px;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
-            }
-
-            .mobile-nav-icons a {
-                font-size: 20px;
-            }
-
-            .mobile-nav-icons .badge {
-                font-size: 10px;
-                padding: 2px 5px;
-            }
-
-            /* Esconder os ícones do navbar padrão no mobile */
-            #templatemo_main_nav .navbar-align-self-center {
-                display: none !important;
-            }
-
-            /* Ajustar espaço do navbar toggler */
-            .navbar-toggler {
-                margin-right: 80px;
-            }
-        }
-
-        /* Desktop - esconder ícones fixos */
-        @media (min-width: 992px) {
-            .mobile-nav-icons {
-                display: none !important;
-            }
-        }
-    </style>
+    <!-- Base Layout CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base-layout.css') }}">
 
     {% block extra_css %}{% endblock %}
 </head>
@@ -199,42 +142,8 @@
     <script src="{{ url_for('static', filename='zay/assets/js/templatemo.js') }}"></script>
     <script src="{{ url_for('static', filename='zay/assets/js/custom.js') }}"></script>
 
-    <!-- Script do Carrinho -->
-    <script>
-        // Atualizar badge do carrinho ao carregar a página
-        function atualizarBadgeCarrinho() {
-            fetch('/api/carrinho/total')
-                .then(response => response.json())
-                .then(data => {
-                    const badgeDesktop = document.getElementById('cart-badge');
-                    const badgeMobile = document.getElementById('cart-badge-mobile');
-                    const total = data.total_itens || '0';
-
-                    if (badgeDesktop) {
-                        badgeDesktop.textContent = total;
-                    }
-                    if (badgeMobile) {
-                        badgeMobile.textContent = total;
-                    }
-                })
-                .catch(error => console.error('Erro ao atualizar badge do carrinho:', error));
-        }
-
-        // Atualizar ao carregar a página
-        document.addEventListener('DOMContentLoaded', atualizarBadgeCarrinho);
-
-        // Header Sticky - Adicionar classe ao scrollar
-        window.addEventListener('scroll', function() {
-            const header = document.getElementById('templatemo_main_nav_container');
-            if (header) {
-                if (window.scrollY > 50) {
-                    header.classList.add('scrolled');
-                } else {
-                    header.classList.remove('scrolled');
-                }
-            }
-        });
-    </script>
+    <!-- Base Main JavaScript -->
+    <script src="{{ url_for('static', filename='js/base-main.js') }}"></script>
 
     {% block extra_js %}{% endblock %}
     <!-- End Script -->

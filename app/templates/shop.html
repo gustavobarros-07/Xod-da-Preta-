@@ -1056,8 +1056,9 @@
                 <div class="product-card">
                     <div class="product-image">
                         {% if produto.imagem %}
-                            <img src="{{ url_for('static', filename='uploads/' + produto.imagem) }}" 
-                                 alt="{{ produto.nome }}">
+                            <img src="{{ url_for('static', filename='uploads/' + produto.imagem) }}"
+                                 alt="{{ produto.nome }}"
+                                 loading="lazy">
                         {% else %}
                             <div class="w-100 h-100 bg-light d-flex align-items-center justify-content-center">
                                 <i class="fas fa-image fa-3x text-muted"></i>

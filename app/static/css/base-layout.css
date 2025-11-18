@@ -1,0 +1,65 @@
+/* ============================================
+   BASE LAYOUT - CSS extraído do template base
+   ============================================ */
+
+/* Header Sticky - Fixo ao scrollar */
+#templatemo_main_nav_container {
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+#templatemo_main_nav_container.scrolled {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Garantir que body tenha espaço para o header fixo */
+body {
+    padding-top: 0;
+}
+
+/* Mobile - Ícones fixos no topo */
+@media (max-width: 991px) {
+    /* Ícones do carrinho e busca sempre visíveis no mobile */
+    .mobile-nav-icons {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: 1040;
+        display: flex;
+        gap: 15px;
+        background: white;
+        padding: 8px 12px;
+        border-radius: 25px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .mobile-nav-icons a {
+        font-size: 20px;
+    }
+
+    .mobile-nav-icons .badge {
+        font-size: 10px;
+        padding: 2px 5px;
+    }
+
+    /* Esconder os ícones do navbar padrão no mobile */
+    #templatemo_main_nav .navbar-align-self-center {
+        display: none !important;
+    }
+
+    /* Ajustar espaço do navbar toggler */
+    .navbar-toggler {
+        margin-right: 80px;
+    }
+}
+
+/* Desktop - esconder ícones fixos */
+@media (min-width: 992px) {
+    .mobile-nav-icons {
+        display: none !important;
+    }
+}

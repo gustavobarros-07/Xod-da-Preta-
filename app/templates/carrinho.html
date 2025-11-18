@@ -99,11 +99,13 @@
                         {% if item.produto.imagem %}
                         <img src="{{ url_for('static', filename='uploads/' + item.produto.imagem) }}"
                              class="cart-item-image"
-                             alt="{{ item.produto.nome }}">
+                             alt="{{ item.produto.nome }}"
+                             loading="lazy">
                         {% else %}
                         <img src="{{ url_for('static', filename='zay/assets/img/feature_prod_01.jpg') }}"
                              class="cart-item-image"
-                             alt="{{ item.produto.nome }}">
+                             alt="{{ item.produto.nome }}"
+                             loading="lazy">
                         {% endif %}
                     </div>
 
