@@ -247,32 +247,32 @@ def dashboard():
     """Dashboard principal do admin com métricas avançadas"""
     from models import ProdutoVisualizacao
 
-    # ===== ESTATÍSTICAS BÁSICAS =====
-    total_produtos = Produto.query.count()
-    produtos_ativos = Produto.query.filter_by(ativo=True).count()
-    produtos_inativos = Produto.query.filter_by(ativo=False).count()
-    produtos_sem_imagem = Produto.query.filter(
+    # ===== ESTATÍSTICAS BÁSICAS ===== (apenas produtos não deletados)
+    total_produtos = Produto.query_active().count()
+    produtos_ativos = Produto.query_active().filter_by(ativo=True).count()
+    produtos_inativos = Produto.query_active().filter_by(ativo=False).count()
+    produtos_sem_imagem = Produto.query_active().filter(
         (Produto.imagem == None) | (Produto.imagem == '')
     ).count()
-    produtos_destaque = Produto.query.filter_by(destaque=True).count()
+    produtos_destaque = Produto.query_active().filter_by(destaque=True).count()
 
-    # ===== ANÁLISE DE PREÇOS =====
-    produto_mais_caro = Produto.query.order_by(Produto.preco.desc()).first()
-    produto_mais_barato = Produto.query.filter(Produto.preco > 0).order_by(Produto.preco.asc()).first()
-    preco_medio = db.session.query(db.func.avg(Produto.preco)).scalar() or 0
+    # ===== ANÁLISE DE PREÇOS ===== (apenas produtos não deletados)
+    produto_mais_caro = Produto.query_active().order_by(Produto.preco.desc()).first()
+    produto_mais_barato = Produto.query_active().filter(Produto.preco > 0).order_by(Produto.preco.asc()).first()
+    preco_medio = db.session.query(db.func.avg(Produto.preco)).filter(Produto.deleted_at.is_(None)).scalar() or 0
 
-    # ===== PRODUTOS POR CATEGORIA (para gráfico de pizza) =====
+    # ===== PRODUTOS POR CATEGORIA (para gráfico de pizza) ===== (apenas não deletados)
     categorias_stats = db.session.query(
         Produto.categoria,
         db.func.count(Produto.id).label('total')
-    ).group_by(Produto.categoria).all()
+    ).filter(Produto.deleted_at.is_(None)).group_by(Produto.categoria).all()
 
     # Formatar para Chart.js
     categorias_labels = [cat for cat, _ in categorias_stats]
     categorias_valores = [total for _, total in categorias_stats]
 
-    # ===== PRODUTOS MAIS VISUALIZADOS (Top 10) =====
-    produtos_mais_vistos = Produto.query.filter(
+    # ===== PRODUTOS MAIS VISUALIZADOS (Top 10) ===== (apenas não deletados)
+    produtos_mais_vistos = Produto.query_active().filter(
         Produto.visualizacoes > 0
     ).order_by(Produto.visualizacoes.desc()).limit(10).all()
 
@@ -289,8 +289,8 @@ def dashboard():
     visualizacoes_labels = [dia.strftime('%d/%m') if hasattr(dia, 'strftime') else str(dia) for dia, _ in visualizacoes_por_dia]
     visualizacoes_valores = [total for _, total in visualizacoes_por_dia]
 
-    # ===== ÚLTIMOS PRODUTOS ADICIONADOS =====
-    ultimos_produtos = Produto.query.order_by(Produto.data_criacao.desc()).limit(5).all()
+    # ===== ÚLTIMOS PRODUTOS ADICIONADOS ===== (apenas não deletados)
+    ultimos_produtos = Produto.query_active().order_by(Produto.data_criacao.desc()).limit(5).all()
 
     # ===== TOTAL DE VISUALIZAÇÕES (últimos 30 dias) =====
     total_visualizacoes = db.session.query(
@@ -318,12 +318,12 @@ def dashboard():
             # Para percentuais, usar preço médio como base de cálculo
             total_descontos_valor += (preco_medio * (cupom.valor_desconto / 100)) * cupom.quantidade_usada
 
-    # ===== RANKING DE CATEGORIAS (por média de visualizações) =====
+    # ===== RANKING DE CATEGORIAS (por média de visualizações) ===== (apenas não deletados)
     categorias_ranking_raw = db.session.query(
         Produto.categoria,
         db.func.count(Produto.id).label('total'),
         db.func.sum(Produto.visualizacoes).label('views_total')
-    ).group_by(Produto.categoria).all()
+    ).filter(Produto.deleted_at.is_(None)).group_by(Produto.categoria).all()
 
     # Converter Row objects para listas e calcular média
     categorias_ranking = []
@@ -371,7 +371,7 @@ def dashboard():
 @admin_bp.route('/produtos')
 @login_required
 def produtos():
-    """Lista todos os produtos"""
+    """Lista todos os produtos (incluindo deletados para visualização no admin)"""
     produtos = Produto.query.order_by(Produto.ordem, Produto.id.desc()).all()
     return render_template('admin/produtos.html', produtos=produtos)
 
@@ -469,20 +469,14 @@ def produto_editar(produto_id):
 @admin_bp.route('/produtos/<int:produto_id>/deletar', methods=['POST'])
 @login_required
 def produto_deletar(produto_id):
-    """Deletar produto"""
+    """Deletar produto (soft delete)"""
     produto = Produto.query.get_or_404(produto_id)
     nome = produto.nome
-    
-    # Deletar imagem se existir
-    if produto.imagem:
-        image_path = Config.UPLOAD_FOLDER / produto.imagem
-        if image_path.exists():
-            image_path.unlink()
-    
-    db.session.delete(produto)
-    db.session.commit()
-    
-    flash(f'Produto "{nome}" deletado com sucesso!', 'success')
+
+    # Usar soft delete ao invés de deletar permanentemente
+    produto.soft_delete()
+
+    flash(f'Produto "{nome}" removido com sucesso!', 'success')
     return redirect(url_for('admin.produtos'))
 
 # ========================================

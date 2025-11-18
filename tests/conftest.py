@@ -24,6 +24,8 @@ def app():
     })
 
     with flask_app.app_context():
+        # Limpar todas as tabelas existentes e recriá-las
+        db.drop_all()
         db.create_all()
 
         # Criar admin de teste

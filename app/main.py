@@ -133,8 +133,8 @@ def home():
     """Página inicial"""
     from models import Produto
 
-    # Buscar produtos em destaque (máximo 4)
-    produtos_destaque = Produto.query.filter_by(
+    # Buscar produtos em destaque (máximo 4) - apenas não deletados
+    produtos_destaque = Produto.query_active().filter_by(
         ativo=True,
         destaque=True
     ).order_by(Produto.ordem).limit(4).all()
@@ -167,8 +167,8 @@ def shop():
     ordenar = request.args.get('ordenar', 'padrao')  # Ordenação
     page = request.args.get('page', 1, type=int)  # Paginação
 
-    # Query base: produtos ativos
-    query = Produto.query.filter_by(ativo=True)
+    # Query base: produtos ativos e não deletados
+    query = Produto.query_active().filter_by(ativo=True)
 
     # Aplicar filtro de categoria (Nível 1)
     if categoria_filtro:
@@ -253,8 +253,8 @@ def shop_single(produto_id):
     produto.visualizacoes += 1
     db.session.commit()
 
-    # Buscar produtos relacionados (mesma categoria)
-    produtos_relacionados = Produto.query.filter(
+    # Buscar produtos relacionados (mesma categoria) - apenas não deletados
+    produtos_relacionados = Produto.query_active().filter(
         Produto.categoria == produto.categoria,
         Produto.id != produto.id,
         Produto.ativo == True
@@ -516,8 +516,8 @@ def busca():
     if not termo:
         return render_template("busca.html", produtos=[], termo='', pagination=None)
 
-    # Buscar produtos por nome ou descrição
-    query = Produto.query.filter(
+    # Buscar produtos por nome ou descrição - apenas não deletados
+    query = Produto.query_active().filter(
         Produto.ativo == True,
         db.or_(
             Produto.nome.ilike(f'%{termo}%'),
@@ -535,6 +535,65 @@ def busca():
     produtos = pagination.items
 
     return render_template("busca.html", produtos=produtos, termo=termo, pagination=pagination)
+
+# ========================================
+# SEO - SITEMAP.XML
+# ========================================
+
+@app.route('/sitemap.xml')
+def sitemap():
+    """Gera sitemap.xml dinâmico para SEO"""
+    from flask import Response, url_for
+    from models import Produto
+    from datetime import datetime
+
+    # URLs estáticas
+    pages = []
+
+    # Páginas principais
+    static_pages = [
+        {'loc': url_for('home', _external=True), 'changefreq': 'daily', 'priority': '1.0'},
+        {'loc': url_for('shop', _external=True), 'changefreq': 'daily', 'priority': '0.9'},
+        {'loc': url_for('about', _external=True), 'changefreq': 'monthly', 'priority': '0.7'},
+        {'loc': url_for('contact', _external=True), 'changefreq': 'monthly', 'priority': '0.6'},
+    ]
+    pages.extend(static_pages)
+
+    # Páginas de produtos (apenas ativos e não deletados)
+    produtos = Produto.query_active().filter_by(ativo=True).all()
+    for produto in produtos:
+        pages.append({
+            'loc': url_for('shop_single', produto_id=produto.id, _external=True),
+            'lastmod': produto.data_atualizacao.strftime('%Y-%m-%d') if produto.data_atualizacao else datetime.utcnow().strftime('%Y-%m-%d'),
+            'changefreq': 'weekly',
+            'priority': '0.8'
+        })
+
+    # Páginas de categorias
+    from config import Config
+    for categoria in Config.CATEGORIES:
+        pages.append({
+            'loc': url_for('shop', categoria=categoria, _external=True),
+            'changefreq': 'daily',
+            'priority': '0.8'
+        })
+
+    # Gerar XML
+    xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+
+    for page in pages:
+        xml += '  <url>\n'
+        xml += f'    <loc>{page["loc"]}</loc>\n'
+        if 'lastmod' in page:
+            xml += f'    <lastmod>{page["lastmod"]}</lastmod>\n'
+        xml += f'    <changefreq>{page["changefreq"]}</changefreq>\n'
+        xml += f'    <priority>{page["priority"]}</priority>\n'
+        xml += '  </url>\n'
+
+    xml += '</urlset>'
+
+    return Response(xml, mimetype='application/xml')
 
 # ========================================
 # FILTROS JINJA2 PERSONALIZADOS

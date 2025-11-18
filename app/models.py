@@ -59,9 +59,26 @@ class Produto(db.Model):
     visualizacoes = db.Column(db.Integer, default=0)  # Contador de visualizações
     data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
     data_atualizacao = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+    deleted_at = db.Column(db.DateTime, nullable=True)  # Soft delete
+
     def __repr__(self):
         return f'<Produto {self.nome}>'
+
+    def soft_delete(self):
+        """Marca o produto como deletado (soft delete)"""
+        self.deleted_at = datetime.utcnow()
+        self.ativo = False
+        db.session.commit()
+
+    def restore(self):
+        """Restaura um produto deletado"""
+        self.deleted_at = None
+        db.session.commit()
+
+    @staticmethod
+    def query_active():
+        """Retorna query apenas com produtos não deletados"""
+        return Produto.query.filter(Produto.deleted_at.is_(None))
     
     def to_dict(self):
         """Converte o produto para dicionário"""

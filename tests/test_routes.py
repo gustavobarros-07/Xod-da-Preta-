@@ -7,7 +7,7 @@ def test_home_page(client):
     """Testa se a página inicial carrega"""
     response = client.get('/')
     assert response.status_code == 200
-    assert b'Xodó da Preta' in response.data or b'da Preta' in response.data
+    assert b'da Preta' in response.data
 
 def test_shop_page(client):
     """Testa se a página da loja carrega"""

@@ -1128,6 +1128,22 @@
             </div>
         {% endif %}
     </div>
+
+    <!-- Paginação -->
+    {% if produtos %}
+    {% from 'components/pagination.html' import render_pagination %}
+    <div class="row mt-5">
+        <div class="col-12">
+            {{ render_pagination(pagination, 'shop',
+                categoria=request.args.get('categoria'),
+                subcategoria=request.args.get('subcategoria'),
+                tipo=request.args.get('tipo'),
+                ordenar=request.args.get('ordenar'),
+                preco=request.args.get('preco')
+            ) }}
+        </div>
+    </div>
+    {% endif %}
         </div><!-- /products-content -->
     </div><!-- /shop-container -->
 </div><!-- /container -->

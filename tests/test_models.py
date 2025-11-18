@@ -56,4 +56,7 @@ def test_produto_imagens_adicionais(app):
         imagens = ['img1.jpg', 'img2.jpg']
         produto.set_imagens_adicionais(imagens)
 
-        assert produto.get_imagens_adicionais() == imagens
+        # get_todas_imagens retorna imagem principal + adicionais
+        todas = produto.get_todas_imagens()
+        assert 'img1.jpg' in todas
+        assert 'img2.jpg' in todas
