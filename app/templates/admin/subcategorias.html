@@ -286,9 +286,15 @@
                 {% endif %}
             {% endfor %}
         {% else %}
-            <div class="alert alert-info">
-                <i class="fas fa-info-circle"></i> Nenhuma subcategoria cadastrada ainda.
-                <a href="{{ url_for('admin.subcategoria_nova') }}">Adicionar a primeira subcategoria</a>
+            <div class="subcategorias-container">
+                <div class="text-center py-5">
+                    <i class="fas fa-tags fa-4x text-muted mb-3"></i>
+                    <h4 class="text-muted">Nenhuma subcategoria cadastrada</h4>
+                    <p class="text-muted">Clique em "Adicionar Subcategoria" para começar</p>
+                    <a href="{{ url_for('admin.subcategoria_nova') }}" class="btn btn-add mt-3">
+                        <i class="fas fa-plus"></i> Adicionar Primeira Subcategoria
+                    </a>
+                </div>
             </div>
         {% endif %}
     </div>
