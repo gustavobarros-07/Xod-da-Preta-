@@ -469,14 +469,15 @@ def produto_editar(produto_id):
 @admin_bp.route('/produtos/<int:produto_id>/deletar', methods=['POST'])
 @login_required
 def produto_deletar(produto_id):
-    """Deletar produto (soft delete)"""
+    """Deletar produto permanentemente (hard delete)"""
     produto = Produto.query.get_or_404(produto_id)
     nome = produto.nome
 
-    # Usar soft delete ao invés de deletar permanentemente
-    produto.soft_delete()
+    # Deletar permanentemente do banco de dados
+    db.session.delete(produto)
+    db.session.commit()
 
-    flash(f'Produto "{nome}" removido com sucesso!', 'success')
+    flash(f'Produto "{nome}" deletado permanentemente com sucesso!', 'success')
     return redirect(url_for('admin.produtos'))
 
 # ========================================
@@ -737,10 +738,10 @@ def conteudo_editar_pagina(pagina):
     # Definir estrutura de campos por página
     estruturas = {
         'home': [
-            {'secao': 'hero_titulo_1', 'label': 'Hero - Título Principal', 'tipo': 'texto', 'placeholder': 'Autenticidade e Inclusão'},
-            {'secao': 'hero_titulo_2', 'label': 'Hero - Subtítulo', 'tipo': 'texto', 'placeholder': 'Identidade, Versatilidade e Representatividade'},
-            {'secao': 'hero_texto', 'label': 'Hero - Texto Descritivo', 'tipo': 'textarea', 'placeholder': 'Desenvolvemos moda e acessórios...'},
-            {'secao': 'hero_imagem', 'label': 'Hero - Imagem Principal', 'tipo': 'imagem'},
+            {'secao': 'hero_titulo_1', 'label': 'Título Principal', 'tipo': 'texto', 'placeholder': 'Autenticidade e Inclusão'},
+            {'secao': 'hero_titulo_2', 'label': 'Subtítulo', 'tipo': 'texto', 'placeholder': 'Identidade, Versatilidade e Representatividade'},
+            {'secao': 'hero_texto', 'label': 'Texto Descritivo', 'tipo': 'textarea', 'placeholder': 'Desenvolvemos moda e acessórios...'},
+            {'secao': 'hero_imagem', 'label': 'Imagem Principal', 'tipo': 'imagem'},
             {'secao': 'slide2_titulo', 'label': 'Slide 2 - Título', 'tipo': 'texto', 'placeholder': 'Uma História de Afeto'},
             {'secao': 'slide2_subtitulo', 'label': 'Slide 2 - Subtítulo', 'tipo': 'texto', 'placeholder': 'Xodó da Preta, criada pela minha mãe Marli'},
             {'secao': 'slide2_texto', 'label': 'Slide 2 - Texto', 'tipo': 'textarea'},

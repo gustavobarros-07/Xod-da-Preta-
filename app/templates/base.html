@@ -36,20 +36,17 @@
     <!-- CSS principal -->
     <link rel="stylesheet" href="{{ url_for('static', filename='zay/assets/css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='zay/assets/css/templatemo.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='zay/assets/css/custom.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='zay/assets/css/fontawesome.min.css') }}">
-
-    <!-- Design System Xodó da Preta -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/design-system.css') }}">
-
-    <!-- Cores Personalizadas (Dinâmico - Admin) -->
-    <link rel="stylesheet" href="{{ url_for('custom_colors_css') }}">
 
     <!-- Google Fonts -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;200;300;400;500;700;900&display=swap">
 
-    <!-- Base Layout CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/base-layout.css') }}">
+    <!-- Xodó da Preta - Design System Unificado -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/xodo-core.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/xodo-site.css') }}">
+
+    <!-- Cores Personalizadas (Dinâmico - Admin) -->
+    <link rel="stylesheet" href="{{ url_for('custom_colors_css') }}">
 
     {% block extra_css %}{% endblock %}
 </head>

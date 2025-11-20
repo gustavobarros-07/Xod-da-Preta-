@@ -9,161 +9,171 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    
+
+    <!-- Xodo da Preta - Design System Unificado -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/xodo-core.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/xodo-admin.css') }}">
+
     <style>
-        :root {
-            --cor-preta: #000000;
-            --cor-dourada: #ffc107;
-            --cor-bege: #F5F5F5;
-            --cor-cinza-escuro: #333333;
-        }
-
-        body {
-            background-color: var(--cor-bege);
-        }
-
-        /* Sidebar */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            width: 250px;
-            background-color: var(--cor-preta);
-            padding: 20px 0;
-            z-index: 1000;
-        }
-
-        .sidebar-header {
-            padding: 20px;
-            text-align: center;
-            border-bottom: 2px solid var(--cor-dourada);
-            margin-bottom: 20px;
-        }
-
-        .sidebar-header h4 {
-            color: var(--cor-dourada);
-            margin: 0;
-            font-weight: 700;
-        }
-
-        .sidebar-header small {
-            color: var(--cor-bege);
-        }
-
-        .sidebar-menu {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .sidebar-menu li a {
-            display: block;
-            padding: 15px 25px;
-            color: var(--cor-bege);
-            text-decoration: none;
-            transition: all 0.3s;
-        }
-
-        .sidebar-menu li a:hover,
-        .sidebar-menu li a.active {
-            background-color: var(--cor-dourada);
-            color: var(--cor-preta);
-            padding-left: 35px;
-        }
-
-        .sidebar-menu li a i {
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
-        }
-
-        /* Conteúdo principal */
-        .main-content {
-            margin-left: 250px;
-            padding: 30px;
-        }
-
         .admin-header {
-            background-color: white;
-            padding: 20px 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 30px;
+            border-radius: 12px;
             margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
+        .admin-header h1 {
+            color: var(--cor-preta);
+            font-weight: 700;
+            margin: 0;
+        }
+
         .btn-create-backup {
-            background-color: var(--cor-dourada);
+            background: linear-gradient(135deg, var(--cor-dourada) 0%, var(--cor-dourada-escura) 100%);
             color: var(--cor-preta);
             border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
             font-weight: 600;
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+            transition: all 0.3s ease;
         }
 
         .btn-create-backup:hover {
-            background-color: var(--cor-dourada-escura);
+            background: linear-gradient(135deg, var(--cor-dourada-escura) 0%, #e0a800 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(255, 193, 7, 0.5);
             color: var(--cor-preta);
+        }
+
+        .backup-info-box {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-left: 5px solid #2196F3;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.15);
+        }
+
+        .backup-info-box h5 {
+            color: #1976D2;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .backup-info-box ul {
+            margin: 15px 0;
+            padding-left: 25px;
+        }
+
+        .backup-info-box li {
+            margin-bottom: 8px;
+            color: #424242;
         }
 
         .backup-container {
             background: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         }
 
-        .backup-info-box {
-            background: #f8f9fa;
-            border-left: 4px solid var(--cor-dourada);
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 25px;
+        .table {
+            margin-bottom: 0;
         }
 
-        .backup-info-box h5 {
+        .table thead {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .table thead th {
             color: var(--cor-preta);
-            margin-bottom: 10px;
+            font-weight: 700;
+            border: none;
+            padding: 15px;
         }
 
-        .backup-info-box p {
-            margin: 5px 0;
-            color: #666;
+        .table tbody tr {
+            transition: all 0.3s ease;
         }
 
-        .table img {
-            width: 60px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 8px;
+        .table tbody tr:hover {
+            background-color: #fffbea;
+            transform: scale(1.01);
+        }
+
+        .table tbody td {
+            padding: 18px 15px;
+            vertical-align: middle;
         }
 
         .btn-action {
-            padding: 5px 10px;
-            margin: 0 2px;
-            font-size: 14px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-right: 5px;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-success.btn-action {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border: none;
+        }
+
+        .btn-success.btn-action:hover {
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-danger.btn-action {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            border: none;
+        }
+
+        .btn-danger.btn-action:hover {
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
         }
 
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
+            padding: 80px 20px;
         }
 
         .empty-state i {
-            font-size: 4rem;
-            color: #ccc;
+            font-size: 80px;
+            color: #dee2e6;
             margin-bottom: 20px;
         }
-    
-        .sidebar-menu li a.btn-logout {
-            background-color: #C44835;
-            color: white;
-            font-weight: 600;
+
+        .empty-state h4 {
+            color: #6c757d;
+            margin-bottom: 10px;
         }
 
-        .sidebar-menu li a.btn-logout:hover {
-            background-color: #a53a2a;
-            padding-left: 35px;
+        /* Modal melhorado */
+        .modal-header {
+            background: linear-gradient(135deg, var(--cor-dourada) 0%, var(--cor-dourada-escura) 100%);
+            color: var(--cor-preta);
+            font-weight: 700;
+        }
+
+        .modal-header .btn-close {
+            filter: brightness(0);
+        }
+
+        /* Ícone de arquivo com cor */
+        .fa-file-archive {
+            color: var(--cor-dourada);
+            font-size: 20px;
+            margin-right: 8px;
         }
     </style>
 </head>

@@ -1,0 +1,583 @@
+/**
+ * ============================================
+ * XODÓ DA PRETA - SITE STYLES
+ * ============================================
+ * Estilos específicos do site (front-end)
+ * Inclui: Navbar, Footer, Produtos, Carrinho, Shop, etc.
+ * Com responsividade mobile completa
+ *
+ * Versão: 2.0
+ * Data: 2025
+ */
+
+/* ========================================
+   NAVBAR - CORES PERSONALIZADAS
+   ======================================== */
+
+#templatemo_nav_top {
+    background-color: var(--cor-preta) !important;
+}
+
+#templatemo_nav_top a {
+    color: var(--cor-dourada) !important;
+}
+
+#templatemo_main_nav {
+    background-color: white;
+    border-bottom: 3px solid var(--cor-dourada);
+}
+
+.navbar-brand {
+    color: var(--cor-preta) !important;
+    font-weight: 700 !important;
+    font-size: 28px !important;
+}
+
+#templatemo_main_nav a {
+    color: var(--cor-cinza-escuro) !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease;
+}
+
+#templatemo_main_nav a:hover {
+    color: var(--cor-dourada) !important;
+}
+
+/* ========================================
+   HEADER STICKY - FIXO AO SCROLLAR
+   ======================================== */
+
+#templatemo_main_nav_container {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-sticky);
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+#templatemo_main_nav_container.scrolled {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* ========================================
+   PRODUTOS - CARDS
+   ======================================== */
+
+.product-wap {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.product-wap:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 25px rgba(255, 193, 7, 0.3);
+}
+
+.product-wap .card-body {
+    background-color: white;
+}
+
+.product-price {
+    color: var(--cor-dourada);
+    font-weight: bold;
+    font-size: 24px !important;
+}
+
+/* Card de produtos - borda dourada ao hover */
+.produto-card {
+    transition: all var(--transicao-media);
+    border: 2px solid transparent;
+}
+
+.produto-card:hover {
+    border-color: var(--cor-dourada);
+    box-shadow: var(--sombra-dourada);
+}
+
+.produto-card .preco {
+    color: var(--cor-dourada);
+    font-size: var(--fonte-xl);
+    font-weight: var(--peso-bold);
+}
+
+/* Destaque no nome dos produtos */
+.card-title,
+.product-name,
+.product-title,
+h5.card-title {
+    font-weight: 700 !important;
+}
+
+/* Overlay dos produtos */
+.card.product-wap .card .product-overlay {
+    background: rgba(0, 0, 0, 0.85);
+    visibility: hidden;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.card.product-wap:hover .card .product-overlay {
+    visibility: visible;
+    opacity: 1;
+}
+
+.product-overlay .btn-success {
+    background-color: var(--cor-dourada) !important;
+}
+
+/* ========================================
+   BANNER/HERO - CORES
+   ======================================== */
+
+.bg-success {
+    background-color: var(--cor-dourada) !important;
+}
+
+.text-success {
+    color: var(--cor-dourada) !important;
+}
+
+#template-mo-zay-hero-carousel .carousel-indicators li {
+    background-color: var(--cor-dourada);
+}
+
+#template-mo-zay-hero-carousel .carousel-control-next i,
+#template-mo-zay-hero-carousel .carousel-control-prev i {
+    color: var(--cor-dourada) !important;
+}
+
+/* ========================================
+   CARROSSEL - PADRONIZAÇÃO DE IMAGENS
+   ======================================== */
+
+.carousel-img {
+    width: 100%;
+    height: 300px;
+    object-fit: contain;
+    object-position: center;
+}
+
+/* Altura fixa do carrossel para evitar "pulos" */
+#template-mo-zay-hero-carousel .carousel-inner {
+    min-height: 400px;
+}
+
+/* ========================================
+   CATEGORIAS - IMAGENS
+   ======================================== */
+
+.category-img {
+    width: 120px !important;
+    height: 120px !important;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto;
+    aspect-ratio: 1 / 1;
+}
+
+.category-badge {
+    background-color: var(--cor-dourada);
+    color: var(--cor-preta);
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+/* ========================================
+   FOOTER - PERSONALIZADO
+   ======================================== */
+
+.footer-xodo,
+#tempaltemo_footer {
+    background-color: var(--cor-preta) !important;
+    color: var(--cor-bege);
+    padding: var(--espacamento-2xl) 0 var(--espacamento-lg);
+}
+
+.footer-xodo h2,
+#tempaltemo_footer h2 {
+    color: var(--cor-dourada) !important;
+    border-bottom-color: var(--cor-dourada) !important;
+}
+
+.footer-xodo a,
+#tempaltemo_footer a {
+    color: var(--cor-bege) !important;
+    transition: all 0.3s ease;
+}
+
+.footer-xodo a:hover,
+#tempaltemo_footer a:hover {
+    color: var(--cor-dourada) !important;
+}
+
+#tempaltemo_footer .footer-icons li:hover {
+    background-color: var(--cor-dourada) !important;
+}
+
+#tempaltemo_footer .footer-icons li:hover i {
+    color: var(--cor-preta) !important;
+}
+
+.btn-success.text-light {
+    background-color: var(--cor-dourada) !important;
+}
+
+/* ========================================
+   CARRINHO - BADGE E ÍCONES
+   ======================================== */
+
+.cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: var(--cor-laranja);
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-weight: bold;
+    display: none;
+}
+
+.nav-icon {
+    position: relative;
+}
+
+/* ========================================
+   CARRINHO - PÁGINA
+   ======================================== */
+
+.cart-item {
+    border-bottom: 1px solid #e9ecef;
+    padding: 20px 0;
+}
+
+.cart-item:last-child {
+    border-bottom: none;
+}
+
+.cart-item-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.quantity-input {
+    width: 80px;
+    text-align: center;
+}
+
+.btn-remove {
+    color: #dc3545;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-remove:hover {
+    color: #a71d2a;
+}
+
+.cart-summary {
+    background: #f8f9fa;
+    padding: 30px;
+    border-radius: 10px;
+    position: sticky;
+    top: 20px;
+}
+
+.empty-cart {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-cart i {
+    font-size: 80px;
+    color: #dee2e6;
+    margin-bottom: 20px;
+}
+
+.whatsapp-checkout {
+    background-color: #25D366;
+    border-color: #25D366;
+    color: white;
+    font-weight: 600;
+    padding: 15px 30px;
+    font-size: 16px;
+    transition: all 0.3s;
+}
+
+.whatsapp-checkout:hover {
+    background-color: #128C7E;
+    border-color: #128C7E;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4);
+}
+
+/* ========================================
+   MARCA DE DESTAQUE
+   ======================================== */
+
+.destaque-badge {
+    position: absolute;
+    top: var(--espacamento-md);
+    right: var(--espacamento-md);
+    background-color: var(--cor-dourada);
+    color: var(--cor-preta);
+    padding: var(--espacamento-xs) var(--espacamento-md);
+    border-radius: var(--borda-radius-md);
+    font-weight: var(--peso-bold);
+    font-size: var(--fonte-sm);
+    box-shadow: var(--sombra-md);
+}
+
+/* ========================================
+   SEÇÕES ESPECIAIS
+   ======================================== */
+
+/* Sobre - Banner */
+.bg-success.py-5 {
+    background: linear-gradient(135deg, var(--cor-preta) 0%, var(--cor-cinza-escuro) 100%) !important;
+}
+
+/* Serviços */
+.services-icon-wap {
+    transition: all 0.3s ease;
+    border-radius: 10px;
+}
+
+.services-icon-wap:hover {
+    background-color: var(--cor-dourada) !important;
+    transform: translateY(-5px);
+}
+
+.services-icon-wap:hover i,
+.services-icon-wap:hover h2 {
+    color: var(--cor-preta) !important;
+}
+
+/* ========================================
+   ALERTAS CUSTOMIZADOS
+   ======================================== */
+
+.alert-custom {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    z-index: 9999;
+    min-width: 300px;
+    animation: slideInRight 0.5s ease-out;
+    border-left: 4px solid var(--cor-dourada);
+}
+
+/* ========================================
+   RESPONSIVIDADE - MOBILE
+   ======================================== */
+
+/* Mobile - Ícones fixos no topo */
+@media (max-width: 991px) {
+    /* Ícones do carrinho e busca sempre visíveis no mobile */
+    .mobile-nav-icons {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        z-index: var(--z-modal);
+        display: flex;
+        gap: 15px;
+        background: white;
+        padding: 8px 12px;
+        border-radius: 25px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .mobile-nav-icons a {
+        font-size: 20px;
+    }
+
+    .mobile-nav-icons .badge {
+        font-size: 10px;
+        padding: 2px 5px;
+    }
+
+    /* Esconder os ícones do navbar padrão no mobile */
+    #templatemo_main_nav .navbar-align-self-center {
+        display: none !important;
+    }
+
+    /* Ajustar espaço do navbar toggler */
+    .navbar-toggler {
+        margin-right: 80px;
+    }
+
+    /* Navbar mobile */
+    .navbar-brand {
+        font-size: 24px !important;
+    }
+
+    .product-wap {
+        margin-bottom: 20px;
+    }
+
+    #templatemo_main_nav .navbar-nav {
+        background-color: white;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 10px;
+    }
+}
+
+/* Desktop - esconder ícones fixos */
+@media (min-width: 992px) {
+    .mobile-nav-icons {
+        display: none !important;
+    }
+
+    .category-img {
+        width: 180px !important;
+        height: 180px !important;
+    }
+
+    .carousel-img {
+        height: 450px;
+    }
+
+    #template-mo-zay-hero-carousel .carousel-inner {
+        min-height: 500px;
+    }
+}
+
+/* Tablets */
+@media (min-width: 768px) and (max-width: 991px) {
+    .category-img {
+        width: 150px !important;
+        height: 150px !important;
+    }
+
+    .carousel-img {
+        height: 400px;
+    }
+}
+
+/* Celulares */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 20px !important;
+    }
+
+    .product-wap {
+        margin-bottom: 30px;
+    }
+
+    .h1 {
+        font-size: 32px !important;
+    }
+
+    .h2 {
+        font-size: 24px !important;
+    }
+
+    /* Ajustar padding em mobile */
+    .container {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    /* Cards de produto em mobile */
+    .card-body {
+        padding: 15px;
+    }
+
+    /* Footer em mobile */
+    #tempaltemo_footer .col-md-4 {
+        margin-bottom: 30px;
+    }
+}
+
+/* Celulares pequenos */
+@media (max-width: 576px) {
+    :root {
+        --fonte-4xl: 2rem;     /* 32px em mobile */
+        --fonte-3xl: 1.75rem;  /* 28px em mobile */
+        --fonte-2xl: 1.5rem;   /* 24px em mobile */
+    }
+
+    h1 { font-size: var(--fonte-4xl); }
+    h2 { font-size: var(--fonte-3xl); }
+    h3 { font-size: var(--fonte-2xl); }
+
+    .navbar-brand {
+        font-size: 18px !important;
+    }
+
+    .product-price {
+        font-size: 20px !important;
+    }
+
+    .btn {
+        font-size: 14px !important;
+        padding: 8px 15px;
+    }
+
+    /* Hero carousel em mobile */
+    #template-mo-zay-hero-carousel .carousel-item {
+        min-height: 300px !important;
+    }
+
+    .btn-lg {
+        padding: var(--espacamento-sm) var(--espacamento-lg);
+        font-size: var(--fonte-base);
+    }
+}
+
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: var(--espacamento-lg);
+    }
+}
+
+/* ========================================
+   DISPLAY RESPONSIVO - BOOTSTRAP BREAKPOINTS
+   ======================================== */
+
+/* sm: ≥576px */
+@media (min-width: 576px) {
+    .d-sm-none { display: none !important; }
+    .d-sm-block { display: block !important; }
+    .d-sm-inline { display: inline !important; }
+    .d-sm-inline-block { display: inline-block !important; }
+    .d-sm-flex { display: flex !important; }
+}
+
+/* md: ≥768px */
+@media (min-width: 768px) {
+    .d-md-none { display: none !important; }
+    .d-md-block { display: block !important; }
+    .d-md-inline { display: inline !important; }
+    .d-md-inline-block { display: inline-block !important; }
+    .d-md-flex { display: flex !important; }
+}
+
+/* lg: ≥992px */
+@media (min-width: 992px) {
+    .d-lg-none { display: none !important; }
+    .d-lg-block { display: block !important; }
+    .d-lg-inline { display: inline !important; }
+    .d-lg-inline-block { display: inline-block !important; }
+    .d-lg-flex { display: flex !important; }
+}
+
+/* xl: ≥1200px */
+@media (min-width: 1200px) {
+    .d-xl-none { display: none !important; }
+    .d-xl-block { display: block !important; }
+    .d-xl-inline { display: inline !important; }
+    .d-xl-inline-block { display: inline-block !important; }
+    .d-xl-flex { display: flex !important; }
+}

@@ -1,0 +1,930 @@
+/**
+ * ============================================
+ * XODÓ DA PRETA - ADMIN PANEL STYLES
+ * ============================================
+ * Estilos unificados do painel administrativo
+ * Extraído e consolidado de todos os 13 templates admin
+ *
+ * Versão: 2.0
+ * Data: 2025
+ */
+
+/* ========================================
+   BODY E LAYOUT BASE
+   ======================================== */
+
+body {
+    background-color: var(--cor-bege);
+    font-family: 'Roboto', sans-serif;
+}
+
+/* ========================================
+   SIDEBAR
+   ======================================== */
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 260px;
+    background: linear-gradient(180deg, var(--cor-preta) 0%, var(--cor-cinza-escuro) 100%);
+    padding: 0;
+    z-index: 1000;
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-header {
+    padding: 30px 20px;
+    text-align: center;
+    border-bottom: 3px solid var(--cor-dourada);
+    background-color: rgba(212, 175, 55, 0.1);
+}
+
+.sidebar-header h4 {
+    color: var(--cor-dourada);
+    margin: 0;
+    font-weight: 700;
+    font-size: 22px;
+}
+
+.sidebar-header small {
+    color: var(--cor-bege);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 20px 0;
+    margin: 0;
+}
+
+.sidebar-menu li a {
+    display: flex;
+    align-items: center;
+    padding: 15px 25px;
+    color: var(--cor-bege);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 15px;
+}
+
+.sidebar-menu li a:hover {
+    background-color: rgba(212, 175, 55, 0.2);
+    padding-left: 35px;
+}
+
+.sidebar-menu li a.active {
+    background-color: var(--cor-dourada);
+    color: var(--cor-preta);
+    font-weight: 600;
+    border-left: 4px solid var(--cor-dourada-escura);
+}
+
+.sidebar-menu li a.btn-logout {
+    background-color: var(--cor-erro);
+    color: white;
+    font-weight: 600;
+}
+
+.sidebar-menu li a.btn-logout:hover {
+    background-color: #a53a2a;
+    padding-left: 35px;
+}
+
+.sidebar-menu li a i {
+    margin-right: 12px;
+    width: 20px;
+    text-align: center;
+    font-size: 16px;
+}
+
+/* ========================================
+   CONTEÚDO PRINCIPAL
+   ======================================== */
+
+.main-content {
+    margin-left: 260px;
+    padding: 30px;
+    min-height: 100vh;
+}
+
+/* ========================================
+   HEADER ADMIN
+   ======================================== */
+
+.admin-header {
+    background: linear-gradient(135deg, white 0%, #fafafa 100%);
+    padding: 25px 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.admin-header h1 {
+    margin: 0;
+    color: var(--cor-cinza-escuro);
+    font-size: 32px;
+    font-weight: 700;
+}
+
+.admin-header .welcome-text {
+    color: #666;
+    font-size: 14px;
+    margin: 5px 0 0;
+}
+
+/* ========================================
+   KPI CARDS (DASHBOARD)
+   ======================================== */
+
+.kpi-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    height: 100%;
+    border-left: 4px solid var(--cor-dourada);
+}
+
+.kpi-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.2);
+}
+
+.kpi-card .icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin-bottom: 15px;
+}
+
+.kpi-card.gold .icon {
+    background: linear-gradient(135deg, var(--cor-dourada) 0%, var(--cor-dourada-escura) 100%);
+    color: white;
+}
+
+.kpi-card.success .icon {
+    background: linear-gradient(135deg, var(--cor-sucesso) 0%, var(--cor-hover) 100%);
+    color: var(--cor-preta);
+}
+
+.kpi-card.danger .icon {
+    background: linear-gradient(135deg, var(--cor-erro) 0%, #e83e8c 100%);
+    color: white;
+}
+
+.kpi-card.info .icon {
+    background: linear-gradient(135deg, var(--cor-laranja) 0%, var(--cor-hover) 100%);
+    color: white;
+}
+
+.kpi-card .value {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--cor-cinza-escuro);
+    margin: 10px 0 5px;
+    line-height: 1;
+}
+
+.kpi-card .label {
+    color: #666;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.kpi-card .trend {
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--cor-sucesso);
+}
+
+/* ========================================
+   QUICK ACTIONS
+   ======================================== */
+
+.quick-actions {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    margin-bottom: 30px;
+}
+
+.quick-actions h4 {
+    color: var(--cor-cinza-escuro);
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.btn-quick-action {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 20px;
+    border-radius: 10px;
+    border: 2px solid var(--cor-dourada);
+    background: linear-gradient(135deg, var(--cor-dourada) 0%, var(--cor-dourada-escura) 100%);
+    color: var(--cor-preta);
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-quick-action:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+    color: var(--cor-preta);
+}
+
+.btn-quick-action i {
+    font-size: 20px;
+}
+
+/* ========================================
+   CHART CARDS
+   ======================================== */
+
+.chart-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    height: 100%;
+}
+
+.chart-card h5 {
+    color: var(--cor-cinza-escuro);
+    font-weight: 700;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.chart-card h5 i {
+    color: var(--cor-dourada);
+}
+
+/* ========================================
+   TOP PRODUCTS / RANKINGS
+   ======================================== */
+
+.top-products {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    min-height: 400px;
+    height: 100%;
+}
+
+.top-products h5 {
+    color: var(--cor-cinza-escuro);
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.product-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    margin-bottom: 10px;
+    background: #fafafa;
+}
+
+.product-item:hover {
+    background: var(--cor-bege);
+    transform: translateX(5px);
+}
+
+.product-item img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-right: 15px;
+}
+
+.product-item .info {
+    flex: 1;
+}
+
+.product-item .name {
+    font-weight: 600;
+    color: var(--cor-cinza-escuro);
+    margin-bottom: 3px;
+}
+
+.product-item .views {
+    font-size: 12px;
+    color: #666;
+}
+
+.product-item .rank {
+    width: 30px;
+    height: 30px;
+    background: var(--cor-dourada);
+    color: var(--cor-preta);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    margin-right: 15px;
+}
+
+/* ========================================
+   RECENT PRODUCTS TABLE
+   ======================================== */
+
+.recent-products {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    margin-top: 30px;
+}
+
+.recent-products h5 {
+    color: var(--cor-cinza-escuro);
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.table img {
+    width: 45px;
+    height: 45px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.badge-categoria {
+    background-color: var(--cor-dourada);
+    color: var(--cor-preta);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* ========================================
+   PRODUTOS - LISTA E GESTÃO
+   ======================================== */
+
+.produtos-container {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.produtos-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--cor-bege);
+}
+
+.produtos-header h2 {
+    margin: 0;
+    color: var(--cor-cinza-escuro);
+    font-weight: 700;
+}
+
+.btn-add {
+    background: linear-gradient(135deg, var(--cor-dourada) 0%, var(--cor-dourada-escura) 100%);
+    color: var(--cor-preta);
+    padding: 12px 24px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-add:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+    color: var(--cor-preta);
+}
+
+/* Tabela de produtos */
+.produtos-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.produtos-table thead {
+    background-color: var(--cor-bege);
+}
+
+.produtos-table th {
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--cor-cinza-escuro);
+    border-bottom: 2px solid var(--cor-dourada);
+}
+
+.produtos-table td {
+    padding: 15px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.produtos-table tbody tr {
+    transition: all 0.3s ease;
+}
+
+.produtos-table tbody tr:hover {
+    background-color: #fafafa;
+}
+
+/* Ações da tabela */
+.btn-action {
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.btn-edit {
+    background-color: var(--cor-dourada);
+    color: var(--cor-preta);
+}
+
+.btn-edit:hover {
+    background-color: var(--cor-dourada-escura);
+    color: var(--cor-preta);
+}
+
+.btn-delete {
+    background-color: var(--cor-erro);
+    color: white;
+}
+
+.btn-delete:hover {
+    background-color: #a53a2a;
+    color: white;
+}
+
+/* ========================================
+   SUBCATEGORIAS
+   ======================================== */
+
+.subcategorias-container {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.subcategorias-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.subcategoria-card {
+    background: white;
+    border: 2px solid var(--cor-bege);
+    border-radius: 10px;
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.subcategoria-card:hover {
+    border-color: var(--cor-dourada);
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+    transform: translateY(-3px);
+}
+
+.subcategoria-card h5 {
+    color: var(--cor-cinza-escuro);
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+/* ========================================
+   FORMULÁRIOS ADMIN
+   ======================================== */
+
+.form-container {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.form-section {
+    margin-bottom: 30px;
+}
+
+.form-section h5 {
+    color: var(--cor-cinza-escuro);
+    font-weight: 600;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--cor-bege);
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    color: var(--cor-cinza-escuro);
+    margin-bottom: 8px;
+}
+
+.form-group .form-control {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.form-group .form-control:focus {
+    outline: none;
+    border-color: var(--cor-dourada);
+    box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.1);
+}
+
+.form-check-input:checked {
+    background-color: var(--cor-dourada);
+    border-color: var(--cor-dourada);
+}
+
+/* Botões de formulário */
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid var(--cor-bege);
+}
+
+/* ========================================
+   BIBLIOTECA DE MÍDIA
+   ======================================== */
+
+.media-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.media-item {
+    background: white;
+    border: 2px solid var(--cor-bege);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.media-item:hover {
+    border-color: var(--cor-dourada);
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+    transform: translateY(-3px);
+}
+
+.media-item img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+.media-item-info {
+    padding: 10px;
+}
+
+.media-item-info p {
+    margin: 0;
+    font-size: 12px;
+    color: #666;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ========================================
+   LOGIN
+   ======================================== */
+
+.login-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    max-width: 400px;
+    width: 100%;
+}
+
+.login-header {
+    background: var(--cor-dourada);
+    color: var(--cor-preta);
+    padding: 30px;
+    text-align: center;
+}
+
+.login-header h2 {
+    margin: 0;
+    font-weight: 700;
+}
+
+.login-body {
+    padding: 40px;
+}
+
+.btn-login {
+    background-color: var(--cor-dourada);
+    border-color: var(--cor-dourada);
+    color: var(--cor-preta);
+    font-weight: 600;
+    padding: 12px;
+    width: 100%;
+    transition: all 0.3s;
+}
+
+.btn-login:hover {
+    background-color: var(--cor-dourada-escura);
+    border-color: var(--cor-dourada-escura);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
+}
+
+.back-to-site {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.back-to-site a {
+    color: var(--cor-dourada);
+    text-decoration: none;
+}
+
+.back-to-site a:hover {
+    text-decoration: underline;
+}
+
+/* Login page body special */
+body.login-page {
+    background: linear-gradient(135deg, var(--cor-preta) 0%, #333333 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ========================================
+   CUPONS
+   ======================================== */
+
+.cupons-container {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.cupom-card {
+    background: white;
+    border: 2px solid var(--cor-bege);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cupom-card:hover {
+    border-color: var(--cor-dourada);
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+}
+
+.cupom-info h5 {
+    margin: 0 0 5px 0;
+    color: var(--cor-cinza-escuro);
+    font-weight: 600;
+}
+
+.cupom-info p {
+    margin: 0;
+    font-size: 14px;
+    color: #666;
+}
+
+.cupom-status {
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.cupom-status.ativo {
+    background-color: var(--cor-sucesso);
+    color: white;
+}
+
+.cupom-status.inativo {
+    background-color: #6c757d;
+    color: white;
+}
+
+/* ========================================
+   CONFIGURAÇÕES
+   ======================================== */
+
+.config-container {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.config-section {
+    margin-bottom: 30px;
+    padding-bottom: 30px;
+    border-bottom: 2px solid var(--cor-bege);
+}
+
+.config-section:last-child {
+    border-bottom: none;
+}
+
+.config-section h4 {
+    color: var(--cor-cinza-escuro);
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+/* ========================================
+   BACKUP
+   ======================================== */
+
+.backup-card {
+    background: white;
+    border: 2px solid var(--cor-bege);
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.backup-card:hover {
+    border-color: var(--cor-dourada);
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+}
+
+.backup-card h5 {
+    color: var(--cor-cinza-escuro);
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.backup-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+/* ========================================
+   PAGINAÇÃO
+   ======================================== */
+
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.pagination {
+    display: flex;
+    list-style: none;
+    gap: 5px;
+}
+
+.pagination li a {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    color: var(--cor-cinza-escuro);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.pagination li a:hover,
+.pagination li.active a {
+    background-color: var(--cor-dourada);
+    color: var(--cor-preta);
+    border-color: var(--cor-dourada);
+}
+
+/* ========================================
+   ESTADO VAZIO
+   ======================================== */
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-state i {
+    font-size: 80px;
+    color: #dee2e6;
+    margin-bottom: 20px;
+}
+
+.empty-state h4 {
+    color: var(--cor-cinza-escuro);
+    margin-bottom: 10px;
+}
+
+.empty-state p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+/* ========================================
+   RESPONSIVIDADE ADMIN
+   ======================================== */
+
+@media (max-width: 992px) {
+    .sidebar {
+        width: 0;
+        overflow: hidden;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 20px;
+    }
+
+    .admin-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .produtos-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+
+    .produtos-table {
+        font-size: 14px;
+    }
+
+    .produtos-table th,
+    .produtos-table td {
+        padding: 10px 5px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .form-actions .btn-submit,
+    .form-actions .btn-cancel {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .kpi-card {
+        margin-bottom: 15px;
+    }
+
+    .subcategorias-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .media-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+}

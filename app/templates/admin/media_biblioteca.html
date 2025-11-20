@@ -9,184 +9,149 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    
+
+    <!-- Xodo da Preta - Design System Unificado -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/xodo-core.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/xodo-admin.css') }}">
+
     <style>
-        :root {
-            --cor-preta: #000000;
-            --cor-dourada: #ffc107;
-            --cor-bege: #F5F5F5;
-            --cor-cinza-escuro: #333333;
-        }
-
-        body {
-            background-color: var(--cor-bege);
-        }
-
-        /* Sidebar */
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            width: 250px;
-            background-color: var(--cor-preta);
-            padding: 20px 0;
-            z-index: 1000;
-        }
-
-        .sidebar-header {
-            padding: 20px;
-            text-align: center;
-            border-bottom: 2px solid var(--cor-dourada);
-            margin-bottom: 20px;
-        }
-
-        .sidebar-header h4 {
-            color: var(--cor-dourada);
-            margin: 0;
-            font-weight: 700;
-        }
-
-        .sidebar-header small {
-            color: var(--cor-bege);
-        }
-
-        .sidebar-menu {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .sidebar-menu li a {
-            display: block;
-            padding: 15px 25px;
-            color: var(--cor-bege);
-            text-decoration: none;
-            transition: all 0.3s;
-        }
-
-        .sidebar-menu li a:hover,
-        .sidebar-menu li a.active {
-            background-color: var(--cor-dourada);
-            color: var(--cor-preta);
-            padding-left: 35px;
-        }
-
-        .sidebar-menu li a i {
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
-        }
-
-        /* Conteúdo principal */
-        .main-content {
-            margin-left: 250px;
-            padding: 30px;
-        }
-
         .admin-header {
-            background-color: white;
-            padding: 20px 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 30px;
+            border-radius: 12px;
             margin-bottom: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .admin-header h1 {
+            color: var(--cor-preta);
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .badge {
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 20px;
         }
 
         .media-container {
             background: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         }
 
         .media-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
         }
 
         .media-item {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 10px;
-            transition: all 0.3s;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
         }
 
         .media-item:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            transform: translateY(-2px);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 193, 7, 0.2);
+            border-color: var(--cor-dourada);
         }
 
         .media-item img {
             width: 100%;
-            height: 150px;
+            height: 200px;
             object-fit: cover;
-            border-radius: 6px;
-            margin-bottom: 10px;
+            border-bottom: 3px solid var(--cor-dourada);
         }
 
         .media-info {
-            font-size: 12px;
-            color: #666;
+            padding: 20px;
+            background: linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%);
         }
 
         .media-info strong {
             display: block;
-            color: #333;
-            margin-bottom: 5px;
+            color: var(--cor-preta);
+            font-size: 14px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .media-info div {
+            color: #6c757d;
             font-size: 13px;
-            word-break: break-all;
+            margin-bottom: 5px;
         }
 
         .badge-em-uso {
-            background-color: var(--cor-sucesso);
-            color: var(--cor-preta);
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 11px;
             display: inline-block;
-            margin-top: 5px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
         }
 
         .badge-nao-usado {
-            background-color: #6c757d;
-            color: white;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 11px;
             display: inline-block;
-            margin-top: 5px;
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 10px;
         }
 
         .btn-delete-img {
-            width: 100%;
-            margin-top: 8px;
-            font-size: 12px;
+            margin-top: 10px;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-delete-img:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
         }
 
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
+            padding: 80px 20px;
         }
 
         .empty-state i {
-            font-size: 4rem;
-            color: #ccc;
+            font-size: 80px;
+            color: #dee2e6;
             margin-bottom: 20px;
         }
-    
-        .sidebar-menu li a.btn-logout {
-            background-color: #C44835;
-            color: white;
-            font-weight: 600;
+
+        .empty-state h4 {
+            color: #6c757d;
+            margin-bottom: 10px;
         }
 
-        .sidebar-menu li a.btn-logout:hover {
-            background-color: #a53a2a;
-            padding-left: 35px;
+        /* Modal melhorado */
+        .modal-header {
+            background: linear-gradient(135deg, var(--cor-dourada) 0%, var(--cor-dourada-escura) 100%);
+            color: var(--cor-preta);
+            font-weight: 700;
+        }
+
+        .modal-header .btn-close {
+            filter: brightness(0);
         }
     </style>
 </head>
