@@ -15,7 +15,7 @@
                     <li>
                         <i class="fab fa-whatsapp fa-fw"></i>
                         <a class="text-decoration-none"
-                           href="https://wa.me/{{ config_loja_telefone|replace(' ', '')|replace('-', '') }}"
+                           href="https://wa.me/{{ config_loja_telefone|clean_phone }}"
                            target="_blank">
                             {{ config_loja_telefone }}
                         </a>

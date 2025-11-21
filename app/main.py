@@ -616,6 +616,15 @@ def from_json_filter(value):
     except (ValueError, TypeError):
         return []
 
+@app.template_filter('clean_phone')
+def clean_phone_filter(value):
+    """Remove todos os caracteres não-numéricos de um número de telefone"""
+    import re
+    try:
+        return re.sub(r'\D', '', str(value)) if value else ''
+    except (ValueError, TypeError):
+        return ''
+
 # ========================================
 # ROTA DE CSS DINÂMICO (CORES PERSONALIZÁVEIS)
 # ========================================

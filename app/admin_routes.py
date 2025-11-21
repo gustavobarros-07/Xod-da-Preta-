@@ -139,33 +139,21 @@ def process_product_images(files, old_imagem=None, old_imagens_adicionais=None):
     imagens_adicionais_files = files.getlist('imagens_adicionais')
     imagens_adicionais_list = []
 
-    if imagens_adicionais_files and any(f.filename for f in imagens_adicionais_files):
-        # Se está editando e tem imagens antigas, deletar
-        if old_imagens_adicionais:
-            try:
-                old_images = json.loads(old_imagens_adicionais)
-                for old_img in old_images:
-                    old_img_path = Config.UPLOAD_FOLDER / old_img
-                    if old_img_path.exists():
-                        try:
-                            old_img_path.unlink()
-                        except OSError:
-                            pass
-            except (json.JSONDecodeError, TypeError):
-                pass
+    # Manter imagens antigas se existirem
+    if old_imagens_adicionais:
+        try:
+            old_images = json.loads(old_imagens_adicionais)
+            imagens_adicionais_list = old_images
+        except (json.JSONDecodeError, TypeError):
+            imagens_adicionais_list = []
 
-        # Salvar novas imagens
+    # Adicionar novas imagens enviadas
+    if imagens_adicionais_files and any(f.filename for f in imagens_adicionais_files):
         for img_file in imagens_adicionais_files:
             if img_file and img_file.filename:
                 filename = save_product_image(img_file)
                 if filename:
                     imagens_adicionais_list.append(filename)
-    elif old_imagens_adicionais:
-        # Manter imagens antigas se não enviou novas
-        try:
-            imagens_adicionais_list = json.loads(old_imagens_adicionais)
-        except (json.JSONDecodeError, TypeError):
-            imagens_adicionais_list = []
 
     return imagem_filename, imagens_adicionais_list
 
@@ -1249,3 +1237,4 @@ def cupom_deletar(cupom_id):
 
     flash(f'Cupom "{codigo}" deletado com sucesso!', 'success')
     return redirect(url_for('admin.cupons'))
+

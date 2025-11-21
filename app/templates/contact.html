@@ -71,8 +71,8 @@
                 <p class="mb-4">
                     <i class="fas fa-phone"></i>
                     <strong>Telefone/WhatsApp:</strong><br>
-                    <a href="https://wa.me/5511954375056" target="_blank" class="text-decoration-none">
-                        +55 11 95437-5056
+                    <a href="https://wa.me/{{ config_loja_telefone|clean_phone }}" target="_blank" class="text-decoration-none">
+                        {{ config_loja_telefone }}
                     </a>
                 </p>
 
@@ -186,7 +186,9 @@
             console.warn('Não foi possível copiar automaticamente');
         });
 
-        const phoneNumber = '{{ config_loja_telefone|replace(" ", "")|replace("-", "") }}';
+        // Limpar número de telefone removendo todos os caracteres não-numéricos
+        const phoneNumber = '{{ config_loja_telefone }}'.replace(/\D/g, '');
+        console.log('Número WhatsApp (Contact):', phoneNumber); // Debug
         const whatsappURL = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(whatsappMessage)}`;
 
         // Detectar se é mobile ou desktop
