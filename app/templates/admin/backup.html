@@ -212,6 +212,11 @@
                 </a>
             </li>
             <li>
+                <a href="{{ url_for('admin.cupons') }}">
+                    <i class="fas fa-ticket-alt"></i> Cupons
+                </a>
+            </li>
+            <li>
                 <a href="{{ url_for('admin.media_biblioteca') }}">
                     <i class="fas fa-images"></i> Biblioteca de Mídia
                 </a>
@@ -295,7 +300,7 @@
                                 <strong>{{ backup.nome }}</strong>
                             </td>
                             <td>{{ backup.tamanho_mb }} MB</td>
-                            <td>{{ backup.data_criacao.strftime('%d/%m/%Y às %H:%M') }}</td>
+                            <td>{{ backup.data.strftime('%d/%m/%Y às %H:%M') }}</td>
                             <td>
                                 <a href="{{ url_for('admin.backup_download', filename=backup.nome) }}"
                                    class="btn btn-sm btn-success btn-action"
