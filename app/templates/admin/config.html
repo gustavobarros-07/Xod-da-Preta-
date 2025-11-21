@@ -384,27 +384,36 @@
             </div>
 
             <!-- Preview Footer -->
-            <h6 class="mb-2"><i class="fas fa-shoe-prints"></i> Rodapé</h6>
+            <h6 class="mb-2"><i class="fas fa-shoe-prints"></i> Rodapé (como aparece no site)</h6>
             <div class="row">
                 <div class="col-md-6">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title" style="color: var(--cor-dourada);" id="preview-nome">{{ configs.loja_nome }}</h5>
+                            <h5 class="card-title" style="color: var(--cor-dourada); border-bottom: 1px solid #ddd; padding-bottom: 10px;" id="preview-nome">{{ configs.loja_nome }}</h5>
+
+                            <!-- Ordem exata do footer real: Endereço, Telefone, Email -->
+                            <p class="card-text mb-2" id="preview-endereco-container" {% if not configs.loja_endereco %}style="display: none;"{% endif %}>
+                                <i class="fas fa-map-marker-alt"></i> <span id="preview-endereco">{{ configs.loja_endereco }}</span>
+                            </p>
                             <p class="card-text mb-2" id="preview-telefone-container" {% if not configs.loja_telefone %}style="display: none;"{% endif %}>
                                 <i class="fab fa-whatsapp"></i> <span id="preview-telefone">{{ configs.loja_telefone }}</span>
                             </p>
-                            <p class="card-text mb-2" id="preview-email-container" {% if not configs.loja_email %}style="display: none;"{% endif %}>
+                            <p class="card-text mb-3" id="preview-email-container" {% if not configs.loja_email %}style="display: none;"{% endif %}>
                                 <i class="fas fa-envelope"></i> <span id="preview-email">{{ configs.loja_email }}</span>
                             </p>
-                            <p class="card-text mb-2" id="preview-instagram-container" {% if not configs.loja_instagram %}style="display: none;"{% endif %}>
-                                <i class="fab fa-instagram"></i> <span id="preview-instagram">{{ configs.loja_instagram }}</span>
-                            </p>
-                            <p class="card-text mb-2" id="preview-facebook-container" {% if not configs.loja_facebook %}style="display: none;"{% endif %}>
-                                <i class="fab fa-facebook-f"></i> <span id="preview-facebook-text">{{ configs.loja_facebook }}</span>
-                            </p>
-                            <p class="card-text mb-0" id="preview-endereco-container" {% if not configs.loja_endereco %}style="display: none;"{% endif %}>
-                                <i class="fas fa-map-marker-alt"></i> <span id="preview-endereco">{{ configs.loja_endereco }}</span>
-                            </p>
+
+                            <!-- Redes sociais em seção separada (como no footer real) -->
+                            <div style="border-top: 1px solid #ddd; padding-top: 10px; margin-top: 10px;">
+                                <small class="text-muted d-block mb-2">Redes Sociais:</small>
+                                <div>
+                                    <span id="preview-facebook-container" {% if not configs.loja_facebook %}style="display: none;"{% endif %} class="me-2">
+                                        <i class="fab fa-facebook-f" style="color: var(--cor-dourada);"></i>
+                                    </span>
+                                    <span id="preview-instagram-container" {% if not configs.loja_instagram %}style="display: none;"{% endif %}>
+                                        <i class="fab fa-instagram" style="color: var(--cor-dourada);"></i>
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -445,26 +454,24 @@
             emailContainer.style.display = 'none';
         }
 
-        // Instagram
+        // Instagram (apenas mostrar/ocultar ícone)
         const instagram = document.getElementById('loja_instagram').value;
         const instagramContainer = document.getElementById('preview-instagram-container');
         const instagramTopbar = document.getElementById('preview-topbar-instagram');
         if (instagram) {
-            document.getElementById('preview-instagram').textContent = instagram;
-            instagramContainer.style.display = 'block';
+            instagramContainer.style.display = 'inline';
             instagramTopbar.style.display = 'inline';
         } else {
             instagramContainer.style.display = 'none';
             instagramTopbar.style.display = 'none';
         }
 
-        // Facebook
+        // Facebook (apenas mostrar/ocultar ícone)
         const facebook = document.getElementById('loja_facebook').value;
         const facebookContainer = document.getElementById('preview-facebook-container');
         const facebookTopbar = document.getElementById('preview-topbar-facebook');
         if (facebook) {
-            document.getElementById('preview-facebook-text').textContent = facebook;
-            facebookContainer.style.display = 'block';
+            facebookContainer.style.display = 'inline';
             facebookTopbar.style.display = 'inline';
         } else {
             facebookContainer.style.display = 'none';

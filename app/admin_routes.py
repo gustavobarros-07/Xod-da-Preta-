@@ -499,7 +499,21 @@ def configuracoes():
         topbar_ativo = request.form.get('topbar_ativo') == 'on'
         Configuracao.set_valor('topbar_ativo', '1' if topbar_ativo else '0')
 
-        flash('Configurações atualizadas com sucesso!', 'success')
+        # IMPORTANTE: Limpar cache para que as mudanças reflitam imediatamente no site
+        cache_limpo = False
+        try:
+            from main import cache, get_configuracoes
+            cache.delete_memoized(get_configuracoes)
+            cache_limpo = True
+            current_app.logger.info('Cache de configurações limpo com sucesso')
+        except Exception as e:
+            current_app.logger.error(f'Erro ao limpar cache: {e}')
+
+        if cache_limpo:
+            flash('Configurações atualizadas com sucesso! As mudanças podem levar até 10 minutos para aparecer no site.', 'success')
+        else:
+            flash('Configurações atualizadas com sucesso! Nota: As mudanças podem levar até 10 minutos para aparecer no site.', 'warning')
+
         return redirect(url_for('admin.configuracoes'))
 
     # Buscar configurações atuais
