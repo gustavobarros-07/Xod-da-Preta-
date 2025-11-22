@@ -65,9 +65,7 @@ def validate_and_get_product_data(form_data, is_edit=False, produto_id=None):
     descricao = form_data.get('descricao', '').strip()
     preco_str = form_data.get('preco', '0')
     categoria = form_data.get('categoria', '').strip()
-    subcategoria = form_data.get('subcategoria')
-    tipo = form_data.get('tipo')
-    subcategoria_id = form_data.get('subcategoria_id')
+    subcategoria_id = form_data.get('subcategoria_id')  # ID da subcategoria selecionada (hierárquica)
     tamanhos = form_data.getlist('tamanhos')
     ativo = form_data.get('ativo') == 'on'
     destaque = form_data.get('destaque') == 'on'
@@ -97,15 +95,50 @@ def validate_and_get_product_data(form_data, is_edit=False, produto_id=None):
     except (ValueError, TypeError):
         ordem = 0
 
+    # Processar subcategoria_id
+    subcategoria_id_final = None
+    subcategoria_nome = None
+    tipo_nome = None
+
+    if subcategoria_id and subcategoria_id.strip():
+        try:
+            subcategoria_id_final = int(subcategoria_id)
+
+            # Buscar a subcategoria para preencher os campos legados (subcategoria e tipo)
+            subcat = Subcategoria.query.get(subcategoria_id_final)
+            if subcat:
+                # Construir o caminho hierárquico para campos legados
+                # Se é nível 3: tipo = nome da subcat, subcategoria = nome do pai
+                # Se é nível 2: subcategoria = nome da subcat, tipo = None
+                # Se é nível 1: subcategoria = nome da subcat, tipo = None
+
+                if subcat.parent_id:
+                    pai = Subcategoria.query.get(subcat.parent_id)
+                    if pai and pai.parent_id:
+                        # Nível 3: subcat atual é o tipo
+                        tipo_nome = subcat.nome
+                        subcategoria_nome = pai.nome
+                    else:
+                        # Nível 2: subcat atual é a subcategoria
+                        subcategoria_nome = subcat.nome
+                        tipo_nome = None
+                else:
+                    # Nível 1: subcat atual é a subcategoria principal
+                    subcategoria_nome = subcat.nome
+                    tipo_nome = None
+
+        except (ValueError, TypeError):
+            subcategoria_id_final = None
+
     # Retornar dados validados
     return {
         'nome': nome,
         'descricao': descricao,
         'preco': preco,
         'categoria': categoria,
-        'subcategoria': subcategoria if subcategoria else None,
-        'tipo': tipo if tipo else None,
-        'subcategoria_id': int(subcategoria_id) if subcategoria_id else None,
+        'subcategoria': subcategoria_nome,  # Campo legado (para retrocompatibilidade)
+        'tipo': tipo_nome,  # Campo legado (para retrocompatibilidade)
+        'subcategoria_id': subcategoria_id_final,  # Campo principal (novo sistema)
         'tamanhos': json.dumps(tamanhos),
         'ativo': ativo,
         'destaque': destaque,
@@ -457,15 +490,41 @@ def produto_editar(produto_id):
 @admin_bp.route('/produtos/<int:produto_id>/deletar', methods=['POST'])
 @login_required
 def produto_deletar(produto_id):
-    """Deletar produto permanentemente (hard delete)"""
+    """
+    Deletar produto permanentemente (hard delete)
+
+    IMPORTANTE: Remove TODAS as referências antes de deletar o produto
+    porque SQLite nem sempre respeita CASCADE corretamente.
+    """
     produto = Produto.query.get_or_404(produto_id)
     nome = produto.nome
 
-    # Deletar permanentemente do banco de dados
-    db.session.delete(produto)
-    db.session.commit()
+    try:
+        # Importar modelos relacionados
+        from models import ItemCarrinho, ProdutoVisualizacao
 
-    flash(f'Produto "{nome}" deletado permanentemente com sucesso!', 'success')
+        # 1. Remover itens do carrinho
+        deleted_carrinho = ItemCarrinho.query.filter_by(produto_id=produto_id).delete()
+
+        # 2. Remover visualizações do produto
+        deleted_visualizacoes = ProdutoVisualizacao.query.filter_by(produto_id=produto_id).delete()
+
+        # 3. Deletar o produto
+        db.session.delete(produto)
+        db.session.commit()
+
+        # Mensagem de sucesso com detalhes
+        msg = f'Produto "{nome}" deletado com sucesso!'
+        if deleted_carrinho > 0 or deleted_visualizacoes > 0:
+            msg += f' (Removidos: {deleted_carrinho} item(ns) do carrinho, {deleted_visualizacoes} visualização(ões))'
+
+        flash(msg, 'success')
+
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Erro ao deletar produto "{nome}": {str(e)}', 'danger')
+        print(f"Erro ao deletar produto {produto_id}: {e}")
+
     return redirect(url_for('admin.produtos'))
 
 # ========================================
@@ -539,15 +598,30 @@ def configuracoes():
 @admin_bp.route('/subcategorias')
 @login_required
 def subcategorias():
-    """Lista todas as subcategorias"""
-    subcategorias = Subcategoria.query.order_by(Subcategoria.categoria, Subcategoria.ordem).all()
+    """Lista todas as subcategorias organizadas hierarquicamente"""
+    # Buscar todas as subcategorias
+    todas_subcategorias = Subcategoria.query.order_by(Subcategoria.categoria, Subcategoria.ordem).all()
 
-    # Agrupar por categoria
+    # Agrupar por categoria e organizar hierarquicamente
     subcategorias_por_categoria = {}
-    for subcat in subcategorias:
+
+    for subcat in todas_subcategorias:
         if subcat.categoria not in subcategorias_por_categoria:
             subcategorias_por_categoria[subcat.categoria] = []
-        subcategorias_por_categoria[subcat.categoria].append(subcat)
+
+    # Adicionar subcategorias na ordem hierárquica (nível 1 seguido de suas filhas)
+    for subcat in todas_subcategorias:
+        # Adicionar apenas subcategorias de nível 1 (sem pai)
+        if subcat.parent_id is None:
+            subcategorias_por_categoria[subcat.categoria].append(subcat)
+
+            # Adicionar as filhas (nível 2) logo após o pai
+            filhas = Subcategoria.query.filter_by(
+                categoria=subcat.categoria,
+                parent_id=subcat.id
+            ).order_by(Subcategoria.ordem).all()
+
+            subcategorias_por_categoria[subcat.categoria].extend(filhas)
 
     return render_template('admin/subcategorias.html',
                          subcategorias_por_categoria=subcategorias_por_categoria,
@@ -556,7 +630,7 @@ def subcategorias():
 @admin_bp.route('/subcategorias/nova', methods=['GET', 'POST'])
 @login_required
 def subcategoria_nova():
-    """Adicionar nova subcategoria"""
+    """Adicionar nova subcategoria (máximo 2 níveis)"""
     if request.method == 'POST':
         nome = request.form.get('nome')
         categoria = request.form.get('categoria')
@@ -569,6 +643,13 @@ def subcategoria_nova():
             parent_id = None
         else:
             parent_id = int(parent_id)
+
+        # VALIDAÇÃO: Impedir criação de nível 3
+        if parent_id:
+            parent = Subcategoria.query.get(parent_id)
+            if parent and parent.parent_id:
+                flash('❌ Não é permitido criar subcategorias de nível 3. O sistema suporta apenas 2 níveis (Subcategoria → Sub-subcategoria).', 'danger')
+                return redirect(url_for('admin.subcategoria_nova'))
 
         # Verificar se já existe
         existe = Subcategoria.query.filter_by(nome=nome, categoria=categoria, parent_id=parent_id).first()
@@ -591,8 +672,12 @@ def subcategoria_nova():
         flash(f'Subcategoria "{nome}" adicionada com sucesso!', 'success')
         return redirect(url_for('admin.subcategorias'))
 
-    # Buscar todas as subcategorias para mostrar como opções de pai
-    subcategorias_disponiveis = Subcategoria.query.filter_by(ativo=True).order_by(Subcategoria.categoria, Subcategoria.ordem).all()
+    # Buscar apenas subcategorias de NÍVEL 1 para mostrar como opções de pai
+    # (Não permitir que subcategorias de nível 2 sejam pais - impede nível 3)
+    subcategorias_disponiveis = Subcategoria.query.filter_by(
+        ativo=True,
+        parent_id=None  # Apenas nível 1
+    ).order_by(Subcategoria.categoria, Subcategoria.ordem).all()
 
     return render_template('admin/subcategoria_form.html',
                          categorias=Config.CATEGORIES,
@@ -616,11 +701,27 @@ def subcategoria_editar(subcategoria_id):
         else:
             parent_id = int(parent_id)
 
+        # VALIDAÇÃO: Impedir criação de nível 3
+        if parent_id:
+            parent = Subcategoria.query.get(parent_id)
+            if parent and parent.parent_id:
+                flash('❌ Não é permitido criar subcategorias de nível 3. O sistema suporta apenas 2 níveis (Subcategoria → Sub-subcategoria).', 'danger')
+                subcategorias_disponiveis = Subcategoria.query.filter(
+                    Subcategoria.id != subcategoria_id,
+                    Subcategoria.parent_id == None,  # Apenas nível 1
+                    Subcategoria.ativo == True
+                ).order_by(Subcategoria.categoria, Subcategoria.ordem).all()
+                return render_template('admin/subcategoria_form.html',
+                                     categorias=Config.CATEGORIES,
+                                     subcategoria=subcategoria,
+                                     subcategorias_disponiveis=subcategorias_disponiveis)
+
         # Impedir que uma subcategoria seja pai dela mesma
         if parent_id == subcategoria_id:
             flash('Uma subcategoria não pode ser pai dela mesma.', 'danger')
             subcategorias_disponiveis = Subcategoria.query.filter(
                 Subcategoria.id != subcategoria_id,
+                Subcategoria.parent_id == None,  # Apenas nível 1
                 Subcategoria.ativo == True
             ).order_by(Subcategoria.categoria, Subcategoria.ordem).all()
             return render_template('admin/subcategoria_form.html',
@@ -640,6 +741,7 @@ def subcategoria_editar(subcategoria_id):
             flash(f'Subcategoria "{nome}" já existe para a categoria "{categoria}".', 'warning')
             subcategorias_disponiveis = Subcategoria.query.filter(
                 Subcategoria.id != subcategoria_id,
+                Subcategoria.parent_id == None,  # Apenas nível 1
                 Subcategoria.ativo == True
             ).order_by(Subcategoria.categoria, Subcategoria.ordem).all()
             return render_template('admin/subcategoria_form.html',
@@ -659,9 +761,11 @@ def subcategoria_editar(subcategoria_id):
         flash(f'Subcategoria "{subcategoria.nome}" atualizada com sucesso!', 'success')
         return redirect(url_for('admin.subcategorias'))
 
-    # Buscar subcategorias disponíveis (exceto a própria)
+    # Buscar apenas subcategorias de NÍVEL 1 (exceto a própria)
+    # Não permitir nível 2 como pai para impedir nível 3
     subcategorias_disponiveis = Subcategoria.query.filter(
         Subcategoria.id != subcategoria_id,
+        Subcategoria.parent_id == None,  # Apenas nível 1
         Subcategoria.ativo == True
     ).order_by(Subcategoria.categoria, Subcategoria.ordem).all()
 
@@ -692,8 +796,14 @@ def subcategoria_deletar(subcategoria_id):
 @admin_bp.route('/api/subcategorias/<categoria>')
 @login_required
 def api_subcategorias_por_categoria(categoria):
-    """API para buscar subcategorias por categoria (para uso em AJAX)"""
-    subcategorias = Subcategoria.query.filter_by(categoria=categoria, ativo=True).order_by(Subcategoria.ordem).all()
+    """API para buscar TODAS as subcategorias de uma categoria (incluindo hierarquia completa)"""
+    # Buscar TODAS as subcategorias da categoria (ativas), independente do parent_id
+    # Isso permite que o JavaScript monte a hierarquia completa no frontend
+    subcategorias = Subcategoria.query.filter_by(
+        categoria=categoria,
+        ativo=True
+    ).order_by(Subcategoria.ordem, Subcategoria.nome).all()
+
     return {
         'subcategorias': [subcat.to_dict() for subcat in subcategorias]
     }

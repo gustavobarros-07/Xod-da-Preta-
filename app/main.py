@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, jsonify
+from flask import Flask, render_template, request, session, jsonify, flash
 from pathlib import Path
 from config import Config
 from database import db
@@ -157,10 +157,10 @@ def shop():
     from models import Produto, Subcategoria
     from config import Config
 
-    # Filtros da URL (3 níveis)
-    categoria_filtro = request.args.get('categoria')  # Nível 1: Roupas, Brincos, etc.
-    subcategoria_filtro = request.args.get('subcategoria')  # Nível 2: Feminino, Masculino
-    tipo_filtro = request.args.get('tipo')  # Nível 3: Vestido, Camisa, etc.
+    # Filtros da URL
+    categoria_filtro = request.args.get('categoria')  # Categoria principal: Roupas, Brincos, etc.
+    subcategoria_filtro = request.args.get('subcategoria')  # Subcategoria (nome): Feminino, Masculino, Vestido, etc.
+    tipo_filtro = request.args.get('tipo')  # Tipo (legado - não usado mais)
     preco_filtro = request.args.get('preco')
     preco_min = request.args.get('preco_min', type=int)
     preco_max = request.args.get('preco_max', type=int)
@@ -170,15 +170,33 @@ def shop():
     # Query base: produtos ativos e não deletados
     query = Produto.query_active().filter_by(ativo=True)
 
-    # Aplicar filtro de categoria (Nível 1)
+    # Aplicar filtro de categoria
     if categoria_filtro:
         query = query.filter_by(categoria=categoria_filtro)
 
-    # Aplicar filtro de subcategoria (Nível 2 - Feminino/Masculino)
+    # Aplicar filtro de subcategoria (com suporte a hierarquia de 2 níveis)
     if subcategoria_filtro:
-        query = query.filter_by(subcategoria=subcategoria_filtro)
+        # Buscar a subcategoria pelo nome
+        subcat = Subcategoria.query.filter_by(nome=subcategoria_filtro, categoria=categoria_filtro).first()
 
-    # Aplicar filtro de tipo (Nível 3 - Vestido/Camisa/etc.)
+        if subcat:
+            # Se for nível 1 (não tem pai), mostrar produtos dela E de todas as filhas
+            if not subcat.parent_id:
+                # Buscar IDs da subcategoria e de todas as suas filhas
+                ids_subcategorias = [subcat.id]
+                filhas = Subcategoria.query.filter_by(parent_id=subcat.id).all()
+                ids_subcategorias.extend([filha.id for filha in filhas])
+
+                # Filtrar produtos que tenham qualquer um desses IDs
+                query = query.filter(Produto.subcategoria_id.in_(ids_subcategorias))
+            else:
+                # Se for nível 2 (tem pai), mostrar apenas produtos dela
+                query = query.filter_by(subcategoria_id=subcat.id)
+        else:
+            # Subcategoria não encontrada - não mostrar nada
+            query = query.filter(Produto.id == None)
+
+    # Aplicar filtro de tipo (legado - mantido para compatibilidade)
     if tipo_filtro:
         query = query.filter_by(tipo=tipo_filtro)
 
@@ -284,10 +302,32 @@ def carrinho():
     session_id = get_session_id()
     itens = ItemCarrinho.query.filter_by(session_id=session_id).all()
 
-    # Calcular total
-    total = sum(item.produto.preco * item.quantidade for item in itens)
+    # Filtrar itens válidos (produto existe e está ativo)
+    # Remover automaticamente itens órfãos (produto deletado ou inativo)
+    itens_validos = []
+    itens_removidos = []
 
-    return render_template("carrinho.html", itens=itens, total=total)
+    for item in itens:
+        if item.produto and item.produto.ativo:
+            # Produto existe e está ativo - manter no carrinho
+            itens_validos.append(item)
+        else:
+            # Produto foi deletado ou está inativo - remover do carrinho
+            itens_removidos.append(item)
+            db.session.delete(item)
+
+    # Commit das remoções (se houver)
+    if itens_removidos:
+        db.session.commit()
+        if len(itens_removidos) == 1:
+            flash('Um produto do seu carrinho foi removido pois não está mais disponível.', 'warning')
+        else:
+            flash(f'{len(itens_removidos)} produtos do seu carrinho foram removidos pois não estão mais disponíveis.', 'warning')
+
+    # Calcular total apenas dos itens válidos
+    total = sum(item.produto.preco * item.quantidade for item in itens_validos)
+
+    return render_template("carrinho.html", itens=itens_validos, total=total)
 
 @app.route("/api/carrinho/adicionar", methods=['POST'])
 def adicionar_ao_carrinho():
@@ -444,6 +484,7 @@ def carrinho_total():
 # ========================================
 
 @app.route("/api/cupom/validar", methods=['POST'])
+@csrf.exempt
 def validar_cupom():
     """Valida um cupom de desconto"""
     from models import Cupom
@@ -453,22 +494,28 @@ def validar_cupom():
         codigo = data.get('codigo', '').upper().strip()
         valor_carrinho = float(data.get('valor_carrinho', 0))
 
+        app.logger.info(f'Tentando validar cupom: {codigo} para carrinho de R$ {valor_carrinho:.2f}')
+
         if not codigo:
+            app.logger.warning('Código do cupom não informado')
             return jsonify({'success': False, 'message': 'Código do cupom não informado'}), 400
 
         # Buscar cupom
         cupom = Cupom.query.filter_by(codigo=codigo).first()
 
         if not cupom:
+            app.logger.warning(f'Cupom "{codigo}" não encontrado no banco de dados')
             return jsonify({'success': False, 'message': f'Cupom "{codigo}" não encontrado. Verifique o código e tente novamente.'}), 404
 
         # Validar cupom
         valido, mensagem = cupom.is_valido()
         if not valido:
+            app.logger.warning(f'Cupom "{codigo}" inválido: {mensagem}')
             return jsonify({'success': False, 'message': mensagem}), 400
 
         # Verificar valor mínimo
         if cupom.valor_minimo and valor_carrinho < cupom.valor_minimo:
+            app.logger.warning(f'Valor do carrinho R$ {valor_carrinho:.2f} menor que o mínimo R$ {cupom.valor_minimo:.2f}')
             return jsonify({
                 'success': False,
                 'message': f'Valor mínimo do carrinho: R$ {cupom.valor_minimo:.2f}'
@@ -478,10 +525,13 @@ def validar_cupom():
         valor_desconto, mensagem_desconto = cupom.calcular_desconto(valor_carrinho)
 
         if valor_desconto == 0:
+            app.logger.warning(f'Desconto calculado foi zero: {mensagem_desconto}')
             return jsonify({
                 'success': False,
                 'message': mensagem_desconto
             }), 400
+
+        app.logger.info(f'Cupom "{codigo}" aplicado com sucesso! Desconto: R$ {valor_desconto:.2f}')
 
         return jsonify({
             'success': True,

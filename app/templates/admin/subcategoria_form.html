@@ -57,18 +57,19 @@
             box-shadow: 0 4px 12px rgba(220, 53, 69, 0.5);
         }
 
-        /* Botão Voltar (no header) - Amarelo */
-        .admin-header .btn-secondary {
-            background: linear-gradient(135deg, var(--cor-dourada) 0%, var(--cor-dourada-escura) 100%) !important;
-            color: var(--cor-preta) !important;
-            box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+        /* Link Voltar (no header) - Amarelo */
+        .admin-header nav a {
+            color: var(--cor-dourada) !important;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            text-decoration: none;
         }
 
-        .admin-header .btn-secondary:hover {
-            background: linear-gradient(135deg, var(--cor-dourada-escura) 0%, #e0a800 100%) !important;
+        .admin-header nav a:hover {
+            background-color: var(--cor-dourada);
             color: var(--cor-preta) !important;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.5);
         }
     </style>
 </head>
@@ -139,12 +140,14 @@
         <!-- Header -->
         <div class="admin-header">
             <h1>
-                <i class="fas fa-tags"></i>
+                <i class="fas fa-{% if subcategoria %}edit{% else %}plus{% endif %}"></i>
                 {% if subcategoria %}Editar Subcategoria{% else %}Nova Subcategoria{% endif %}
             </h1>
-            <a href="{{ url_for('admin.subcategorias') }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Voltar
-            </a>
+            <nav>
+                <a href="{{ url_for('admin.subcategorias') }}" class="text-muted">
+                    <i class="fas fa-arrow-left"></i> Voltar para subcategorias
+                </a>
+            </nav>
         </div>
 
         <!-- Mensagens Flash -->

@@ -14,6 +14,87 @@
     <!-- Xodo da Preta - Design System Unificado -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/xodo-core.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/xodo-admin.css') }}">
+
+    <style>
+        /* Placeholders mais visíveis */
+        .form-control::placeholder,
+        .form-select::placeholder {
+            color: #6c757d !important;
+            opacity: 1 !important;
+        }
+
+        /* Dica em destaque */
+        .info-box {
+            background-color: #fffbea !important;
+            border-left: 4px solid var(--cor-dourada) !important;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(255, 193, 7, 0.15);
+        }
+
+        .info-box strong {
+            color: var(--cor-dourada) !important;
+            font-size: 16px;
+        }
+
+        .info-box i {
+            color: var(--cor-dourada);
+            font-size: 18px;
+            margin-right: 8px;
+        }
+
+        /* Botão Salvar/Criar - Verde */
+        .btn-save {
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%) !important;
+            color: white !important;
+            border: none;
+            padding: 12px 30px;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-save:hover {
+            background: linear-gradient(135deg, #218838 0%, #1e7e34 100%) !important;
+            color: white !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.5);
+        }
+
+        /* Botão Cancelar (no formulário) - Vermelho */
+        .d-flex.justify-content-between .btn-secondary {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+            color: white !important;
+            border: none;
+            padding: 12px 30px;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .d-flex.justify-content-between .btn-secondary:hover {
+            background: linear-gradient(135deg, #c82333 0%, #bd2130 100%) !important;
+            color: white !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.5);
+        }
+
+        /* Link Voltar (no header) - Amarelo */
+        .admin-header nav a {
+            color: var(--cor-dourada) !important;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .admin-header nav a:hover {
+            background-color: var(--cor-dourada);
+            color: var(--cor-preta) !important;
+        }
+    </style>
 </head>
 <body>
     <!-- Sidebar -->
@@ -82,12 +163,14 @@
         <!-- Header -->
         <div class="admin-header">
             <h1>
-                <i class="fas fa-ticket-alt"></i>
+                <i class="fas fa-{% if cupom %}edit{% else %}plus{% endif %}"></i>
                 {% if cupom %}Editar Cupom{% else %}Novo Cupom{% endif %}
             </h1>
-            <a href="{{ url_for('admin.cupons') }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Voltar
-            </a>
+            <nav>
+                <a href="{{ url_for('admin.cupons') }}" class="text-muted">
+                    <i class="fas fa-arrow-left"></i> Voltar para cupons
+                </a>
+            </nav>
         </div>
 
         <!-- Mensagens Flash -->

@@ -824,23 +824,24 @@
                     <a href="?categoria=Roupas" class="mobile-modal-option subcategory {% if categoria_filtro == 'Roupas' and not request.args.get('subcategoria') %}active{% endif %}">
                         Todas as Roupas
                     </a>
-                    <a href="?categoria=Roupas&subcategoria=Feminino" class="mobile-modal-option subcategory {% if request.args.get('subcategoria') == 'Feminino' %}active{% endif %}">
-                        <i class="fas fa-female"></i> Feminino
-                    </a>
-                    <a href="?categoria=Roupas&subcategoria=Masculino" class="mobile-modal-option subcategory {% if request.args.get('subcategoria') == 'Masculino' %}active{% endif %}">
-                        <i class="fas fa-male"></i> Masculino
-                    </a>
-                    <a href="?categoria=Roupas&subcategoria=Unissex" class="mobile-modal-option subcategory {% if request.args.get('subcategoria') == 'Unissex' %}active{% endif %}">
-                        <i class="fas fa-users"></i> Unissex
-                    </a>
 
-                    <!-- Subcategorias Dinâmicas (criadas no admin) -->
+                    <!-- Subcategorias Dinâmicas de Nível 1 (criadas no admin) -->
                     {% if subcategorias %}
                         {% for subcat in subcategorias %}
-                            {% if subcat.categoria == 'Roupas' and subcat.nome not in ['Feminino', 'Masculino', 'Unissex'] %}
+                            {# Mostrar apenas subcategorias de NÍVEL 1 (sem parent_id) #}
+                            {% if subcat.categoria == 'Roupas' and not subcat.parent_id %}
                             <a href="?categoria=Roupas&subcategoria={{ subcat.nome }}" class="mobile-modal-option subcategory {% if request.args.get('subcategoria') == subcat.nome %}active{% endif %}">
-                                <i class="fas fa-tag"></i> {{ subcat.nome }}
+                                <i class="fas fa-folder"></i> {{ subcat.nome }}
                             </a>
+
+                                {# Mostrar sub-subcategorias (nível 2) mais indentadas #}
+                                {% for subsubcat in subcategorias %}
+                                    {% if subsubcat.parent_id == subcat.id %}
+                                    <a href="?categoria=Roupas&subcategoria={{ subsubcat.nome }}" class="mobile-modal-option subcategory {% if request.args.get('subcategoria') == subsubcat.nome %}active{% endif %}" style="padding-left: 72px; font-size: 13px;">
+                                        <i class="fas fa-tag"></i> {{ subsubcat.nome }}
+                                    </a>
+                                    {% endif %}
+                                {% endfor %}
                             {% endif %}
                         {% endfor %}
                     {% endif %}
@@ -920,28 +921,25 @@
                                 <i class="fas fa-th"></i> Todas as Roupas
                             </a>
 
-                            <!-- Subcategorias Padrão (Hardcoded) -->
-                            <a href="{{ url_for('shop', categoria='Roupas', subcategoria='Feminino') }}"
-                               class="filter-link {% if subcategoria_filtro == 'Feminino' %}active{% endif %}">
-                                <i class="fas fa-female"></i> Feminino
-                            </a>
-                            <a href="{{ url_for('shop', categoria='Roupas', subcategoria='Masculino') }}"
-                               class="filter-link {% if subcategoria_filtro == 'Masculino' %}active{% endif %}">
-                                <i class="fas fa-male"></i> Masculino
-                            </a>
-                            <a href="{{ url_for('shop', categoria='Roupas', subcategoria='Unissex') }}"
-                               class="filter-link {% if subcategoria_filtro == 'Unissex' %}active{% endif %}">
-                                <i class="fas fa-users"></i> Unissex
-                            </a>
-
-                            <!-- Subcategorias Dinâmicas (criadas no admin) -->
+                            <!-- Subcategorias Dinâmicas de Nível 1 (criadas no admin) -->
                             {% if subcategorias %}
                                 {% for subcat in subcategorias %}
-                                    {% if subcat.categoria == 'Roupas' and subcat.nome not in ['Feminino', 'Masculino', 'Unissex'] %}
+                                    {# Mostrar apenas subcategorias de NÍVEL 1 (sem parent_id) da categoria Roupas #}
+                                    {% if subcat.categoria == 'Roupas' and not subcat.parent_id %}
                                     <a href="{{ url_for('shop', categoria='Roupas', subcategoria=subcat.nome) }}"
                                        class="filter-link {% if subcategoria_filtro == subcat.nome %}active{% endif %}">
-                                        <i class="fas fa-tag"></i> {{ subcat.nome }}
+                                        <i class="fas fa-folder"></i> {{ subcat.nome }}
                                     </a>
+
+                                        {# Mostrar sub-subcategorias (nível 2) indentadas #}
+                                        {% for subsubcat in subcategorias %}
+                                            {% if subsubcat.parent_id == subcat.id %}
+                                            <a href="{{ url_for('shop', categoria='Roupas', subcategoria=subsubcat.nome) }}"
+                                               class="sub-filter-link {% if subcategoria_filtro == subsubcat.nome %}active{% endif %}">
+                                                <i class="fas fa-tag"></i> {{ subsubcat.nome }}
+                                            </a>
+                                            {% endif %}
+                                        {% endfor %}
                                     {% endif %}
                                 {% endfor %}
                             {% endif %}

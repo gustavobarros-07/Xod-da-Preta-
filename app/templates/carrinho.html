@@ -495,9 +495,19 @@ document.getElementById('checkout-btn')?.addEventListener('click', function() {
         mensagem += `${index + 1}. ${nome} (${qtd}x)\n`;
     });
 
+    // Subtotal
+    const subtotal = document.getElementById('cart-subtotal').textContent.trim();
+    mensagem += `\n*Subtotal: ${subtotal}*\n`;
+
+    // Cupom aplicado (se houver)
+    if (cupomAplicado && valorDesconto > 0) {
+        const descontoFormatado = document.getElementById('desconto-valor').textContent.trim();
+        mensagem += `*Cupom ${cupomAplicado.codigo}: ${descontoFormatado}*\n`;
+    }
+
     // Total e fechamento
     const total = document.getElementById('cart-total').textContent.trim();
-    mensagem += `\n💰 *Total: ${total}*\n\n`;
+    mensagem += `\n💰 *Total Final: ${total}*\n\n`;
     mensagem += 'Aguardo contato para combinar entrega! 😊';
 
     // Copiar para área de transferência como fallback

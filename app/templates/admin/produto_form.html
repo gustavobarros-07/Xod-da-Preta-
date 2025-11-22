@@ -216,54 +216,35 @@
                             </div>
                         </div>
 
-                        <!-- Campos de Hierarquia (aparecem apenas para Roupas) -->
-                        <div id="hierarquia-roupas" style="display: {% if produto and produto.categoria == 'Roupas' %}block{% else %}none{% endif %};">
+                        <!-- Sistema de Subcategorias Dinâmicas (2 Níveis) -->
+                        <div id="subcategorias-container">
                             <div class="row">
+                                <!-- Nível 1: Subcategoria Principal -->
                                 <div class="col-md-6 mb-3">
-                                    <label for="subcategoria" class="form-label">
-                                        <i class="fas fa-venus-mars"></i> Subcategoria (Gênero)
+                                    <label for="subcategoria_nivel1" class="form-label">
+                                        <i class="fas fa-folder"></i> Subcategoria
                                     </label>
-                                    <select class="form-select" id="subcategoria" name="subcategoria">
-                                        <option value="">Selecione...</option>
-                                        <option value="Feminino" {% if produto and produto.subcategoria == 'Feminino' %}selected{% endif %}>Feminino</option>
-                                        <option value="Masculino" {% if produto and produto.subcategoria == 'Masculino' %}selected{% endif %}>Masculino</option>
-                                        <option value="Unissex" {% if produto and produto.subcategoria == 'Unissex' %}selected{% endif %}>Unissex</option>
-
-                                        <!-- Subcategorias Dinâmicas (criadas no admin) -->
-                                        {% if subcategorias %}
-                                            {% for subcat in subcategorias %}
-                                                {% if subcat.categoria == 'Roupas' %}
-                                                <option value="{{ subcat.nome }}"
-                                                        data-subcat-id="{{ subcat.id }}"
-                                                        {% if produto and produto.subcategoria == subcat.nome %}selected{% endif %}>
-                                                    {{ subcat.nome }}
-                                                </option>
-                                                {% endif %}
-                                            {% endfor %}
-                                        {% endif %}
+                                    <select class="form-select" id="subcategoria_nivel1" name="subcategoria_nivel1">
+                                        <option value="">Nenhuma</option>
+                                        <!-- Preenchido via JavaScript -->
                                     </select>
-                                    <small class="text-muted">Selecione o gênero ou subcategoria</small>
+                                    <small class="text-muted">Ex: Feminino, Masculino, Argola, etc.</small>
                                 </div>
 
+                                <!-- Nível 2: Sub-subcategoria -->
                                 <div class="col-md-6 mb-3">
-                                    <label for="tipo" class="form-label">
-                                        <i class="fas fa-tag"></i> Tipo
+                                    <label for="subcategoria_nivel2" class="form-label">
+                                        <i class="fas fa-tag"></i> Sub-subcategoria
                                     </label>
-                                    <select class="form-select" id="tipo" name="tipo">
+                                    <select class="form-select" id="subcategoria_nivel2" name="subcategoria_nivel2" disabled>
                                         <option value="">Selecione primeiro a subcategoria...</option>
-                                        <!-- Feminino -->
-                                        <option value="Vestido" data-subcategoria="Feminino" {% if produto and produto.tipo == 'Vestido' %}selected{% endif %}>Vestido</option>
-                                        <option value="Saia" data-subcategoria="Feminino" {% if produto and produto.tipo == 'Saia' %}selected{% endif %}>Saia</option>
-                                        <option value="Macacão" data-subcategoria="Feminino" {% if produto and produto.tipo == 'Macacão' %}selected{% endif %}>Macacão</option>
-                                        <option value="Jaqueta" data-subcategoria="Feminino" {% if produto and produto.tipo == 'Jaqueta' %}selected{% endif %}>Jaqueta</option>
-                                        <!-- Masculino -->
-                                        <option value="Camisa" data-subcategoria="Masculino" {% if produto and produto.tipo == 'Camisa' %}selected{% endif %}>Camisa</option>
-                                        <option value="Bata" data-subcategoria="Masculino" {% if produto and produto.tipo == 'Bata' %}selected{% endif %}>Bata</option>
-                                        <option value="Conjunto" data-subcategoria="Masculino" {% if produto and produto.tipo == 'Conjunto' %}selected{% endif %}>Conjunto</option>
-                                        <option value="Jaqueta" data-subcategoria="Masculino" {% if produto and produto.tipo == 'Jaqueta' %}selected{% endif %}>Jaqueta</option>
+                                        <!-- Preenchido via JavaScript -->
                                     </select>
-                                    <small class="text-muted">Tipo específico do produto</small>
+                                    <small class="text-muted">Ex: Vestido, Camisa, Bata, etc. (opcional)</small>
                                 </div>
+
+                                <!-- Campo oculto para armazenar o ID final da subcategoria -->
+                                <input type="hidden" id="subcategoria_id" name="subcategoria_id" value="{% if produto %}{{ produto.subcategoria_id }}{% endif %}">
                             </div>
                         </div>
 
@@ -447,64 +428,164 @@
             }
         }
 
-        // Controlar exibição da hierarquia de roupas
+        // Sistema de Subcategorias Hierárquicas (2 Níveis)
         document.addEventListener('DOMContentLoaded', function() {
             const categoriaSelect = document.getElementById('categoria');
-            const hierarquiaDiv = document.getElementById('hierarquia-roupas');
-            const subcategoriaSelect = document.getElementById('subcategoria');
-            const tipoSelect = document.getElementById('tipo');
+            const nivel1Select = document.getElementById('subcategoria_nivel1');
+            const nivel2Select = document.getElementById('subcategoria_nivel2');
+            const subcategoriaIdInput = document.getElementById('subcategoria_id');
 
-            // Função para mostrar/ocultar hierarquia baseado na categoria
-            function toggleHierarquia() {
-                if (categoriaSelect.value === 'Roupas') {
-                    hierarquiaDiv.style.display = 'block';
-                } else {
-                    hierarquiaDiv.style.display = 'none';
-                    // Limpar valores quando não é Roupas
-                    if (subcategoriaSelect) subcategoriaSelect.value = '';
-                    if (tipoSelect) tipoSelect.value = '';
+            // Dados de subcategorias (carregado do backend)
+            let todasSubcategorias = [];
+
+            // Função para carregar subcategorias do backend
+            async function carregarSubcategorias(categoria) {
+                if (!categoria) {
+                    limparSelects();
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/admin/api/subcategorias/${categoria}`);
+                    const data = await response.json();
+                    todasSubcategorias = data.subcategorias || [];
+
+                    // Carregar nível 1 (subcategorias sem parent_id)
+                    carregarNivel1();
+                } catch (error) {
+                    console.error('Erro ao carregar subcategorias:', error);
+                    todasSubcategorias = [];
+                    limparSelects();
                 }
             }
 
-            // Função para filtrar tipos baseado na subcategoria selecionada
-            function filtrarTipos() {
-                const subcategoriaSelecionada = subcategoriaSelect.value;
-                const tipoOptions = tipoSelect.querySelectorAll('option');
+            // Carregar subcategorias de nível 1 (sem pai)
+            function carregarNivel1() {
+                nivel1Select.innerHTML = '<option value="">Nenhuma</option>';
 
-                tipoOptions.forEach(option => {
-                    if (option.value === '') {
-                        option.style.display = 'block';
-                        option.textContent = subcategoriaSelecionada ?
-                            'Selecione o tipo...' :
-                            'Selecione primeiro a subcategoria...';
-                    } else {
-                        const optionSubcat = option.getAttribute('data-subcategoria');
-                        if (optionSubcat === subcategoriaSelecionada) {
-                            option.style.display = 'block';
-                        } else {
-                            option.style.display = 'none';
-                        }
-                    }
+                const subcatsNivel1 = todasSubcategorias.filter(s => !s.parent_id);
+
+                subcatsNivel1.forEach(subcat => {
+                    const option = document.createElement('option');
+                    option.value = subcat.id;
+                    option.textContent = subcat.nome;
+                    nivel1Select.appendChild(option);
                 });
 
-                // Resetar seleção se o tipo atual não pertence à nova subcategoria
-                const selectedTipo = tipoSelect.options[tipoSelect.selectedIndex];
-                if (selectedTipo && selectedTipo.getAttribute('data-subcategoria') !== subcategoriaSelecionada) {
-                    tipoSelect.value = '';
+                // Se estamos editando e há uma subcategoria selecionada, restaurar a seleção
+                {% if produto and produto.subcategoria_id %}
+                    restaurarSelecao({{ produto.subcategoria_id }});
+                {% endif %}
+            }
+
+            // Carregar subcategorias de nível 2 (filhas do nível 1)
+            function carregarNivel2(parentId) {
+                nivel2Select.innerHTML = '<option value="">Nenhuma</option>';
+                nivel2Select.disabled = false;
+
+                const subcatsNivel2 = todasSubcategorias.filter(s => s.parent_id == parentId);
+
+                if (subcatsNivel2.length === 0) {
+                    nivel2Select.disabled = true;
+                    nivel2Select.innerHTML = '<option value="">Sem sub-subcategorias</option>';
+                    atualizarSubcategoriaId();
+                    return;
+                }
+
+                subcatsNivel2.forEach(subcat => {
+                    const option = document.createElement('option');
+                    option.value = subcat.id;
+                    option.textContent = subcat.nome;
+                    nivel2Select.appendChild(option);
+                });
+            }
+
+            // Limpar todos os selects de subcategoria
+            function limparSelects() {
+                nivel1Select.innerHTML = '<option value="">Nenhuma</option>';
+                nivel2Select.innerHTML = '<option value="">Selecione primeiro a subcategoria...</option>';
+                nivel2Select.disabled = true;
+                subcategoriaIdInput.value = '';
+            }
+
+            // Limpar nível 2
+            function limparNivel2() {
+                nivel2Select.innerHTML = '<option value="">Nenhuma</option>';
+                nivel2Select.disabled = true;
+                atualizarSubcategoriaId();
+            }
+
+            // Atualizar o campo oculto subcategoria_id com o nível mais específico selecionado
+            function atualizarSubcategoriaId() {
+                let idFinal = '';
+
+                // Prioridade: Nível 2 > Nível 1
+                if (nivel2Select.value && nivel2Select.value !== '') {
+                    idFinal = nivel2Select.value;
+                } else if (nivel1Select.value && nivel1Select.value !== '') {
+                    idFinal = nivel1Select.value;
+                }
+
+                subcategoriaIdInput.value = idFinal;
+                console.log('Subcategoria ID atualizado:', idFinal);
+            }
+
+            // Restaurar seleção ao editar produto
+            function restaurarSelecao(subcategoriaId) {
+                // Encontrar a subcategoria selecionada
+                const subcatSelecionada = todasSubcategorias.find(s => s.id == subcategoriaId);
+
+                if (!subcatSelecionada) return;
+
+                // Descobrir o caminho hierárquico (máximo 2 níveis)
+                let nivel1Id, nivel2Id;
+
+                if (subcatSelecionada.parent_id) {
+                    // É nível 2 (tem pai)
+                    nivel2Id = subcatSelecionada.id;
+                    nivel1Id = subcatSelecionada.parent_id;
+                } else {
+                    // É nível 1 (não tem pai)
+                    nivel1Id = subcatSelecionada.id;
+                }
+
+                // Selecionar nível 1
+                if (nivel1Id) {
+                    nivel1Select.value = nivel1Id;
+                    carregarNivel2(nivel1Id);
+                }
+
+                // Selecionar nível 2
+                if (nivel2Id) {
+                    setTimeout(() => {
+                        nivel2Select.value = nivel2Id;
+                        atualizarSubcategoriaId();
+                    }, 100);
                 }
             }
 
-            // Event listeners
-            if (categoriaSelect) {
-                categoriaSelect.addEventListener('change', toggleHierarquia);
-                // Trigger no load
-                toggleHierarquia();
-            }
+            // Event Listeners
+            categoriaSelect.addEventListener('change', function() {
+                carregarSubcategorias(this.value);
+            });
 
-            if (subcategoriaSelect && tipoSelect) {
-                subcategoriaSelect.addEventListener('change', filtrarTipos);
-                // Trigger no load para mostrar tipos corretos
-                filtrarTipos();
+            nivel1Select.addEventListener('change', function() {
+                limparNivel2();
+
+                if (this.value) {
+                    carregarNivel2(this.value);
+                }
+
+                atualizarSubcategoriaId();
+            });
+
+            nivel2Select.addEventListener('change', function() {
+                atualizarSubcategoriaId();
+            });
+
+            // Carregar subcategorias ao inicializar (se já tiver categoria selecionada)
+            if (categoriaSelect.value) {
+                carregarSubcategorias(categoriaSelect.value);
             }
         });
     </script>
