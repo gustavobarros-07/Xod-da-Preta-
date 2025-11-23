@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Xodó da Preta - Contato{% endblock %}
+{% block title %}Xodo da Preta - Contato{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -13,7 +13,6 @@
         font-size: 18px;
         transition: all 0.3s;
     }
-    
     .whatsapp-btn:hover {
         background-color: #128C7E;
         border-color: #128C7E;
@@ -21,11 +20,7 @@
         transform: translateY(-2px);
         box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4);
     }
-    
-    .whatsapp-btn i {
-        margin-right: 10px;
-    }
-    
+    .whatsapp-btn i { margin-right: 10px; }
     .contact-info-card {
         background: white;
         border-radius: 10px;
@@ -33,16 +28,8 @@
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         margin-bottom: 30px;
     }
-    
-    .contact-info-card h5 {
-        color: #ffc107;
-        margin-bottom: 20px;
-    }
-    
-    .contact-info-card p {
-        margin-bottom: 10px;
-    }
-    
+    .contact-info-card h5 { color: #ffc107; margin-bottom: 20px; }
+    .contact-info-card p { margin-bottom: 10px; }
     .contact-info-card i {
         color: #ffc107;
         margin-right: 10px;
@@ -52,21 +39,18 @@
 {% endblock %}
 
 {% block content %}
-<!-- Start Content Page -->
 <div class="container-fluid bg-light py-5">
     <div class="col-md-6 m-auto text-center">
         <h1 class="h1">Entre em Contato</h1>
-        <p>Ficou com alguma dúvida? Envie uma mensagem pelo WhatsApp!</p>
+        <p>Ficou com alguma duvida? Envie uma mensagem pelo WhatsApp!</p>
     </div>
 </div>
 
-<!-- Start Contact -->
 <div class="container py-5">
     <div class="row py-5">
-        <!-- Informações de Contato -->
         <div class="col-md-4 mb-4">
             <div class="contact-info-card">
-                <h5><i class="fas fa-info-circle"></i> Informações</h5>
+                <h5><i class="fas fa-info-circle"></i> Informacoes</h5>
                 
                 <p class="mb-4">
                     <i class="fas fa-phone"></i>
@@ -76,30 +60,31 @@
                     </a>
                 </p>
 
+                {% if config_loja_instagram %}
                 <p class="mb-4">
                     <i class="fab fa-instagram"></i>
                     <strong>Instagram:</strong><br>
-                    <a href="https://www.instagram.com/xododapreta" target="_blank" class="text-decoration-none">
-                        @xododapreta
+                    <a href="https://www.instagram.com/{{ config_loja_instagram|replace('@', '') }}" target="_blank" class="text-decoration-none">
+                        {{ config_loja_instagram }}
                     </a>
                 </p>
+                {% endif %}
 
                 <p class="mb-4">
                     <i class="fas fa-map-marker-alt"></i>
-                    <strong>Localização:</strong><br>
-                    São Paulo, SP
+                    <strong>Localizacao:</strong><br>
+                    {{ config_loja_endereco or 'Sao Paulo, SP' }}
                 </p>
                 
                 <hr>
                 
                 <p class="text-muted small mb-0">
                     <i class="fas fa-clock"></i>
-                    Respondemos em até 24 horas!
+                    Respondemos em ate 24 horas!
                 </p>
             </div>
         </div>
         
-        <!-- Formulário -->
         <div class="col-md-8">
             <div class="contact-info-card">
                 <h5><i class="fab fa-whatsapp"></i> Enviar Mensagem via WhatsApp</h5>
@@ -107,33 +92,18 @@
                 <form id="contactForm">
                     <div class="mb-3">
                         <label for="name" class="form-label">Seu Nome *</label>
-                        <input type="text" 
-                               class="form-control" 
-                               id="name" 
-                               placeholder="Digite seu nome"
-                               required>
-                        <div class="invalid-feedback">
-                            Por favor, digite seu nome.
-                        </div>
+                        <input type="text" class="form-control" id="name" placeholder="Digite seu nome" required>
+                        <div class="invalid-feedback">Por favor, digite seu nome.</div>
                     </div>
                     
                     <div class="mb-3">
                         <label for="message" class="form-label">Sua Mensagem *</label>
-                        <textarea class="form-control"
-                                  id="message"
-                                  rows="4"
-                                  maxlength="300"
-                                  placeholder="Digite sua mensagem..."
-                                  required></textarea>
-                        <div class="form-text text-end">
-                            <span id="char-count">0</span>/300 caracteres
-                        </div>
-                        <div class="invalid-feedback">
-                            Por favor, digite sua mensagem.
-                        </div>
+                        <textarea class="form-control" id="message" rows="4" maxlength="300" placeholder="Digite sua mensagem..." required></textarea>
+                        <div class="form-text text-end"><span id="char-count">0</span>/300 caracteres</div>
+                        <div class="invalid-feedback">Por favor, digite sua mensagem.</div>
                         <small class="text-muted">
                             <i class="fas fa-info-circle"></i>
-                            Mantenha sua mensagem breve para garantir que será carregada corretamente no WhatsApp.
+                            Mantenha sua mensagem breve para garantir que sera carregada corretamente no WhatsApp.
                         </small>
                     </div>
                     
@@ -145,20 +115,17 @@
                     </div>
                     
                     <p class="text-muted text-center mt-3 small">
-                        Ao clicar, você será redirecionado para o WhatsApp com sua mensagem pronta.
+                        Ao clicar, voce sera redirecionado para o WhatsApp com sua mensagem pronta.
                     </p>
                 </form>
             </div>
         </div>
     </div>
 </div>
-<!-- End Contact -->
 {% endblock %}
 
 {% block extra_js %}
-<!-- WhatsApp Integration Script -->
 <script>
-    // Contador de caracteres
     const messageField = document.getElementById('message');
     const charCount = document.getElementById('char-count');
 
@@ -166,7 +133,6 @@
         charCount.textContent = this.value.length;
     });
 
-    // Envio do formulário
     document.getElementById('contactForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -178,37 +144,27 @@
             return;
         }
 
-        // Mensagem compacta
-        const whatsappMessage = `Olá! Meu nome é ${name}.\n\n${message}`;
+        const whatsappMessage = `Ola! Meu nome e ${name}.\n\n${message}`;
 
-        // Copiar para área de transferência como fallback
-        navigator.clipboard.writeText(whatsappMessage).catch(err => {
-            console.warn('Não foi possível copiar automaticamente');
-        });
+        navigator.clipboard.writeText(whatsappMessage).catch(() => {});
 
-        // Limpar número de telefone removendo todos os caracteres não-numéricos
         const phoneNumber = '{{ config_loja_telefone }}'.replace(/\D/g, '');
-        console.log('Número WhatsApp (Contact):', phoneNumber); // Debug
         const whatsappURL = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(whatsappMessage)}`;
 
-        // Detectar se é mobile ou desktop
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
         if (isMobile) {
-            // Mobile: Abrir direto (mensagem geralmente preenche automaticamente)
             window.open(whatsappURL, '_blank');
             document.getElementById('contactForm').reset();
             charCount.textContent = '0';
 
-            // Feedback sutil
             setTimeout(() => {
-                alert('💬 Abrindo WhatsApp...\n\nSe a mensagem não aparecer, ela foi copiada para você colar!');
+                alert('Abrindo WhatsApp... Se a mensagem nao aparecer, ela foi copiada para voce colar!');
             }, 500);
         } else {
-            // Desktop: Avisar sobre a cópia
             const confirmacao = confirm(
-                '📋 Mensagem copiada para área de transferência!\n\n' +
-                'O WhatsApp Desktop geralmente não preenche automaticamente.\n\n' +
+                'Mensagem copiada para area de transferencia!\n\n' +
+                'O WhatsApp Desktop geralmente nao preenche automaticamente.\n\n' +
                 'Quando abrir o WhatsApp, cole a mensagem com Ctrl+V (ou Cmd+V no Mac).\n\n' +
                 'Clique OK para continuar.'
             );

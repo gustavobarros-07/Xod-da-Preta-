@@ -78,7 +78,7 @@ venv\Scripts\activate
 ### 2.3. Instalar dependências
 
 ```bash
-pip install --upgrade pip
+pip install --upgrade pip , se não der certo tente esse rapaziada  python.exe -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
