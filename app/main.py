@@ -549,6 +549,45 @@ def validar_cupom():
         app.logger.error(f"Erro ao validar cupom: {e}", exc_info=True)
         return jsonify({'success': False, 'message': 'Erro ao validar cupom'}), 500
 
+@app.route("/api/cupom/usar", methods=['POST'])
+@limiter.limit("10 per minute")
+def usar_cupom():
+    """Marca um cupom como usado ao finalizar pedido"""
+    from models import Cupom
+
+    try:
+        data = request.get_json()
+        cupom_id = data.get('cupom_id')
+
+        if not cupom_id:
+            return jsonify({'success': False, 'message': 'ID do cupom não informado'}), 400
+
+        # Buscar cupom
+        cupom = Cupom.query.get(cupom_id)
+
+        if not cupom:
+            app.logger.warning(f'Cupom ID {cupom_id} não encontrado')
+            return jsonify({'success': False, 'message': 'Cupom não encontrado'}), 404
+
+        # Verificar se ainda não atingiu o limite máximo
+        if cupom.quantidade_maxima and cupom.quantidade_usada >= cupom.quantidade_maxima:
+            return jsonify({'success': False, 'message': 'Cupom já atingiu o limite de usos'}), 400
+
+        # Incrementar quantidade usada
+        cupom.usar()
+
+        app.logger.info(f'Cupom "{cupom.codigo}" (ID: {cupom.id}) marcado como usado. Total de usos: {cupom.quantidade_usada}')
+
+        return jsonify({
+            'success': True,
+            'message': 'Cupom registrado com sucesso',
+            'quantidade_usada': cupom.quantidade_usada
+        })
+
+    except Exception as e:
+        app.logger.error(f"Erro ao marcar cupom como usado: {e}", exc_info=True)
+        return jsonify({'success': False, 'message': 'Erro ao processar cupom'}), 500
+
 # ========================================
 # BUSCA
 # ========================================

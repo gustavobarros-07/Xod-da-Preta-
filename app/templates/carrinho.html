@@ -481,7 +481,35 @@ function atualizarTotalComDesconto() {
 }
 
 // Finalizar pedido via WhatsApp
-document.getElementById('checkout-btn')?.addEventListener('click', function() {
+document.getElementById('checkout-btn')?.addEventListener('click', async function() {
+    // Se há cupom aplicado, registrar o uso antes de finalizar
+    if (cupomAplicado && cupomAplicado.id) {
+        try {
+            const response = await fetch('/api/cupom/usar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    cupom_id: cupomAplicado.id
+                })
+            });
+
+            const data = await response.json();
+
+            if (!data.success) {
+                console.warn('Aviso ao registrar cupom:', data.message);
+                // Continua mesmo se houver erro no registro do cupom
+            } else {
+                console.log('Cupom registrado com sucesso:', data.message);
+            }
+        } catch (error) {
+            console.error('Erro ao registrar uso do cupom:', error);
+            // Continua mesmo se houver erro
+        }
+    }
+
     // Mensagem otimizada - ~300 caracteres (seguro para todas as plataformas)
     let mensagem = '🛍️ *Olá! Quero finalizar meu pedido*\n\n';
 

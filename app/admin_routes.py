@@ -306,9 +306,26 @@ def dashboard():
         ProdutoVisualizacao.data_visualizacao >= trinta_dias_atras
     ).group_by('dia').order_by('dia').all()
 
-    # Formatar para Chart.js
-    visualizacoes_labels = [dia.strftime('%d/%m') if hasattr(dia, 'strftime') else str(dia) for dia, _ in visualizacoes_por_dia]
-    visualizacoes_valores = [total for _, total in visualizacoes_por_dia]
+    # Formatar para Chart.js (formato brasileiro: DD/MM)
+    visualizacoes_labels = []
+    visualizacoes_valores = []
+
+    for dia, total in visualizacoes_por_dia:
+        # Converter para datetime se for string ou date
+        if isinstance(dia, str):
+            # Formato pode ser 'YYYY-MM-DD' do SQLite
+            try:
+                dia_obj = datetime.strptime(dia, '%Y-%m-%d')
+                visualizacoes_labels.append(dia_obj.strftime('%d/%m'))
+            except:
+                visualizacoes_labels.append(dia)
+        elif hasattr(dia, 'strftime'):
+            # Já é um objeto date/datetime
+            visualizacoes_labels.append(dia.strftime('%d/%m'))
+        else:
+            visualizacoes_labels.append(str(dia))
+
+        visualizacoes_valores.append(total)
 
     # ===== ÚLTIMOS PRODUTOS ADICIONADOS ===== (apenas não deletados)
     ultimos_produtos = Produto.query_active().order_by(Produto.data_criacao.desc()).limit(5).all()
@@ -1228,19 +1245,19 @@ def cupom_novo():
         except (ValueError, TypeError):
             quantidade_maxima = None
 
-        # Converter datas
+        # Converter datas (formato brasileiro: DD/MM/AAAA HH:MM)
         data_inicio = None
         data_fim = None
 
         if data_inicio_str:
             try:
-                data_inicio = datetime.strptime(data_inicio_str, '%Y-%m-%dT%H:%M')
+                data_inicio = datetime.strptime(data_inicio_str, '%d/%m/%Y %H:%M')
             except ValueError:
                 data_inicio = datetime.utcnow()
 
         if data_fim_str:
             try:
-                data_fim = datetime.strptime(data_fim_str, '%Y-%m-%dT%H:%M')
+                data_fim = datetime.strptime(data_fim_str, '%d/%m/%Y %H:%M')
             except ValueError:
                 data_fim = None
 
@@ -1314,19 +1331,19 @@ def cupom_editar(cupom_id):
         except (ValueError, TypeError):
             quantidade_maxima = None
 
-        # Converter datas
+        # Converter datas (formato brasileiro: DD/MM/AAAA HH:MM)
         data_inicio = cupom.data_inicio
         data_fim = None
 
         if data_inicio_str:
             try:
-                data_inicio = datetime.strptime(data_inicio_str, '%Y-%m-%dT%H:%M')
+                data_inicio = datetime.strptime(data_inicio_str, '%d/%m/%Y %H:%M')
             except ValueError:
                 pass
 
         if data_fim_str:
             try:
-                data_fim = datetime.strptime(data_fim_str, '%Y-%m-%dT%H:%M')
+                data_fim = datetime.strptime(data_fim_str, '%d/%m/%Y %H:%M')
             except ValueError:
                 data_fim = None
 
