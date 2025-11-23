@@ -12,6 +12,10 @@ sys.path.insert(0, str(app_dir))
 from main import app as flask_app
 from database import db
 from models import Admin, Produto, Configuracao, Subcategoria
+from config import Config
+
+TEST_ADMIN_USERNAME = Config.ADMIN_USERNAME
+TEST_ADMIN_PASSWORD = Config.ADMIN_PASSWORD
 
 @pytest.fixture
 def app():
@@ -29,8 +33,8 @@ def app():
         db.create_all()
 
         # Criar admin de teste
-        admin = Admin(username='admin', email='admin@test.com')
-        admin.set_password('admin123')
+        admin = Admin(username=TEST_ADMIN_USERNAME, email=f'{TEST_ADMIN_USERNAME}@test.com')
+        admin.set_password(TEST_ADMIN_PASSWORD)
         db.session.add(admin)
 
         # Criar configurações básicas
@@ -84,5 +88,5 @@ def auth_client(client):
     with client.session_transaction() as session:
         session['admin_logged_in'] = True
         session['admin_id'] = 1
-        session['admin_username'] = 'admin'
+        session['admin_username'] = TEST_ADMIN_USERNAME
     return client

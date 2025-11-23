@@ -1,19 +1,25 @@
 """
-Script para criar usuário administrador
+Script para criar usuario administrador
 Executar: python create_admin.py
 """
 from main import app
 from database import db
 from models import Admin
+from config import Config
+
 
 def create_admin_user():
-    """Cria o usuário administrador no banco de dados existente"""
+    """Cria ou confirma o usuario administrador usando credenciais do .env"""
     with app.app_context():
-        # Verificar se já existe admin
-        existing_admin = Admin.query.filter_by(username='admin').first()
+        username = Config.ADMIN_USERNAME
+        password = Config.ADMIN_PASSWORD
+        email = f"{username}@xododapreta.com"
+
+        # Verificar se ja existe admin com esse username
+        existing_admin = Admin.query.filter_by(username=username).first()
 
         if existing_admin:
-            print("[ERRO] Usuario 'admin' ja existe no banco de dados!")
+            print(f"[ERRO] Usuario '{username}' ja existe no banco de dados!")
             print(f"   Email: {existing_admin.email}")
             print("\n[AVISO] Se esqueceu a senha, voce pode redefinir manualmente no banco.")
             return
@@ -21,10 +27,10 @@ def create_admin_user():
         # Criar novo admin
         print("Criando usuario administrador...")
         admin = Admin(
-            username='admin',
-            email='admin@xododapreta.com'
+            username=username,
+            email=email
         )
-        admin.set_password('admin123')
+        admin.set_password(password)
 
         db.session.add(admin)
         db.session.commit()
@@ -34,11 +40,12 @@ def create_admin_user():
         print("CREDENCIAIS DE ACESSO")
         print("="*50)
         print(f"URL: http://localhost:5000/admin/login")
-        print(f"Usuario: admin")
-        print(f"Senha: admin123")
+        print(f"Usuario: {username}")
+        print(f"Senha: {password}")
         print("="*50)
         print("\n[IMPORTANTE] Altere a senha apos o primeiro login!")
         print("   (Menu: Admin -> Configuracoes -> Alterar Senha)\n")
+
 
 if __name__ == '__main__':
     create_admin_user()
