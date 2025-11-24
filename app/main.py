@@ -259,8 +259,12 @@ def shop_single(produto_id):
     """Página de produto individual"""
     from models import Produto, ProdutoVisualizacao
 
-    # Buscar produto pelo ID
-    produto = Produto.query.get_or_404(produto_id)
+    # Buscar produto ativo e n�o deletado pelo ID
+    produto = Produto.query.filter(
+        Produto.id == produto_id,
+        Produto.deleted_at.is_(None),
+        Produto.ativo.is_(True)
+    ).first_or_404()
 
     # Registrar visualização (analytics)
     visualizacao = ProdutoVisualizacao()
